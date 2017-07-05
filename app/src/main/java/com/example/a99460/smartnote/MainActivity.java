@@ -37,10 +37,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, note_activity.class);
-                startActivityForResult(intent, 1);
+                startActivity(intent);
         }
         });
         menu = (FloatingActionButton) findViewById(R.id.menu);
+
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 popup.show();
             }
         });
+
         mLv.setAdapter(new CommonAdapter<Note>(this, mDatas, R.layout./*item_swipe_menu*/item_note) {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
@@ -73,10 +75,11 @@ public class MainActivity extends AppCompatActivity {
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //你有两个intent要进行修改，这是第一个
                         Intent intent = new Intent(MainActivity.this, note_activity.class);
-                        intent.putExtra("in_data", note.note);
+                       // intent.putExtra("in_data", note.id);
                         DataSupport.deleteAll(Notedata.class,"note==?",note.note);
-                        startActivityForResult(intent, 1);
+                        startActivity(intent);
                     }
                 });
 
@@ -95,35 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-@Override
-    protected void onActivityResult(int requestCode,int resultCode,Intent data){
-    switch (requestCode){
-        case 1:
-            if(resultCode==RESULT_OK)
-            {
-                String word = data.getStringExtra("data_return");
-                if(word!=null&&Issave(word)){
-                Notedata notedata = new Notedata();
-                notedata.setNote(word);
-                notedata.save();}
-            }
-            break;
-        default:
-    }
-}
-protected boolean Issave(String word){
-    int length = word.length();
-    int i,flag=0;
-    for (i=0;i<length;i++){
-        if(word.charAt(i)!=' '&&word.charAt(i)!='\n'){
-            flag=1;
-        }
-    }
-    if (flag==1){
-        return true;
-    }
-    return false;
-}
+
+
 protected void onStart(){
     super.onStart();
     mLv = (ListView) findViewById(R.id.list);
@@ -133,7 +109,7 @@ protected void onStart(){
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(MainActivity.this, note_activity.class);
-            startActivityForResult(intent, 1);
+            startActivity(intent);
         }
     });
     mLv.setAdapter(new CommonAdapter<Note>(this, mDatas, R.layout./*item_swipe_menu*/item_note) {
@@ -144,10 +120,12 @@ protected void onStart(){
             holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //你有两个intent要进行修改，这是第一个
                     Intent intent = new Intent(MainActivity.this, note_activity.class);
-                    intent.putExtra("in_data", note.note);
+
+                    //intent.putExtra("in_data", note.id);
                     DataSupport.deleteAll(Notedata.class,"note==?",note.note);
-                    startActivityForResult(intent, 1);
+                    startActivity(intent);
                 }
             });
 
@@ -181,7 +159,7 @@ protected void initdata(){
     mDatas = new ArrayList<>();
     List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
     for (Notedata notedata:notedatas){
-        mDatas.add(new Note(notedata.getNote()));
+        mDatas.add(new Note(notedata.getNote(),notedata.getId()));
     }
 }
 }
