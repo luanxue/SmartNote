@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.a99460.smartnote.MainActivity"
+    android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+    >
+
+<ListView
+    android:id="@+id/list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+</ListView>
+
+<android.support.design.widget.FloatingActionButton
+    android:src="@mipmap/add"
+    android:id="@+id/fab"
+    android:layout_gravity="bottom|end"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:layout_alignParentBottom="true" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:src="@mipmap/menu"
+        android:id="@+id/menu"
+        android:layout_gravity="bottom|start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentBottom="true" />
+
+</FrameLayout>
