@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.litepal.crud.DataSupport;
+
 public class note_activity extends AppCompatActivity {
     EditText editText;
     @Override
@@ -18,7 +20,9 @@ public class note_activity extends AppCompatActivity {
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
         Intent intent = getIntent();
-        String word = intent.getStringExtra("in_data");
+        int id = intent.getIntExtra("in_data",1);
+        Notedata notedata = DataSupport.find(Notedata.class,id);
+        String word = notedata.getNote();
         if(!TextUtils.isEmpty(word)) {
         editText.setText(word);
         editText.setSelection(word.length());}

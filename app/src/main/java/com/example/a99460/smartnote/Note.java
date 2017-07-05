@@ -7,8 +7,11 @@ package com.example.a99460.smartnote;
 public class Note {
     public String note;
 
-    public Note(String note){
+    public int id;
+
+    public Note(String note,int id){
         this.note=note;
+        this.id=id;
     }
 
 

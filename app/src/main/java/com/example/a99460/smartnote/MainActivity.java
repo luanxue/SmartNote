@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(MainActivity.this, note_activity.class);
-                        intent.putExtra("in_data", note.note);
+                        intent.putExtra("in_data", note.id);
                         DataSupport.deleteAll(Notedata.class,"note==?",note.note);
                         startActivityForResult(intent, 1);
                     }
@@ -145,7 +145,7 @@ protected void onStart(){
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(MainActivity.this, note_activity.class);
-                    intent.putExtra("in_data", note.note);
+                    intent.putExtra("in_data", note.id);
                     DataSupport.deleteAll(Notedata.class,"note==?",note.note);
                     startActivityForResult(intent, 1);
                 }
@@ -181,7 +181,7 @@ protected void initdata(){
     mDatas = new ArrayList<>();
     List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
     for (Notedata notedata:notedatas){
-        mDatas.add(new Note(notedata.getNote()));
+        mDatas.add(new Note(notedata.getNote(),notedata.getId()));
     }
 }
 }
