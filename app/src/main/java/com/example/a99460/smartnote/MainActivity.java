@@ -1,11 +1,14 @@
 package com.example.a99460.smartnote;
 
 import android.content.Intent;
+
+import android.os.Bundle;
+
 import android.content.SharedPreferences;
 import android.provider.CalendarContract;
+
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.view.View;
