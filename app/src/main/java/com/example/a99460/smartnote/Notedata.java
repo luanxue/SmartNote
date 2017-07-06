@@ -8,17 +8,17 @@ import org.litepal.crud.DataSupport;
 
 public class Notedata extends DataSupport{
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
 
         this.id = id;
 
     }
 
-    private  int id;
+    private  long id;
 
 
     public String getNote() {
