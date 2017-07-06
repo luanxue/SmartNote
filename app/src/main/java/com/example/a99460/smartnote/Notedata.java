@@ -19,7 +19,15 @@ public class Notedata extends DataSupport{
     }
 
     private  long id;
+    private boolean isLock;
 
+    public boolean isLock() {
+        return isLock;
+    }
+
+    public void setLock(boolean lock) {
+        isLock = lock;
+    }
 
     public String getNote() {
         return note;

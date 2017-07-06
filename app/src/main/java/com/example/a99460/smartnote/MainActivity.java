@@ -3,6 +3,7 @@ package com.example.a99460.smartnote;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.provider.CalendarContract;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.gongyunhaoyyy.password.DeblockingActivity;
+import com.gongyunhaoyyy.password.LockActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
@@ -35,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
         if(isFirstRun){
             LitePal.getDatabase();
         }
-
+        SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
+        final String opassword=pref.getString( "oldpassword","" );
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mLv = (ListView) findViewById(R.id.list);
@@ -78,9 +82,11 @@ public class MainActivity extends AppCompatActivity {
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
                 holder.setText(R.id.content, note.note);
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         Intent intent = new Intent(MainActivity.this, note_activity.class);
                         intent.putExtra("in_data",note.id);
                         //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
@@ -98,6 +104,31 @@ public class MainActivity extends AppCompatActivity {
                         DataSupport.deleteAll(Notedata.class,"note==?",note.note);
                     }
                 });
+
+                holder.setOnClickListener( R.id.btnTop, new View.OnClickListener( ) {
+                    @Override
+                    public void onClick(View v) {
+                        long id=note.id;
+                        Notedata notedata = DataSupport.find(Notedata.class, id);
+                        boolean islock=notedata.isLock();
+                        //判断是否设置了密码
+                        if (opassword==null){
+                            Toast.makeText( MainActivity.this,"未设置密码,点左下角设置",Toast.LENGTH_SHORT ).show();
+                        }else{
+                            if (!islock){//上锁
+                                notedata.setLock( true );
+                                notedata.save();
+                                Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
+                            }else {//解锁
+                                Intent deblocking=new Intent( MainActivity.this, DeblockingActivity.class );
+                                deblocking.putExtra("deblocking",note.id);
+                                startActivity( deblocking );
+                            }
+                        }
+
+                    }
+                } );
+
             }
         });
 
