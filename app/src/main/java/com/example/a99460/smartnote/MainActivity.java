@@ -1,6 +1,7 @@
 package com.example.a99460.smartnote;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.provider.CalendarContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 
+import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
@@ -28,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton menu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
+        final boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
+        if(isFirstRun){
+            LitePal.getDatabase();
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mLv = (ListView) findViewById(R.id.list);
@@ -37,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, note_activity.class);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent,1);
         }
         });
         menu = (FloatingActionButton) findViewById(R.id.menu);
@@ -74,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(MainActivity.this, note_activity.class);
-                        intent.putExtra("in_data", note.id);
-                        DataSupport.deleteAll(Notedata.class,"note==?",note.note);
+                        intent.putExtra("in_data",note.id);
+                    //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
                         startActivityForResult(intent, 1);
                     }
                 });
@@ -146,7 +154,7 @@ protected void onStart(){
                 public void onClick(View v) {
                     Intent intent = new Intent(MainActivity.this, note_activity.class);
                     intent.putExtra("in_data", note.id);
-                    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
+                //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
                     startActivityForResult(intent, 1);
                 }
             });
