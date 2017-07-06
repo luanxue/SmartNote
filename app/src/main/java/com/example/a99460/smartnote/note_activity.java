@@ -18,20 +18,19 @@ import java.util.List;
 
 public class note_activity extends AppCompatActivity {
     EditText editText;
-     String word;
+    String word;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
-<<<<<<< HEAD
         Intent intent = getIntent();
         long myid = intent.getLongExtra("in_data",1);
 
-            Notedata notedata = DataSupport.find(Notedata.class, myid);
+        Notedata notedata = DataSupport.find(Notedata.class, myid);
         if (notedata!=null) {
 
-          word  = notedata.getNote();
+            word  = notedata.getNote();
 
             if (!TextUtils.isEmpty(word)) {
 
@@ -43,33 +42,21 @@ public class note_activity extends AppCompatActivity {
 
         }
 
-=======
-        //Intent intent = getIntent();
-       // int id = intent.getIntExtra("in_data",1);
-    //    Notedata notedata = DataSupport.find(Notedata.class,id);
-      //  final String  word = notedata.getNote();
-       // if(!TextUtils.isEmpty(word)) {
-       // editText.setText(word);
-       // editText.setSelection(word.length());}
->>>>>>> 4c3748e7f75fa4d3065d301939e7fe255eba845b
         Button yes = (Button)findViewById(R.id.yes);
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent();
                 String word = editText.getText().toString();
-                if(word!=null&&Issave(word)) {
-                    Notedata notedata = new Notedata();
-                    notedata.setNote(word);
-                    notedata.save();
-                }
+                intent.putExtra("data_return",word);
+                setResult(RESULT_OK,intent);
                 finish();
             }
         });
-   /*     Button back = (Button)findViewById(R.id.cancle);
+        Button back = (Button)findViewById(R.id.cancle);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-<<<<<<< HEAD
                 AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
                 dialog.setTitle("提醒");
                 dialog.setMessage("是否保存？");
@@ -90,9 +77,9 @@ public class note_activity extends AppCompatActivity {
                         Intent intent = new Intent();
 
                         intent.putExtra("data_return",word);
-                    setResult(RESULT_OK,intent);
-                    finish();
-                }
+                        setResult(RESULT_OK,intent);
+                        finish();
+                    }
                 });
                 dialog.show();
             }
@@ -124,44 +111,6 @@ public class note_activity extends AppCompatActivity {
             }
         });
         dialog.show();
-=======
-                if(word!=null&&Issave(word)) {
-                    Notedata notedata = new Notedata();
-                    notedata.setNote(word);
-                    notedata.save();
-                }
-                finish();
-            }
-        });*/
-    }
-/*    public void onBackPressed(){
-        Intent intent = getIntent();
-        int id = intent.getIntExtra("in_data",1);
-        Notedata notedata = DataSupport.find(Notedata.class,id);
-        final String  word = notedata.getNote();
-        if(word!=null&&Issave(word)){
-        Notedata notedata1 = new Notedata();
-        notedata1.setNote(word);
-        notedata1.save();
-        }
-        finish();
-    }*/
-
-    protected boolean Issave(String word){
-        int length = word.length();
-        int i,flag=0;
-        for (i=0;i<length;i++){
-            if(word.charAt(i)!=' '&&word.charAt(i)!='\n'){
-                flag=1;
-            }
-        }
-        if (flag==1){
-            return true;
-        }
-        return false;
->>>>>>> 4c3748e7f75fa4d3065d301939e7fe255eba845b
     }
 
 }
-
-
