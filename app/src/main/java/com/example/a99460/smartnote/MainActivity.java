@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                holder.setOnClickListener( R.id.btnTop, new View.OnClickListener( ) {
+                holder.setOnClickListener( R.id.btnLock, new View.OnClickListener( ) {
                     @Override
                     public void onClick(View v) {
                         long id=note.id;
