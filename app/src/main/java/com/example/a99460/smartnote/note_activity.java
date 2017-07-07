@@ -19,13 +19,14 @@ import java.util.List;
 public class note_activity extends AppCompatActivity {
     EditText editText;
     String word;
+    long myid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
         Intent intent = getIntent();
-        long myid = intent.getLongExtra("in_data",1);
+        myid = intent.getLongExtra("in_data",1);
 
         Notedata notedata = DataSupport.find(Notedata.class, myid);
         if (notedata!=null) {
@@ -36,7 +37,7 @@ public class note_activity extends AppCompatActivity {
 
                 editText.setText(word);
                 editText.setSelection(word.length());
-                DataSupport.deleteAll(Notedata.class,"note == ?" ,word);
+
             }
 
 
@@ -46,10 +47,28 @@ public class note_activity extends AppCompatActivity {
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                String word = editText.getText().toString();
-                intent.putExtra("data_return",word);
-                setResult(RESULT_OK,intent);
+                if(word==null){
+                    String word1 = editText.getText().toString();
+                    Notedata notedata = new Notedata();
+                    if(word1!=null&&Issave(word1))
+                    {
+                        notedata.setNote(word1);
+                        notedata.save();
+                        Toast.makeText(note_activity.this,"success",Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else {
+                   Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    String word1 = editText.getText().toString();
+
+                    if(word1!=null&&Issave(word1))
+                    {
+                        notedata.setNote(word1);
+                        notedata.save();
+                    }
+
+                }
+
                 finish();
             }
         });
@@ -64,20 +83,34 @@ public class note_activity extends AppCompatActivity {
                 dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog,int which){
-                        Intent intent = new Intent();
-                        String word = editText.getText().toString();
-                        intent.putExtra("data_return",word);
-                        setResult(RESULT_OK,intent);
+                        if(word==null){
+                            String word1 = editText.getText().toString();
+                            Notedata notedata = new Notedata();
+                            if(word1!=null&&Issave(word1))
+                            {
+                                notedata.setNote(word1);
+                                notedata.save();
+                            }
+                        }
+                        else {
+                            Notedata notedata = DataSupport.find(Notedata.class,myid);
+                            String word1 = editText.getText().toString();
+
+                            if(word1!=null&&Issave(word1))
+                            {
+                                notedata.setNote(word1);
+                                notedata.save();
+                            }
+
+                        }
+
                         finish();
                     }
                 });
                 dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog,int which){
-                        Intent intent = new Intent();
 
-                        intent.putExtra("data_return",word);
-                        setResult(RESULT_OK,intent);
                         finish();
                     }
                 });
@@ -93,24 +126,49 @@ public class note_activity extends AppCompatActivity {
         dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialog,int which){
-                Intent intent = new Intent();
-                String word = editText.getText().toString();
-                intent.putExtra("data_return",word);
-                setResult(RESULT_OK,intent);
+                if(word==null){
+                    String word1 = editText.getText().toString();
+                    Notedata notedata = new Notedata();
+                    if(word1!=null&&Issave(word1))
+                    {
+                        notedata.setNote(word1);
+                        notedata.save();
+                    }
+                }
+                else {
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    String word1 = editText.getText().toString();
+                    if(word1!=null&&Issave(word1))
+                    {
+                        notedata.setNote(word1);
+                        notedata.save();
+                    }
+
+                }
+
                 finish();
             }
         });
         dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialog,int which){
-                Intent intent = new Intent();
 
-                intent.putExtra("data_return",word);
-                setResult(RESULT_OK,intent);
                 finish();
             }
         });
         dialog.show();
     }
-
+    protected boolean Issave(String word){
+        int length = word.length();
+        int i,flag=0;
+        for (i=0;i<length;i++){
+            if(word.charAt(i)!=' '&&word.charAt(i)!='\n'){
+                flag=1;
+            }
+        }
+        if (flag==1){
+            return true;
+        }
+        return false;
+    }
 }

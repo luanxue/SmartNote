@@ -4,10 +4,10 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@color/yellow">
+    android:background="#FA8072">
 
     <Button
-        android:background="@mipmap/back"
+        android:background="@mipmap/pic6"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
         android:layout_alignParentLeft="true"
@@ -21,10 +21,11 @@
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text="编辑"/>
+        android:text="编辑"
+        android:textColor="#2F4F4F"/>
 
     <Button
-        android:background="@mipmap/yes"
+        android:background="@mipmap/pic5"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
         android:id="@+id/yes"
