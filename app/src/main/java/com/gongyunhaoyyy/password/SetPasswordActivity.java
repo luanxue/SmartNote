@@ -1,6 +1,5 @@
 package com.gongyunhaoyyy.password;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,17 +12,13 @@ import com.andrognito.patternlockview.utils.PatternLockUtils;
 import com.andrognito.patternlockview.utils.ResourceUtils;
 import com.andrognito.rxpatternlockview.RxPatternLockView;
 import com.andrognito.rxpatternlockview.events.PatternLockCompoundEvent;
-import com.example.a99460.smartnote.Notedata;
 import com.example.a99460.smartnote.R;
-import com.example.a99460.smartnote.note_activity;
-
-import org.litepal.crud.DataSupport;
 
 import java.util.List;
 
 import io.reactivex.functions.Consumer;
 
-public class DeblockingActivity extends AppCompatActivity {
+public class SetPasswordActivity extends AppCompatActivity {
     private PatternLockView mPatternLockView;
     private PatternLockViewListener mPatternLockViewListener = new PatternLockViewListener() {
         @Override
@@ -39,18 +34,20 @@ public class DeblockingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_deblocking );
-        TextView db_titlt_tv=(TextView)findViewById( R.id.db_title_TextView );
-        final TextView db_hint_tv=(TextView)findViewById( R.id.db_hint_TextView );
-        db_titlt_tv.setText( "输入密码以解锁" );
+        setContentView( R.layout.activity_set_password );
+
+        //记录新密码次数
+        final int[] i = {0};
+
         //记录输入错误次数
         final int[] wrongpw = {5};
-        Intent it=getIntent();
-        final long myid=it.getLongExtra( "deblocking",1 );
+        final TextView textView=(TextView)findViewById( R.id.set_title_TextView );
+        final TextView test=(TextView)findViewById( R.id.set_hint_TextView );
+        textView.setText( "输入新密码");
 
         //-----------------------------------------------------------
 
-        mPatternLockView = (PatternLockView) findViewById(R.id.db_patter_lock_view);
+        mPatternLockView = (PatternLockView) findViewById(R.id.patter_lock_view);
         mPatternLockView.setDotCount(3);
         mPatternLockView.setDotNormalSize((int) ResourceUtils.getDimensionInPx(this, R.dimen.pattern_lock_dot_size));
         mPatternLockView.setDotSelectedSize((int) ResourceUtils.getDimensionInPx(this, R.dimen.pattern_lock_dot_selected_size));
@@ -71,43 +68,39 @@ public class DeblockingActivity extends AppCompatActivity {
                     @Override
                     public void accept(PatternLockCompoundEvent event) throws Exception {
                         if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_STARTED) {
-                            db_hint_tv.setText( "开始绘制" );
+                            test.setText( "开始绘制" );
                         } else if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_PROGRESS) {
-                            db_hint_tv.setText( "松手后完成" );
+                            test.setText( "松手后完成" );
                         } else if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_COMPLETE) {
-                            //获取得到string形式的密码
+                            //获取得到当前输入的string形式的密码
                             String password= PatternLockUtils.patternToString(mPatternLockView, event.getPattern());
                             int passwordlength=password.length();
                             if (passwordlength<=3){
-                                db_hint_tv.setText( "至少连接4个点,请重试" );
+                                test.setText( "至少连接4个点,请重试" );
                             }else {
-                                db_hint_tv.setText( "绘制完成" );
-                                SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
-                                String opassword=pref.getString( "oldpassword","" );
-                                if (opassword.equals( password )){
-                                    Notedata notedata = DataSupport.find(Notedata.class, myid);
-                                    notedata.setLock( false );
-                                    notedata.save();
-                                    if(notedata.isLock()){
-                                        Toast.makeText( DeblockingActivity.this,"解锁失败",Toast.LENGTH_SHORT ).show();
-                                    }else {
-                                        Toast.makeText( DeblockingActivity.this,"解锁成功",Toast.LENGTH_SHORT ).show();
-                                    }
-                                    finish();
-                                }else {
-                                    wrongpw[0]-=1;
-                                    if (wrongpw[0]>0){
-                                        db_hint_tv.setText( "密码错误,还有"+ wrongpw[0] +"次机会！" );
-                                    }else {
-                                        db_hint_tv.setText( "警告！" );
-                                        Toast.makeText( DeblockingActivity.this,"密码功能锁定,请30秒后重试",Toast.LENGTH_LONG ).show();
-                                        SharedPreferences.Editor timeeditor=getSharedPreferences( "time",MODE_PRIVATE ).edit();
-                                        timeeditor.putLong( "wrongtime", System.currentTimeMillis());
-                                        timeeditor.apply();
+                                if (i[0] ==0){
+                                    SharedPreferences.Editor editor=getSharedPreferences( "newpwfirst",MODE_PRIVATE ).edit();
+                                    editor.putString( "passwordfirst", password);
+                                    editor.apply();
+                                    test.setText( "绘制成功，再次绘制以确认" );
+                                    i[0]++;
+                                }else if (i[0] ==1){
+                                    SharedPreferences pref=getSharedPreferences( "newpwfirst",MODE_PRIVATE );
+                                    String pwfirst=pref.getString( "passwordfirst","" );
+                                    if (password.equals( pwfirst )){
+                                        SharedPreferences.Editor editor=getSharedPreferences( "data",MODE_PRIVATE ).edit();
+                                        editor.putString( "oldpassword", password);
+                                        editor.apply();
+                                        Toast.makeText( SetPasswordActivity.this,"密码设置成功",Toast.LENGTH_SHORT ).show();
                                         finish();
+                                        i[0]=0;
+                                    }else {
+                                        test.setText( "密码不一致，请再次绘制" );
                                     }
                                 }
                             }
+                        } else if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_CLEARED) {
+                            test.setText( "密码清空" );
                         }
                     }
                 });

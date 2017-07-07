@@ -1,3 +1,4 @@
+
 package com.example.a99460.smartnote;
 
 import android.content.DialogInterface;
@@ -26,7 +27,7 @@ public class note_activity extends AppCompatActivity {
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
         Intent intent = getIntent();
-        myid = intent.getLongExtra("in_data",1);
+        myid = intent.getLongExtra("in_data",-1);
 
         Notedata notedata = DataSupport.find(Notedata.class, myid);
         if (notedata!=null) {
@@ -39,7 +40,6 @@ public class note_activity extends AppCompatActivity {
                 editText.setSelection(word.length());
 
             }
-
 
         }
 
@@ -54,11 +54,10 @@ public class note_activity extends AppCompatActivity {
                     {
                         notedata.setNote(word1);
                         notedata.save();
-                        Toast.makeText(note_activity.this,"success",Toast.LENGTH_SHORT).show();
                     }
                 }
                 else {
-                   Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
                     String word1 = editText.getText().toString();
 
                     if(word1!=null&&Issave(word1))
