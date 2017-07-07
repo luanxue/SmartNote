@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.a99460.smartnote.note_activity"
-    android:background="@color/white">
+    >
 
     <include layout="@layout/title"
         />
@@ -15,10 +15,12 @@
         android:layout_height="match_parent"
         android:gravity="top"
         android:textSize="25sp"
+        android:textColor = "#2F4F4F"
+        android:hint="Please add your notes."
         android:layout_marginTop="60dp"
-        android:background="@color/white"
+        android:background="#FFE4E1"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="0dp"
-      />
+        />
 
 </RelativeLayout>

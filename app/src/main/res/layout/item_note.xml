@@ -17,7 +17,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:textSize="25sp"
         android:gravity="left"
-        android:maxLines="3"
+        android:maxLines="2"
         android:textStyle="italic"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
@@ -26,7 +26,7 @@
 
     <!-- 以下都是侧滑菜单的内容依序排列 -->
     <Button
-        android:id="@+id/btnTop"
+        android:id="@+id/btnLock"
         android:layout_width="60dp"
         android:layout_height="match_parent"
         android:background="#d9dee4"
