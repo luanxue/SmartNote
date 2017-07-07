@@ -18,7 +18,7 @@ import java.util.List;
 
 public class note_activity extends AppCompatActivity {
     EditText editText;
-    String word;
+    String wordfirst;
     long myid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,49 +26,39 @@ public class note_activity extends AppCompatActivity {
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
         Intent intent = getIntent();
-        myid = intent.getLongExtra("in_data",1);
+        myid = intent.getLongExtra("in_data",-1);
 
         Notedata notedata = DataSupport.find(Notedata.class, myid);
         if (notedata!=null) {
-
-            word  = notedata.getNote();
-
-            if (!TextUtils.isEmpty(word)) {
-
-                editText.setText(word);
-                editText.setSelection(word.length());
-
+            wordfirst  = notedata.getNote();
+            if (!TextUtils.isEmpty(wordfirst)) {
+                editText.setText(wordfirst);
+                editText.setSelection(wordfirst.length());
             }
-
-
         }
 
         Button yes = (Button)findViewById(R.id.yes);
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(word==null){
+                if(wordfirst==null){
                     String word1 = editText.getText().toString();
                     Notedata notedata = new Notedata();
-                    if(word1!=null&&Issave(word1))
+                    if(Issave(word1))
                     {
                         notedata.setNote(word1);
                         notedata.save();
-                        Toast.makeText(note_activity.this,"success",Toast.LENGTH_SHORT).show();
                     }
                 }
                 else {
                    Notedata notedata = DataSupport.find(Notedata.class,myid);
                     String word1 = editText.getText().toString();
-
-                    if(word1!=null&&Issave(word1))
+                    if(Issave(word1))
                     {
                         notedata.setNote(word1);
                         notedata.save();
                     }
-
                 }
-
                 finish();
             }
         });
@@ -76,87 +66,92 @@ public class note_activity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
-                dialog.setTitle("提醒");
-                dialog.setMessage("是否保存？");
-                dialog.setCancelable(false);
-                dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog,int which){
-                        if(word==null){
-                            String word1 = editText.getText().toString();
-                            Notedata notedata = new Notedata();
-                            if(word1!=null&&Issave(word1))
-                            {
-                                notedata.setNote(word1);
-                                notedata.save();
+                final String wordsecond = editText.getText().toString();
+                //空笔记或者没有改变笔记都不会弹dialog
+                if(wordsecond.equals( wordfirst )||wordsecond==null||!Issave( wordsecond )){
+                    finish();
+                }else {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+                    dialog.setTitle("提醒");
+                    dialog.setMessage("是否保存？");
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog,int which){
+                            if(wordfirst==null){
+                                String word1 = editText.getText().toString();
+                                Notedata notedata = new Notedata();
+                                if(word1!=null&&Issave(word1))
+                                {
+                                    notedata.setNote(word1);
+                                    notedata.save();
+                                }
                             }
-                        }
-                        else {
-                            Notedata notedata = DataSupport.find(Notedata.class,myid);
-                            String word1 = editText.getText().toString();
-
-                            if(word1!=null&&Issave(word1))
-                            {
-                                notedata.setNote(word1);
-                                notedata.save();
+                            else {
+                                Notedata notedata = DataSupport.find(Notedata.class,myid);
+                                String word1 = editText.getText().toString();
+                                if(word1!=null&&Issave(word1))
+                                {
+                                    notedata.setNote(word1);
+                                    notedata.save();
+                                }
                             }
-
+                            finish();
                         }
-
-                        finish();
-                    }
-                });
-                dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog,int which){
-
-                        finish();
-                    }
-                });
-                dialog.show();
+                    });
+                    dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog,int which){
+                            finish();
+                        }
+                    });
+                    dialog.show();
+                }
             }
         });
     }
     public void onBackPressed(){
-        AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
-        dialog.setTitle("提醒");
-        dialog.setMessage("是否保存？");
-        dialog.setCancelable(false);
-        dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog,int which){
-                if(word==null){
-                    String word1 = editText.getText().toString();
-                    Notedata notedata = new Notedata();
-                    if(word1!=null&&Issave(word1))
-                    {
-                        notedata.setNote(word1);
-                        notedata.save();
+        final String wordsecond = editText.getText().toString();
+        //空笔记或者没有改变笔记都不会弹dialog
+        if(wordsecond.equals( wordfirst )||wordsecond==null||!Issave( wordsecond )){
+            finish();
+        }else {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+            dialog.setTitle("提醒");
+            dialog.setMessage("是否保存？");
+            dialog.setCancelable(false);
+            dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog,int which){
+                    if(wordfirst==null){
+                        String word1 = editText.getText().toString();
+                        Notedata notedata = new Notedata();
+                        if(word1!=null&&Issave(word1))
+                        {
+                            notedata.setNote(word1);
+                            notedata.save();
+                        }
                     }
-                }
-                else {
-                    Notedata notedata = DataSupport.find(Notedata.class,myid);
-                    String word1 = editText.getText().toString();
-                    if(word1!=null&&Issave(word1))
-                    {
-                        notedata.setNote(word1);
-                        notedata.save();
+                    else {
+                        Notedata notedata = DataSupport.find(Notedata.class,myid);
+                        String word1 = editText.getText().toString();
+                        if(word1!=null&&Issave(word1))
+                        {
+                            notedata.setNote(word1);
+                            notedata.save();
+                        }
                     }
-
+                    finish();
                 }
-
-                finish();
-            }
-        });
-        dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog,int which){
-
-                finish();
-            }
-        });
-        dialog.show();
+            });
+            dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog,int which){
+                    finish();
+                }
+            });
+            dialog.show();
+        }
     }
     protected boolean Issave(String word){
         int length = word.length();
