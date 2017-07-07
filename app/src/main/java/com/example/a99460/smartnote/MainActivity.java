@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, note_activity.class);
-                startActivityForResult(intent,1);
+                startActivity(intent);
             }
         });
         menu = (FloatingActionButton) findViewById(R.id.menu);
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, note_activity.class);
                         intent.putExtra("in_data",note.id);
                         //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
-                        startActivityForResult(intent, 1);
+                        startActivity(intent);
                     }
                 });
 
@@ -95,7 +95,14 @@ public class MainActivity extends AppCompatActivity {
                         ((SwipeMenuLayout) holder.getConvertView()).quickClose();
                         mDatas.remove(position);
                         notifyDataSetChanged();
-                        DataSupport.deleteAll(Notedata.class,"note==?",note.note);
+                        DataSupport.delete(Notedata.class,note.id);
+                    }
+                });
+                holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
+                        Toast.makeText(MainActivity.this,"xixixixi",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -103,35 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode,int resultCode,Intent data){
-        switch (requestCode){
-            case 1:
-                if(resultCode==RESULT_OK)
-                {
-                    String word = data.getStringExtra("data_return");
-                    if(word!=null&&Issave(word)){
-                        Notedata notedata = new Notedata();
-                        notedata.setNote(word);
-                        notedata.save();}
-                }
-                break;
-            default:
-        }
-    }
-    protected boolean Issave(String word){
-        int length = word.length();
-        int i,flag=0;
-        for (i=0;i<length;i++){
-            if(word.charAt(i)!=' '&&word.charAt(i)!='\n'){
-                flag=1;
-            }
-        }
-        if (flag==1){
-            return true;
-        }
-        return false;
-    }
+
+
     protected void onStart(){
         super.onStart();
         mLv = (ListView) findViewById(R.id.list);
@@ -155,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, note_activity.class);
                         intent.putExtra("in_data", note.id);
                         //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
-                        startActivityForResult(intent, 1);
+                        startActivity(intent);
                     }
                 });
 
@@ -166,23 +146,20 @@ public class MainActivity extends AppCompatActivity {
                         ((SwipeMenuLayout) holder.getConvertView()).quickClose();
                         mDatas.remove(position);
                         notifyDataSetChanged();
-                        DataSupport.deleteAll(Notedata.class,"note==?",note.note);
+                        DataSupport.delete(Notedata.class,note.id);
+                    }
+                });
+                holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
+                        Toast.makeText(MainActivity.this,"xixixixi",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
 
         //setContentView(R.layout.activity_main);
-    }
-    protected void onRestart(){
-        super.onRestart();
-        initdata();
-        //setContentView(R.layout.activity_main);
-    }
-    protected void onResume(){
-        super.onResume();
-        initdata();
-        // setContentView(R.layout.activity_main);
     }
 
     protected void initdata(){

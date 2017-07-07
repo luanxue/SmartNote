@@ -26,7 +26,7 @@
 
     <!-- 以下都是侧滑菜单的内容依序排列 -->
     <Button
-        android:id="@+id/btnTop"
+        android:id="@+id/btnLock"
         android:layout_width="60dp"
         android:layout_height="match_parent"
         android:background="#d9dee4"
