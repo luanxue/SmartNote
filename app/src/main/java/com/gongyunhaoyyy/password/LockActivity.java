@@ -42,18 +42,15 @@ public class LockActivity extends AppCompatActivity {
         final TextView hint_tv=(TextView)findViewById( R.id.hint_TextView );
         //记录输入错误次数
         final int[] wrongpw = {5};
+        //记录新密码次数
+        final int[] i = {0};
+        SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
+        final String opassword=pref.getString( "oldpassword","" );
 
-        //判断是否时第一次进入
-        SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
-        final boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        if (isFirstRun)
-        {
+        if (opassword==null||opassword.length()<=0){
             titlt_tv.setText( "第一次使用，录入新密码" );
-            editor.putBoolean("isFirstRun", false);
-            editor.commit();
-        } else {
-            titlt_tv.setText( "绘制密码以进入" );
+        }else {
+            titlt_tv.setText( "输入旧密码" );
         }
 
         //-----------------------------------------------------------
@@ -79,34 +76,59 @@ public class LockActivity extends AppCompatActivity {
                 .subscribe(new Consumer<PatternLockCompoundEvent>() {
                     @Override
                     public void accept(PatternLockCompoundEvent event) throws Exception {
-                        if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_STARTED) {
-                            hint_tv.setText( "开始绘制" );
-                        } else if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_PROGRESS) {
-                            hint_tv.setText( "绘制中..." );
-                        } else if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_COMPLETE) {
-                            //获取得到string形式的密码
-                            String password=PatternLockUtils.patternToString(mPatternLockView, event.getPattern());
-                            int passwordlength=password.length();
-                            if (passwordlength<=3){
-                                hint_tv.setText( "至少连接4个点,请重试" );
-                            }else {
-                                hint_tv.setText( "绘制完成" );
-                                Intent intent=new Intent( LockActivity.this,note_activity.class );
-                                if (isFirstRun){
-                                    SharedPreferences.Editor editor=getSharedPreferences( "data",MODE_PRIVATE ).edit();
-                                    editor.putString( "oldpassword", password);
-                                    editor.apply();
-                                    Toast.makeText( LockActivity.this,"密码设置成功",Toast.LENGTH_SHORT ).show();
-                                    startActivity( intent );
-                                    finish();
-                                }else {
-                                    SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
-                                    String opassword=pref.getString( "oldpassword","" );
-                                    if (opassword.equals( password )){
-                                        Toast.makeText( LockActivity.this,"密码正确",Toast.LENGTH_SHORT ).show();
+                        if (opassword == null || opassword.length( ) <= 0) {
+                            if (event.getEventType( ) == PatternLockCompoundEvent.EventType.PATTERN_STARTED) {
+                                hint_tv.setText( "开始绘制" );
+                            } else if (event.getEventType( ) == PatternLockCompoundEvent.EventType.PATTERN_PROGRESS) {
+                                hint_tv.setText( "松手后完成" );
+                            } else if (event.getEventType( ) == PatternLockCompoundEvent.EventType.PATTERN_COMPLETE) {
+                                //获取得到string形式的密码
+                                String password = PatternLockUtils.patternToString( mPatternLockView, event.getPattern( ) );
+                                int passwordlength = password.length( );
+                                if (passwordlength <= 3) {
+                                    hint_tv.setText( "至少连接4个点,请重试" );
+                                } else {
+                                    if (i[0] == 0) {
+                                        SharedPreferences.Editor editor = getSharedPreferences( "newpwfirst", MODE_PRIVATE ).edit( );
+                                        editor.putString( "passwordfirst", password );
+                                        editor.apply( );
+                                        hint_tv.setText( "绘制成功，再次绘制以确认" );
+                                        i[0]++;
+                                    } else if (i[0] == 1) {
+                                        SharedPreferences pref = getSharedPreferences( "newpwfirst", MODE_PRIVATE );
+                                        String pwfirst = pref.getString( "passwordfirst", "" );
+                                        if (password.equals( pwfirst )) {
+                                            SharedPreferences.Editor editor = getSharedPreferences( "data", MODE_PRIVATE ).edit( );
+                                            editor.putString( "oldpassword", password );
+                                            editor.apply( );
+                                            Toast.makeText( LockActivity.this, "密码设置成功", Toast.LENGTH_SHORT ).show( );
+                                            finish( );
+                                            i[0] = 0;
+                                        } else {
+                                            hint_tv.setText( "密码不一致，请再次绘制" );
+                                        }
+                                    }
+                                }
+                            }
+                        }else {
+                            SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
+                            String opassword=pref.getString( "oldpassword","" );
+                            if (event.getEventType( ) == PatternLockCompoundEvent.EventType.PATTERN_STARTED) {
+                                hint_tv.setText( "开始绘制" );
+                            } else if (event.getEventType( ) == PatternLockCompoundEvent.EventType.PATTERN_PROGRESS) {
+                                hint_tv.setText( "绘制中..." );
+                            } else if (event.getEventType( ) == PatternLockCompoundEvent.EventType.PATTERN_COMPLETE) {
+                                //获取得到string形式的密码
+                                String password = PatternLockUtils.patternToString( mPatternLockView, event.getPattern( ) );
+                                int passwordlength = password.length( );
+                                if (passwordlength <= 3) {
+                                    hint_tv.setText( "至少连接4个点,请重试" );
+                                } else {
+                                    if (opassword.equals( password)) {
+                                        Intent intent=new Intent( LockActivity.this,SetPasswordActivity.class );
                                         startActivity( intent );
                                         finish();
-                                    }else {
+                                    } else{
                                         wrongpw[0]-=1;
                                         if (wrongpw[0]>0){
                                             hint_tv.setText( "密码错误,还有"+ wrongpw[0] +"次机会！" );
@@ -118,18 +140,12 @@ public class LockActivity extends AppCompatActivity {
                                             timeeditor.apply();
                                             finish();
                                         }
-
-
                                     }
                                 }
                             }
-                            //                            SharedPreferences.Editor lteditor=getSharedPreferences( "length",MODE_PRIVATE ).edit();
-                            //                            lteditor.putInt( "pwlt", passwordlength);
-                            //                            lteditor.apply();//存放密码的长度
-                        } else if (event.getEventType() == PatternLockCompoundEvent.EventType.PATTERN_CLEARED) {
-                            hint_tv.setText( "Pattern has been cleared" );
                         }
                     }
+
                 });
 
     }

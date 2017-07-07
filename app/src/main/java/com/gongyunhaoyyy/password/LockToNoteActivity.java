@@ -23,7 +23,7 @@ import java.util.List;
 
 import io.reactivex.functions.Consumer;
 
-public class DeblockingActivity extends AppCompatActivity {
+public class LockToNoteActivity extends AppCompatActivity {
     private PatternLockView mPatternLockView;
     private PatternLockViewListener mPatternLockViewListener = new PatternLockViewListener() {
         @Override
@@ -39,18 +39,17 @@ public class DeblockingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_deblocking );
-        TextView db_titlt_tv=(TextView)findViewById( R.id.db_title_TextView );
-        final TextView db_hint_tv=(TextView)findViewById( R.id.db_hint_TextView );
-        db_titlt_tv.setText( "输入密码以解锁" );
+        setContentView( R.layout.activity_lock_to_note );
+        TextView db_titlt_tv=(TextView)findViewById( R.id.ltn_title_TextView );
+        final TextView db_hint_tv=(TextView)findViewById( R.id.ltn_hint_TextView );
+        db_titlt_tv.setText( "请输入密码" );
         //记录输入错误次数
         final int[] wrongpw = {5};
         Intent it=getIntent();
-        final long myid=it.getLongExtra( "deblocking",1 );
+        final long myid=it.getLongExtra( "in_data",1 );
 
         //-----------------------------------------------------------
-
-        mPatternLockView = (PatternLockView) findViewById(R.id.db_patter_lock_view);
+        mPatternLockView = (PatternLockView) findViewById(R.id.ltn_patter_lock_view);
         mPatternLockView.setDotCount(3);
         mPatternLockView.setDotNormalSize((int) ResourceUtils.getDimensionInPx(this, R.dimen.pattern_lock_dot_size));
         mPatternLockView.setDotSelectedSize((int) ResourceUtils.getDimensionInPx(this, R.dimen.pattern_lock_dot_selected_size));
@@ -85,14 +84,9 @@ public class DeblockingActivity extends AppCompatActivity {
                                 SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
                                 String opassword=pref.getString( "oldpassword","" );
                                 if (opassword.equals( password )){
-                                    Notedata notedata = DataSupport.find(Notedata.class, myid);
-                                    notedata.setLock( false );
-                                    notedata.save();
-                                    if(notedata.isLock()){
-                                        Toast.makeText( DeblockingActivity.this,"解锁失败",Toast.LENGTH_SHORT ).show();
-                                    }else {
-                                        Toast.makeText( DeblockingActivity.this,"解锁成功",Toast.LENGTH_SHORT ).show();
-                                    }
+                                    Intent intent=new Intent( LockToNoteActivity.this,note_activity.class );
+                                    intent.putExtra( "in_data",myid );
+                                    startActivityForResult( intent,1 );
                                     finish();
                                 }else {
                                     wrongpw[0]-=1;
@@ -100,7 +94,7 @@ public class DeblockingActivity extends AppCompatActivity {
                                         db_hint_tv.setText( "密码错误,还有"+ wrongpw[0] +"次机会！" );
                                     }else {
                                         db_hint_tv.setText( "警告！" );
-                                        Toast.makeText( DeblockingActivity.this,"密码功能锁定,请30秒后重试",Toast.LENGTH_LONG ).show();
+                                        Toast.makeText( LockToNoteActivity.this,"密码功能锁定,请30秒后重试",Toast.LENGTH_LONG ).show();
                                         SharedPreferences.Editor timeeditor=getSharedPreferences( "time",MODE_PRIVATE ).edit();
                                         timeeditor.putLong( "wrongtime", System.currentTimeMillis());
                                         timeeditor.apply();
