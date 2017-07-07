@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
+import com.gongyunhaoyyy.password.LockToNoteActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
@@ -29,6 +30,7 @@ import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Note> mDatas;
     private FloatingActionButton fab;
     private FloatingActionButton menu;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
@@ -43,10 +46,9 @@ public class MainActivity extends AppCompatActivity {
         if(isFirstRun){
             LitePal.getDatabase();
         }
-        SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
-        final String opassword=pref.getString( "oldpassword","" );
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mLv = (ListView) findViewById(R.id.list);
         initdata();
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -68,12 +70,16 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.passwordsetting:
-                                Toast.makeText(MainActivity.this,"你点了小猪~",
-                                        Toast.LENGTH_SHORT).show();
+                                //设置新密码or修改密码
+                                if (isDeadLock()){
+                                    Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
+                                }else {
+                                    Intent it=new Intent( MainActivity.this,LockActivity.class );
+                                    startActivity( it );
+                                }
                                 break;
                             case R.id.themeselect:
-                                Toast.makeText(MainActivity.this,"你点了大猪~",
-                                        Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this,"你点了大猪~", Toast.LENGTH_SHORT).show();
                                 break;
                         }
                         return true;
@@ -92,10 +98,28 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
+                        long id=note.id;
+                        Notedata notedata = DataSupport.find(Notedata.class, id);
+                        boolean islock=notedata.isLock();
+                        if (isDeadLock()){
+                            Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
+                        }else {
+                            if (islock){
+                                Intent lock=new Intent( MainActivity.this, LockToNoteActivity.class );
+                                lock.putExtra( "in_data",note.id );
+                                startActivity( lock);
+                            }else {
+                                Intent intent = new Intent(MainActivity.this, note_activity.class);
+                                intent.putExtra("in_data",note.id);
+                                startActivity(intent);
+                            }
+                        }
+
                         Intent intent = new Intent(MainActivity.this, note_activity.class);
                         intent.putExtra("in_data",note.id);
                         //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
                         startActivity(intent);
+
                     }
                 });
 
@@ -117,14 +141,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                holder.setOnClickListener( R.id.btnTop, new View.OnClickListener( ) {
+                holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
+                        final String opassword=pref.getString( "oldpassword","" );
                         long id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
                         boolean islock=notedata.isLock();
                         //判断是否设置了密码
-                        if (opassword==null){
+                        if (opassword==null||opassword.length()<=0){
                             Toast.makeText( MainActivity.this,"未设置密码,点左下角设置",Toast.LENGTH_SHORT ).show();
                         }else{
                             if (!islock){//上锁
@@ -132,18 +158,32 @@ public class MainActivity extends AppCompatActivity {
                                 notedata.save();
                                 Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
                             }else {//解锁
-                                Intent deblocking=new Intent( MainActivity.this, DeblockingActivity.class );
-                                deblocking.putExtra("deblocking",note.id);
-                                startActivity( deblocking );
+                                if (isDeadLock()){
+                                    Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
+                                }else {
+                                    Intent intent=new Intent( MainActivity.this, DeblockingActivity.class );
+                                    intent.putExtra("deblocking",note.id);
+                                    startActivity( intent );
+                                }
                             }
                         }
-
                     }
-                } );
+                });
 
             }
         });
 
+    }
+
+
+    boolean isDeadLock(){
+        SharedPreferences pref=getSharedPreferences( "time",MODE_PRIVATE );
+        Long wt=pref.getLong( "wrongtime",0 );
+        if (System.currentTimeMillis()-wt<=30000){
+            return true;
+        }else {
+            return false;
+        }
     }
 
 
@@ -168,10 +208,24 @@ public class MainActivity extends AppCompatActivity {
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(MainActivity.this, note_activity.class);
-                        intent.putExtra("in_data", note.id);
-                        //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
-                        startActivity(intent);
+
+                        long id=note.id;
+                        Notedata notedata = DataSupport.find(Notedata.class, id);
+                        boolean islock=notedata.isLock();
+                        if (isDeadLock()){
+                            Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
+                        }else {
+                            if (islock){
+                                Intent lock=new Intent( MainActivity.this, LockToNoteActivity.class );
+                                lock.putExtra( "in_data",note.id );
+                                startActivity(lock);
+                            }else {
+                                Intent intent = new Intent(MainActivity.this, note_activity.class);
+                                intent.putExtra("in_data",note.id);
+                                startActivity(intent);
+                            }
+                        }
+
                     }
                 });
 
@@ -192,6 +246,36 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this,"xixixixi",Toast.LENGTH_SHORT).show();
                     }
                 });
+
+                holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
+                        final String opassword=pref.getString( "oldpassword","" );
+                        long id=note.id;
+                        Notedata notedata = DataSupport.find(Notedata.class, id);
+                        boolean islock=notedata.isLock();
+                        //判断是否设置了密码
+                        if (opassword==null||opassword.length()<=0){
+                            Toast.makeText( MainActivity.this,"未设置密码,点左下角设置",Toast.LENGTH_SHORT ).show();
+                        }else{
+                            if (!islock){//上锁
+                                notedata.setLock( true );
+                                notedata.save();
+                                Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
+                            }else {//解锁
+                                if (isDeadLock()){
+                                    Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
+                                }else {
+                                    Intent intent=new Intent( MainActivity.this, DeblockingActivity.class );
+                                    intent.putExtra("deblocking",note.id);
+                                    startActivity( intent );
+                                }
+                            }
+                        }
+                    }
+                });
+
             }
         });
 

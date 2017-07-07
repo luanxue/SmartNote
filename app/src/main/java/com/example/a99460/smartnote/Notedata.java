@@ -19,7 +19,7 @@ public class Notedata extends DataSupport{
     }
 
     private  long id;
-    private boolean isLock;
+    private boolean isLock=false;
 
     public boolean isLock() {
         return isLock;
