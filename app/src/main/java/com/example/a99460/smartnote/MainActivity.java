@@ -2,6 +2,7 @@ package com.example.a99460.smartnote;
 
 import android.content.Intent;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import android.content.SharedPreferences;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
 import com.gongyunhaoyyy.password.LockToNoteActivity;
+import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
@@ -48,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
 
         mLv = (ListView) findViewById(R.id.list);
         initdata();
@@ -79,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 break;
                             case R.id.themeselect:
-                                Toast.makeText(MainActivity.this,"你点了大猪~", Toast.LENGTH_SHORT).show();
+                                Intent intent=new Intent( MainActivity.this, ThemeSelectActivity.class );
+                                startActivity( intent );
                                 break;
                         }
                         return true;
@@ -131,13 +137,6 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
-                    }
-                });
-                holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
-                        Toast.makeText(MainActivity.this,"xixixixi",Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -237,13 +236,6 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
-                    }
-                });
-                holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //在ListView里，点击侧滑菜单上的选项时，如果想让擦花菜单同时关闭，调用这句话
-                        Toast.makeText(MainActivity.this,"xixixixi",Toast.LENGTH_SHORT).show();
                     }
                 });
 

@@ -30,6 +30,8 @@
         </activity>
         <activity android:name="com.gongyunhaoyyy.password.LockToNoteActivity">
         </activity>
+        <activity android:name="com.gongyunhaoyyy.password.ThemeSelectActivity">
+        </activity>
     </application>
 
 </manifest>

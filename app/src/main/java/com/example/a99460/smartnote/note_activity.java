@@ -1,15 +1,20 @@
 package com.example.a99460.smartnote;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
@@ -19,14 +24,25 @@ import java.util.List;
 public class note_activity extends AppCompatActivity {
     EditText editText;
     String wordfirst;
+    TextView bianji;
     long myid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
+        bianji=(TextView)findViewById( R.id.bianji );
         Intent intent = getIntent();
         myid = intent.getLongExtra("in_data",-1);
+
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
+        if(tftf.length()<=0){
+            editText.setTypeface( Typeface.SANS_SERIF );
+        }else {
+            Typeface typeface =Typeface.createFromAsset(getAssets(),tftf);
+            editText.setTypeface( typeface );
+        }
 
         Notedata notedata = DataSupport.find(Notedata.class, myid);
         if (notedata!=null) {

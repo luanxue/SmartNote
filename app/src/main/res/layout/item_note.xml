@@ -22,7 +22,7 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:textColor="@color/black"
-        android:text="项目中我是任意复杂的原Item布局"/>
+        android:text="我是任意复杂的原Item布局"/>
 
     <!-- 以下都是侧滑菜单的内容依序排列 -->
     <Button
