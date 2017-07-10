@@ -7,20 +7,26 @@ package com.example.a99460.smartnote;
 public class Note {
     public String note;
 
+    public boolean isalarm;
 
-    public long id;
+    public int id;
 
-    public long getId() {
+    public int hour;
+
+    public int minute;
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Note(String note, long id){
+    public Note(String note, int id,boolean isalarm){
         this.note=note;
         this.id=id;
+        this.isalarm=isalarm;
     }
 
 

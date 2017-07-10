@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.a99460.smartnote">
+    package="com.example.a99460.smartnote">
 
     <application
         android:name="org.litepal.LitePalApplication"
@@ -14,22 +14,27 @@
             android:name=".MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".note_activity"
-            android:theme="@style/BarTheme"/>
-        <activity android:name="com.gongyunhaoyyy.password.LockActivity">
-        </activity>
-        <activity android:name="com.gongyunhaoyyy.password.DeblockingActivity">
-        </activity>
-        <activity android:name="com.gongyunhaoyyy.password.SetPasswordActivity">
-        </activity>
-        <activity android:name="com.gongyunhaoyyy.password.LockToNoteActivity">
-        </activity>
+            android:theme="@style/BarTheme" />
+        <activity android:name="com.gongyunhaoyyy.password.LockActivity" />
+        <activity android:name="com.gongyunhaoyyy.password.DeblockingActivity" />
+        <activity android:name="com.gongyunhaoyyy.password.SetPasswordActivity" />
+        <activity android:name="com.gongyunhaoyyy.password.LockToNoteActivity" />
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.alarmtest.ALARM_RECEIVER"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
