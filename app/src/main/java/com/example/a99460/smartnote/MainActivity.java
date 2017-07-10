@@ -17,6 +17,7 @@ import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gongyunhaoyyy.password.DeblockingActivity;
@@ -50,11 +51,9 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
-        String tftf=typef.getString( "typefacehaha","" );
+        final String tftf=typef.getString( "typefacehaha","" );
 
-        mLv = (ListView) findViewById(R.id.list);
         initdata();
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -98,8 +97,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                holder.setText(R.id.content, note.note);
-
+                long iddd=note.id;
+                Notedata nd=DataSupport.find( Notedata.class,iddd );
+                boolean lock=nd.isLock();
+                if(lock){
+                    holder.setText(R.id.content,"已上锁" );
+                }else {
+                    holder.setText(R.id.content, note.note);
+                }
+                
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -155,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!islock){//上锁
                                 notedata.setLock( true );
                                 notedata.save();
+                                holder.setText(R.id.content,"已上锁" );
                                 Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
                             }else {//解锁
                                 if (isDeadLock()){
@@ -203,7 +210,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                holder.setText(R.id.content, note.note);
+                long iddd=note.id;
+                Notedata nd=DataSupport.find( Notedata.class,iddd );
+                boolean lock=nd.isLock();
+                if(lock){
+                    holder.setText(R.id.content,"已上锁" );
+                }else {
+                    holder.setText(R.id.content, note.note);
+                }
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -254,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!islock){//上锁
                                 notedata.setLock( true );
                                 notedata.save();
+                                holder.setText(R.id.content,"已上锁" );
                                 Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
                             }else {//解锁
                                 if (isDeadLock()){
