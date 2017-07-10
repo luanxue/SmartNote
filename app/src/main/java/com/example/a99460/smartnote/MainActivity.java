@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import android.content.SharedPreferences;
@@ -24,12 +25,17 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
+
+import android.widget.TextView;
+
 import android.widget.TimePicker;
+
 import android.widget.Toast;
 
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
 import com.gongyunhaoyyy.password.LockToNoteActivity;
+import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
@@ -60,8 +66,9 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        final String tftf=typef.getString( "typefacehaha","" );
 
-        mLv = (ListView) findViewById(R.id.list);
         initdata();
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 break;
                             case R.id.themeselect:
-                                Toast.makeText(MainActivity.this,"你点了大猪~", Toast.LENGTH_SHORT).show();
+                                Intent intent=new Intent( MainActivity.this, ThemeSelectActivity.class );
+                                startActivity( intent );
                                 break;
                         }
                         return true;
@@ -104,8 +112,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                holder.setText(R.id.content, note.note);
-
+                long iddd=note.id;
+                Notedata nd=DataSupport.find( Notedata.class,iddd );
+                boolean lock=nd.isLock();
+                if(lock){
+                    holder.setText(R.id.content,"已上锁" );
+                }else {
+                    holder.setText(R.id.content, note.note);
+                }
+                
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -140,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                         DataSupport.delete(Notedata.class,note.id);
                     }
                 });
+
 
 
 
@@ -283,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!islock){//上锁
                                 notedata.setLock( true );
                                 notedata.save();
+                                holder.setText(R.id.content,"已上锁" );
                                 Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
                             }else {//解锁
                                 if (isDeadLock()){
@@ -343,7 +360,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                holder.setText(R.id.content, note.note);
+                long iddd=note.id;
+                Notedata nd=DataSupport.find( Notedata.class,iddd );
+                boolean lock=nd.isLock();
+                if(lock){
+                    holder.setText(R.id.content,"已上锁" );
+                }else {
+                    holder.setText(R.id.content, note.note);
+                }
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -378,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
                         DataSupport.delete(Notedata.class,note.id);
                     }
                 });
+
 
                 holder.setOnClickListener(R.id.alarm,new View.OnClickListener(){
                     @Override
@@ -501,6 +526,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } );
 
+
                 holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -516,6 +542,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!islock){//上锁
                                 notedata.setLock( true );
                                 notedata.save();
+                                holder.setText(R.id.content,"已上锁" );
                                 Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
                             }else {//解锁
                                 if (isDeadLock()){

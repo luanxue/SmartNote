@@ -1,16 +1,21 @@
 
 package com.example.a99460.smartnote;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
@@ -19,26 +24,35 @@ import java.util.List;
 
 public class note_activity extends AppCompatActivity {
     EditText editText;
-    String word;
+    String wordfirst;
+    TextView bianji;
     long myid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
+        bianji=(TextView)findViewById( R.id.bianji );
         Intent intent = getIntent();
         myid = intent.getLongExtra("in_data",-1);
 
+
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
+        if(tftf.length()<=0){
+            editText.setTypeface( Typeface.SANS_SERIF );
+        }else {
+            Typeface typeface =Typeface.createFromAsset(getAssets(),tftf);
+            editText.setTypeface( typeface );
+        }
+
+
         Notedata notedata = DataSupport.find(Notedata.class, myid);
         if (notedata!=null) {
-
-            word  = notedata.getNote();
-
-            if (!TextUtils.isEmpty(word)) {
-
-                editText.setText(word);
-                editText.setSelection(word.length());
-
+            wordfirst  = notedata.getNote();
+            if (!TextUtils.isEmpty(wordfirst)) {
+                editText.setText(wordfirst);
+                editText.setSelection(wordfirst.length());
             }
 
         }
@@ -47,10 +61,10 @@ public class note_activity extends AppCompatActivity {
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(word==null){
+                if(wordfirst==null){
                     String word1 = editText.getText().toString();
                     Notedata notedata = new Notedata();
-                    if(word1!=null&&Issave(word1))
+                    if(Issave(word1))
                     {
                         notedata.setNote(word1);
                         notedata.save();
@@ -59,15 +73,12 @@ public class note_activity extends AppCompatActivity {
                 else {
                     Notedata notedata = DataSupport.find(Notedata.class,myid);
                     String word1 = editText.getText().toString();
-
-                    if(word1!=null&&Issave(word1))
+                    if(Issave(word1))
                     {
                         notedata.setNote(word1);
                         notedata.save();
                     }
-
                 }
-
                 finish();
             }
         });
@@ -75,87 +86,92 @@ public class note_activity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
-                dialog.setTitle("提醒");
-                dialog.setMessage("是否保存？");
-                dialog.setCancelable(false);
-                dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog,int which){
-                        if(word==null){
-                            String word1 = editText.getText().toString();
-                            Notedata notedata = new Notedata();
-                            if(word1!=null&&Issave(word1))
-                            {
-                                notedata.setNote(word1);
-                                notedata.save();
+                final String wordsecond = editText.getText().toString();
+                //空笔记或者没有改变笔记都不会弹dialog
+                if(wordsecond.equals( wordfirst )||wordsecond==null||!Issave( wordsecond )){
+                    finish();
+                }else {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+                    dialog.setTitle("提醒");
+                    dialog.setMessage("是否保存？");
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog,int which){
+                            if(wordfirst==null){
+                                String word1 = editText.getText().toString();
+                                Notedata notedata = new Notedata();
+                                if(word1!=null&&Issave(word1))
+                                {
+                                    notedata.setNote(word1);
+                                    notedata.save();
+                                }
                             }
-                        }
-                        else {
-                            Notedata notedata = DataSupport.find(Notedata.class,myid);
-                            String word1 = editText.getText().toString();
-
-                            if(word1!=null&&Issave(word1))
-                            {
-                                notedata.setNote(word1);
-                                notedata.save();
+                            else {
+                                Notedata notedata = DataSupport.find(Notedata.class,myid);
+                                String word1 = editText.getText().toString();
+                                if(word1!=null&&Issave(word1))
+                                {
+                                    notedata.setNote(word1);
+                                    notedata.save();
+                                }
                             }
-
+                            finish();
                         }
-
-                        finish();
-                    }
-                });
-                dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog,int which){
-
-                        finish();
-                    }
-                });
-                dialog.show();
+                    });
+                    dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog,int which){
+                            finish();
+                        }
+                    });
+                    dialog.show();
+                }
             }
         });
     }
     public void onBackPressed(){
-        AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
-        dialog.setTitle("提醒");
-        dialog.setMessage("是否保存？");
-        dialog.setCancelable(false);
-        dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog,int which){
-                if(word==null){
-                    String word1 = editText.getText().toString();
-                    Notedata notedata = new Notedata();
-                    if(word1!=null&&Issave(word1))
-                    {
-                        notedata.setNote(word1);
-                        notedata.save();
+        final String wordsecond = editText.getText().toString();
+        //空笔记或者没有改变笔记都不会弹dialog
+        if(wordsecond.equals( wordfirst )||wordsecond==null||!Issave( wordsecond )){
+            finish();
+        }else {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+            dialog.setTitle("提醒");
+            dialog.setMessage("是否保存？");
+            dialog.setCancelable(false);
+            dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog,int which){
+                    if(wordfirst==null){
+                        String word1 = editText.getText().toString();
+                        Notedata notedata = new Notedata();
+                        if(word1!=null&&Issave(word1))
+                        {
+                            notedata.setNote(word1);
+                            notedata.save();
+                        }
                     }
-                }
-                else {
-                    Notedata notedata = DataSupport.find(Notedata.class,myid);
-                    String word1 = editText.getText().toString();
-                    if(word1!=null&&Issave(word1))
-                    {
-                        notedata.setNote(word1);
-                        notedata.save();
+                    else {
+                        Notedata notedata = DataSupport.find(Notedata.class,myid);
+                        String word1 = editText.getText().toString();
+                        if(word1!=null&&Issave(word1))
+                        {
+                            notedata.setNote(word1);
+                            notedata.save();
+                        }
                     }
-
+                    finish();
                 }
-
-                finish();
-            }
-        });
-        dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog,int which){
-
-                finish();
-            }
-        });
-        dialog.show();
+            });
+            dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog,int which){
+                    finish();
+                }
+            });
+            dialog.show();
+        }
     }
     protected boolean Issave(String word){
         int length = word.length();
