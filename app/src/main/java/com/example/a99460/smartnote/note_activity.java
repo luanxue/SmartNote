@@ -1,3 +1,4 @@
+
 package com.example.a99460.smartnote;
 
 import android.app.Activity;
@@ -35,6 +36,7 @@ public class note_activity extends AppCompatActivity {
         Intent intent = getIntent();
         myid = intent.getLongExtra("in_data",-1);
 
+
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
         if(tftf.length()<=0){
@@ -44,6 +46,7 @@ public class note_activity extends AppCompatActivity {
             editText.setTypeface( typeface );
         }
 
+
         Notedata notedata = DataSupport.find(Notedata.class, myid);
         if (notedata!=null) {
             wordfirst  = notedata.getNote();
@@ -51,6 +54,7 @@ public class note_activity extends AppCompatActivity {
                 editText.setText(wordfirst);
                 editText.setSelection(wordfirst.length());
             }
+
         }
 
         Button yes = (Button)findViewById(R.id.yes);
@@ -67,7 +71,7 @@ public class note_activity extends AppCompatActivity {
                     }
                 }
                 else {
-                   Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
                     String word1 = editText.getText().toString();
                     if(Issave(word1))
                     {

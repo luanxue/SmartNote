@@ -1,23 +1,35 @@
 package com.example.a99460.smartnote;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
 
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.provider.CalendarContract;
 
 import android.provider.ContactsContract;
 
 
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
+
 import android.widget.TextView;
+
+import android.widget.TimePicker;
+
 import android.widget.Toast;
 
 import com.gongyunhaoyyy.password.DeblockingActivity;
@@ -32,6 +44,7 @@ import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
@@ -41,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Note> mDatas;
     private FloatingActionButton fab;
     private FloatingActionButton menu;
+    String result = "";
+    long triggerAtTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,11 +142,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
 
-                        Intent intent = new Intent(MainActivity.this, note_activity.class);
-                        intent.putExtra("in_data",note.id);
-                        //    DataSupport.deleteAll(Notedata.class,"note==?",note.note);
-                        startActivity(intent);
-
                     }
                 });
 
@@ -145,6 +155,134 @@ public class MainActivity extends AppCompatActivity {
                         DataSupport.delete(Notedata.class,note.id);
                     }
                 });
+
+
+
+
+                holder.setOnClickListener(R.id.alarm,new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+
+                        if(note.isalarm==true){
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                            dialog.setTitle("提醒");
+                            dialog.setMessage("是否修改闹钟？");
+                            dialog.setCancelable(false);
+                            dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog,int which){
+                                    final Calendar cale2 = Calendar.getInstance();
+
+                                    TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                                        @Override
+                                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                            result = "";
+                                            result += "您选择的时间是:"+hourOfDay+"时"+minute+"分";
+                                            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                                            Notedata notedata = DataSupport.find(Notedata.class,note.id);
+                                            notedata.setHour(hourOfDay);
+                                            notedata.setMinute(minute);
+                                            notedata.setAlarm(true);
+                                            note.isalarm=true;
+                                            notedata.save();
+                                            long setTime = (60*hourOfDay+minute)*60*1000;
+                                            long currentTime = (60*cale2.get(Calendar.HOUR_OF_DAY)+cale2.get(Calendar.MINUTE))*60*1000;
+                                            if (setTime>currentTime) {
+                                                triggerAtTime = System.currentTimeMillis()+setTime-currentTime;
+                                            }
+                                            else {
+                                                triggerAtTime = System.currentTimeMillis()+setTime-currentTime+24*60*60*1000;
+                                            }
+                                            Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                                            intent.putExtra("id",note.id);
+                                            intent.setAction("com.example.alarmtest.ALARM_RECEIVER");
+                                            intent.setClass(MainActivity.this, AlarmReceiver.class);
+                                            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
+                                            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                                            am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+
+                                        }
+                                    };
+                                    TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
+                                    my.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        public void onCancel(DialogInterface dialog) {
+
+                                        }
+                                    });
+
+                                    my.show();
+                                }
+                            });
+                            dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog,int which){
+                                    Notedata notedata = DataSupport.find(Notedata.class,note.id);
+                                    notedata.setAlarm(false);
+                                    note.isalarm=false;
+                                    notedata.save();
+                                    Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                                    intent.putExtra("id",note.id);
+                                    intent.setAction("com.example.alarmtest.ALARM_RECEIVER");
+                                    intent.setClass(MainActivity.this, AlarmReceiver.class);
+                                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
+                                    AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                                    am.cancel( pendingIntent);
+
+                                }
+                            });
+                            dialog.show();
+                        }
+
+                        else{
+                            final Calendar cale2 = Calendar.getInstance();
+
+                            TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    result = "";
+                                    result += "您选择的时间是:"+hourOfDay+"时"+minute+"分";
+                                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                                    Notedata notedata = DataSupport.find(Notedata.class,note.id);
+                                    notedata.setHour(hourOfDay);
+                                    notedata.setMinute(minute);
+                                    notedata.setAlarm(true);
+                                    note.isalarm=true;
+                                    notedata.save();
+                                    long setTime = (60*hourOfDay+minute)*60*1000;
+                                    long currentTime = (60*cale2.get(Calendar.HOUR_OF_DAY)+cale2.get(Calendar.MINUTE))*60*1000;
+                                    if (setTime>currentTime) {
+                                        triggerAtTime = System.currentTimeMillis()+setTime-currentTime;
+                                    }
+                                    else {
+                                        triggerAtTime = System.currentTimeMillis()+setTime-currentTime+24*60*60*1000;
+                                    }
+                                    Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                                    intent.putExtra("id",note.id);
+                                    intent.setAction("com.example.alarmtest.ALARM_RECEIVER");
+                                    intent.setClass(MainActivity.this, AlarmReceiver.class);
+                                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
+                                    AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                                    am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+
+                                }
+                            };
+                            TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
+                            my.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                public void onCancel(DialogInterface dialog) {
+
+                                }
+                            });
+
+                            my.show();
+                        }
+
+
+
+                    }
+                } );
+
+
+
 
                 holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
@@ -176,6 +314,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+            }
+        });
+        mLv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    SwipeMenuLayout viewCache = SwipeMenuLayout.getViewCache();
+                    if (null != viewCache) {
+                        viewCache.smoothClose();
+                    }
+                }
+                return false;
             }
         });
 
@@ -253,6 +403,130 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+
+                holder.setOnClickListener(R.id.alarm,new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+
+                        if(note.isalarm==true){
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                            dialog.setTitle("提醒");
+                            dialog.setMessage("是否修改闹钟？");
+                            dialog.setCancelable(false);
+                            dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog,int which){
+                                    final Calendar cale2 = Calendar.getInstance();
+
+                                    TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                                        @Override
+                                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                            result = "";
+                                            result += "您选择的时间是:"+hourOfDay+"时"+minute+"分";
+                                            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                                            Notedata notedata = DataSupport.find(Notedata.class,note.id);
+                                            notedata.setHour(hourOfDay);
+                                            notedata.setMinute(minute);
+                                            notedata.setAlarm(true);
+                                            note.isalarm=true;
+                                            notedata.save();
+                                            long setTime = (60*hourOfDay+minute)*60*1000;
+                                            long currentTime = (60*cale2.get(Calendar.HOUR_OF_DAY)+cale2.get(Calendar.MINUTE))*60*1000;
+                                            if (setTime>currentTime) {
+                                                triggerAtTime = System.currentTimeMillis()+setTime-currentTime;
+                                            }
+                                            else {
+                                                triggerAtTime = System.currentTimeMillis()+setTime-currentTime+24*60*60*1000;
+                                            }
+                                            Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                                            intent.putExtra("id",note.id);
+                                            intent.setAction("com.example.alarmtest.ALARM_RECEIVER");
+                                            intent.setClass(MainActivity.this, AlarmReceiver.class);
+                                            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
+                                            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                                            am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+
+                                        }
+                                    };
+                                    TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
+                                    my.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        public void onCancel(DialogInterface dialog) {
+
+                                        }
+                                    });
+
+                                    my.show();
+                                }
+                            });
+                            dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog,int which){
+                                    Notedata notedata = DataSupport.find(Notedata.class,note.id);
+                                    notedata.setAlarm(false);
+                                    note.isalarm=false;
+                                    notedata.save();
+                                    Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                                    intent.putExtra("id",note.id);
+                                    intent.setAction("com.example.alarmtest.ALARM_RECEIVER");
+                                    intent.setClass(MainActivity.this, AlarmReceiver.class);
+                                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
+                                    AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                                    am.cancel( pendingIntent);
+
+                                }
+                            });
+                            dialog.show();
+                        }
+
+                        else{
+                            final Calendar cale2 = Calendar.getInstance();
+
+                            TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    result = "";
+                                    result += "您选择的时间是:"+hourOfDay+"时"+minute+"分";
+                                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                                    Notedata notedata = DataSupport.find(Notedata.class,note.id);
+                                    notedata.setHour(hourOfDay);
+                                    notedata.setMinute(minute);
+                                    note.isalarm=true;
+                                    notedata.setAlarm(true);
+                                    notedata.save();
+                                    long setTime = (60*hourOfDay+minute)*60*1000;
+                                    long currentTime = (60*cale2.get(Calendar.HOUR_OF_DAY)+cale2.get(Calendar.MINUTE))*60*1000;
+                                    if (setTime>currentTime) {
+                                         triggerAtTime = System.currentTimeMillis()+setTime-currentTime;
+                                    }
+                                    else {
+                                         triggerAtTime = System.currentTimeMillis()+setTime-currentTime+24*60*60*1000;
+                                    }
+                                    Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                                    intent.putExtra("id",note.id);
+                                    intent.setAction("com.example.alarmtest.ALARM_RECEIVER");
+                                    intent.setClass(MainActivity.this, AlarmReceiver.class);
+                                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
+                                    AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                                    am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+
+                                }
+                            };
+                            TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
+                            my.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                public void onCancel(DialogInterface dialog) {
+
+                                }
+                            });
+
+                            my.show();
+                        }
+
+
+
+                    }
+                } );
+
+
                 holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -285,7 +559,18 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+        mLv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    SwipeMenuLayout viewCache = SwipeMenuLayout.getViewCache();
+                    if (null != viewCache) {
+                        viewCache.smoothClose();
+                    }
+                }
+                return false;
+            }
+        });
         //setContentView(R.layout.activity_main);
     }
 
@@ -293,7 +578,7 @@ public class MainActivity extends AppCompatActivity {
         mDatas = new ArrayList<>();
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
-            mDatas.add(new Note(notedata.getNote(),notedata.getId()));
+            mDatas.add(new Note(notedata.getNote(),notedata.getId(),notedata.isAlarm()));
         }
     }
 }

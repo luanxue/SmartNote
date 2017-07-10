@@ -8,17 +8,30 @@ import org.litepal.crud.DataSupport;
 
 public class Notedata extends DataSupport{
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
 
         this.id = id;
 
     }
 
-    private  long id;
+    public boolean isAlarm() {
+        return isAlarm;
+    }
+
+    public void setAlarm(boolean alarm) {
+        isAlarm = alarm;
+    }
+
+    private boolean isAlarm;
+
+
+
+    private  int id;
+
     private boolean isLock=false;
 
     public boolean isLock() {
@@ -38,5 +51,25 @@ public class Notedata extends DataSupport{
     }
 
     private String note;
+
+    public int getHour() {
+        return hour;
+    }
+
+    public void setHour(int hour) {
+        this.hour = hour;
+    }
+
+    private int hour;
+
+    public int getMinute() {
+        return minute;
+    }
+
+    public void setMinute(int minute) {
+        this.minute = minute;
+    }
+
+    private int minute;
 
 }
