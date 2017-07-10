@@ -32,7 +32,7 @@ public class note_activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
-        bianji=(TextView)findViewById( R.id.bianji );
+        bianji=(TextView)findViewById( R.id.bianji);
         Intent intent = getIntent();
         myid = intent.getLongExtra("in_data",-1);
 
