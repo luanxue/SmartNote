@@ -34,6 +34,7 @@
         <activity android:name="com.gongyunhaoyyy.password.ThemeSelectActivity">
         </activity>
 
+
         <receiver
             android:name=".AlarmReceiver"
             android:enabled="true"
