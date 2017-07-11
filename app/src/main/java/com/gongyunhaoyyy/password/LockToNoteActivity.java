@@ -46,7 +46,9 @@ public class LockToNoteActivity extends AppCompatActivity {
         //记录输入错误次数
         final int[] wrongpw = {5};
         Intent it=getIntent();
-        final int myid=it.getIntExtra( "in_data",1 );
+
+        final int myid=it.getIntExtra( "in_data",-1 );
+
 
         //-----------------------------------------------------------
         mPatternLockView = (PatternLockView) findViewById(R.id.ltn_patter_lock_view);
@@ -59,7 +61,8 @@ public class LockToNoteActivity extends AppCompatActivity {
         mPatternLockView.setViewMode(PatternLockView.PatternViewMode.CORRECT);
         mPatternLockView.setDotAnimationDuration(150);
         mPatternLockView.setPathEndAnimationDuration(100);
-        mPatternLockView.setCorrectStateColor(ResourceUtils.getColor(this, R.color.white));
+        mPatternLockView.setCorrectStateColor(ResourceUtils.getColor(this, R.color.line));
+        mPatternLockView.setNormalStateColor( ResourceUtils.getColor(this, R.color.line) );
         mPatternLockView.setInStealthMode(false);
         mPatternLockView.setTactileFeedbackEnabled(true);
         mPatternLockView.setInputEnabled(true);
@@ -86,7 +89,9 @@ public class LockToNoteActivity extends AppCompatActivity {
                                 if (opassword.equals( password )){
                                     Intent intent=new Intent( LockToNoteActivity.this,note_activity.class );
                                     intent.putExtra( "in_data",myid );
+
                                     startActivity( intent);
+
                                     finish();
                                 }else {
                                     wrongpw[0]-=1;

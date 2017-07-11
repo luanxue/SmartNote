@@ -5,14 +5,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.a99460.smartnote.MainActivity"
     android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-    android:background="@mipmap/pic7">
+    android:background="#fff2f0">
 
 <ListView
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:textStyle="bold"
-    android:textColor="#838B83">
+    android:textColor="#3a3f3a">
 </ListView>
 
 <android.support.design.widget.FloatingActionButton

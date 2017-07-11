@@ -46,7 +46,7 @@ public class DeblockingActivity extends AppCompatActivity {
         //记录输入错误次数
         final int[] wrongpw = {5};
         Intent it=getIntent();
-        final long myid=it.getLongExtra( "deblocking",1 );
+        final int myid=it.getIntExtra( "deblocking",-1 );
 
         //-----------------------------------------------------------
 
@@ -60,7 +60,8 @@ public class DeblockingActivity extends AppCompatActivity {
         mPatternLockView.setViewMode(PatternLockView.PatternViewMode.CORRECT);
         mPatternLockView.setDotAnimationDuration(150);
         mPatternLockView.setPathEndAnimationDuration(100);
-        mPatternLockView.setCorrectStateColor(ResourceUtils.getColor(this, R.color.white));
+        mPatternLockView.setCorrectStateColor(ResourceUtils.getColor(this, R.color.line));
+        mPatternLockView.setNormalStateColor( ResourceUtils.getColor(this, R.color.line) );
         mPatternLockView.setInStealthMode(false);
         mPatternLockView.setTactileFeedbackEnabled(true);
         mPatternLockView.setInputEnabled(true);

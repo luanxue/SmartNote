@@ -3,34 +3,35 @@
     android:fitsSystemWindows="true"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
-    android:background="#FA8072">
+    android:layout_height="75dp"
+    android:background="#fa8678"
+    android:clipToPadding="true">
 
     <Button
         android:background="@mipmap/pic6"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="5dp"
-        android:layout_alignParentLeft="true"
         android:id="@+id/cancle"
-        android:layout_width="45dp"
-        android:layout_height="45dp" />
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
     <TextView
         android:id="@+id/bianji"
         android:gravity="center"
         android:textSize="25sp"
-        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:text="编辑"
-        android:textColor="#2F4F4F"/>
+        android:textColor="#1f3737"
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:background="@mipmap/pic5"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="5dp"
         android:id="@+id/yes"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_alignParentRight="true"/>
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 </RelativeLayout>
