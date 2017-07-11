@@ -23,7 +23,7 @@ public class Note {
         this.id = id;
     }
 
-    public Note(String note, int id,boolean isalarm){
+    public Note(String note,int id,boolean isalarm){
         this.note=note;
         this.id=id;
         this.isalarm=isalarm;

@@ -34,9 +34,8 @@ public class note_activity extends AppCompatActivity {
         editText = (EditText)findViewById(R.id.edit_note);
         bianji=(TextView)findViewById( R.id.bianji);
         Intent intent = getIntent();
-        myid = intent.getLongExtra("in_data",-1);
-
-
+        myid = intent.getIntExtra("in_data",-1);
+        Toast.makeText(note_activity.this,""+myid,Toast.LENGTH_SHORT).show();
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
         if(tftf.length()<=0){

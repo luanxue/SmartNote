@@ -74,11 +74,37 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(MainActivity.this, note_activity.class);
                 startActivity(intent);
+
+            }
+        });
+        fab.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    SwipeMenuLayout viewCache = SwipeMenuLayout.getViewCache();
+                    if (null != viewCache) {
+                        viewCache.smoothClose();
+                    }
+                }
+                return false;
             }
         });
         menu = (FloatingActionButton) findViewById(R.id.menu);
+        menu.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    SwipeMenuLayout viewCache = SwipeMenuLayout.getViewCache();
+                    if (null != viewCache) {
+                        viewCache.smoothClose();
+                    }
+                }
+                return false;
+            }
+        });
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,36 +134,38 @@ public class MainActivity extends AppCompatActivity {
                 popup.show();
             }
         });
+        mLv = (ListView)findViewById(R.id.list);
         mLv.setAdapter(new CommonAdapter<Note>(this, mDatas, R.layout./*item_swipe_menu*/item_note) {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                long iddd=note.id;
+                int iddd=note.id;
                 Notedata nd=DataSupport.find( Notedata.class,iddd );
                 boolean lock=nd.isLock();
                 if(lock){
                     holder.setText(R.id.content,"已上锁" );
                 }else {
-                    holder.setText(R.id.content, note.note);
+                    holder.setText(R.id.content, note.note.trim());
                 }
-                
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        long id=note.id;
+                        ((SwipeMenuLayout) holder.getConvertView()).quickClose();
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
+
                         boolean islock=notedata.isLock();
                         if (isDeadLock()){
                             Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
                         }else {
                             if (islock){
                                 Intent lock=new Intent( MainActivity.this, LockToNoteActivity.class );
-                                lock.putExtra( "in_data",note.id );
+                                lock.putExtra( "in_data",id );
                                 startActivity( lock);
                             }else {
                                 Intent intent = new Intent(MainActivity.this, note_activity.class);
-                                intent.putExtra("in_data",note.id);
+                                intent.putExtra("in_data",id);
                                 startActivity(intent);
                             }
                         }
@@ -162,13 +190,13 @@ public class MainActivity extends AppCompatActivity {
                 holder.setOnClickListener(R.id.alarm,new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
-
+                        ((SwipeMenuLayout) holder.getConvertView()).quickClose();
                         if(note.isalarm==true){
                             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                             dialog.setTitle("提醒");
                             dialog.setMessage("是否修改闹钟？");
                             dialog.setCancelable(false);
-                            dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                            dialog.setPositiveButton("修改闹钟",new DialogInterface.OnClickListener(){
                                 @Override
                                 public void onClick(DialogInterface dialog,int which){
                                     final Calendar cale2 = Calendar.getInstance();
@@ -199,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-                                            am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+                                            am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
 
                                         }
                                     };
@@ -213,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                                     my.show();
                                 }
                             });
-                            dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                            dialog.setNegativeButton("取消该闹钟",new DialogInterface.OnClickListener(){
                                 @Override
                                 public void onClick(DialogInterface dialog,int which){
                                     Notedata notedata = DataSupport.find(Notedata.class,note.id);
@@ -262,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
                                     intent.setClass(MainActivity.this, AlarmReceiver.class);
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-                                    am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+                                    am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
 
                                 }
                             };
@@ -287,9 +315,10 @@ public class MainActivity extends AppCompatActivity {
                 holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        ((SwipeMenuLayout) holder.getConvertView()).quickClose();
                         SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
                         final String opassword=pref.getString( "oldpassword","" );
-                        long id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
                         boolean islock=notedata.isLock();
                         //判断是否设置了密码
@@ -353,27 +382,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, note_activity.class);
-                startActivityForResult(intent, 1);
+                startActivity(intent);
             }
         });
         mLv.setAdapter(new CommonAdapter<Note>(this, mDatas, R.layout./*item_swipe_menu*/item_note) {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                long iddd=note.id;
+                int iddd=note.id;
                 Notedata nd=DataSupport.find( Notedata.class,iddd );
                 boolean lock=nd.isLock();
                 if(lock){
                     holder.setText(R.id.content,"已上锁" );
                 }else {
-                    holder.setText(R.id.content, note.note);
+                    holder.setText(R.id.content, note.note.trim());
                 }
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        long id=note.id;
+                        ((SwipeMenuLayout) holder.getConvertView()).quickClose();
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
+
                         boolean islock=notedata.isLock();
                         if (isDeadLock()){
                             Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
@@ -407,13 +437,13 @@ public class MainActivity extends AppCompatActivity {
                 holder.setOnClickListener(R.id.alarm,new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
-
+                        ((SwipeMenuLayout) holder.getConvertView()).quickClose();
                         if(note.isalarm==true){
                             AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                             dialog.setTitle("提醒");
                             dialog.setMessage("是否修改闹钟？");
                             dialog.setCancelable(false);
-                            dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
+                            dialog.setPositiveButton("修改闹钟",new DialogInterface.OnClickListener(){
                                 @Override
                                 public void onClick(DialogInterface dialog,int which){
                                     final Calendar cale2 = Calendar.getInstance();
@@ -444,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-                                            am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+                                            am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
 
                                         }
                                     };
@@ -458,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
                                     my.show();
                                 }
                             });
-                            dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
+                            dialog.setNegativeButton("取消该闹钟",new DialogInterface.OnClickListener(){
                                 @Override
                                 public void onClick(DialogInterface dialog,int which){
                                     Notedata notedata = DataSupport.find(Notedata.class,note.id);
@@ -495,7 +525,7 @@ public class MainActivity extends AppCompatActivity {
                                     notedata.save();
                                     long setTime = (60*hourOfDay+minute)*60*1000;
                                     long currentTime = (60*cale2.get(Calendar.HOUR_OF_DAY)+cale2.get(Calendar.MINUTE))*60*1000;
-                                    if (setTime>currentTime) {
+                                    if (setTime>currentTime ) {
                                          triggerAtTime = System.currentTimeMillis()+setTime-currentTime;
                                     }
                                     else {
@@ -507,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
                                     intent.setClass(MainActivity.this, AlarmReceiver.class);
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-                                    am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+                                    am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
 
                                 }
                             };
@@ -530,9 +560,10 @@ public class MainActivity extends AppCompatActivity {
                 holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        ((SwipeMenuLayout) holder.getConvertView()).quickClose();
                         SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
                         final String opassword=pref.getString( "oldpassword","" );
-                        long id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
                         boolean islock=notedata.isLock();
                         //判断是否设置了密码
@@ -573,6 +604,7 @@ public class MainActivity extends AppCompatActivity {
         });
         //setContentView(R.layout.activity_main);
     }
+
 
     protected void initdata(){
         mDatas = new ArrayList<>();

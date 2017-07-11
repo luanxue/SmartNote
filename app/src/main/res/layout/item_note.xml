@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="60dp"
     android:clickable="true"
     android:paddingBottom="1dp"
     app:ios="false"
@@ -17,7 +17,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:textSize="25sp"
         android:gravity="left"
-        android:maxLines="2"
+        android:maxLines="1"
         android:textStyle="italic"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
@@ -27,7 +27,7 @@
     <!-- 以下都是侧滑菜单的内容依序排列 -->
     <Button
         android:id="@+id/btnLock"
-        android:layout_width="75dp"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:background="#d9dee4"
         android:text="上锁"
@@ -35,7 +35,7 @@
 
     <Button
         android:id="@+id/alarm"
-        android:layout_width="90dp"
+        android:layout_width="75dp"
         android:layout_height="match_parent"
         android:background="#ecd50a"
         android:clickable="true"
@@ -44,7 +44,7 @@
 
     <Button
         android:id="@+id/btnDelete"
-        android:layout_width="75dp"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:background="@android:color/holo_red_dark"
         android:text="删除"
