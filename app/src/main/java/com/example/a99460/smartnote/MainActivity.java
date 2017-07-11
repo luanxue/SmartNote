@@ -3,10 +3,12 @@ package com.example.a99460.smartnote;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.content.SharedPreferences;
@@ -17,13 +19,18 @@ import android.provider.ContactsContract;
 
 
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.ThemedSpinnerAdapter;
+import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ListView;
 
 import android.widget.TextView;
@@ -48,6 +55,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 
 public class MainActivity extends AppCompatActivity {
     private ListView mLv;
@@ -57,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     String result = "";
     long triggerAtTime;
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
@@ -66,10 +77,15 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
-        final String tftf=typef.getString( "typefacehaha","" );
-
         initdata();
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
+        //onCreat中注册Calligraphy
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath(tftf)
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,11 +124,12 @@ public class MainActivity extends AppCompatActivity {
                 popup.show();
             }
         });
+        mLv = (ListView)findViewById( R.id.list );
         mLv.setAdapter(new CommonAdapter<Note>(this, mDatas, R.layout./*item_swipe_menu*/item_note) {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                long iddd=note.id;
+                int iddd=note.id;
                 Notedata nd=DataSupport.find( Notedata.class,iddd );
                 boolean lock=nd.isLock();
                 if(lock){
@@ -120,12 +137,11 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     holder.setText(R.id.content, note.note);
                 }
-                
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        long id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
                         boolean islock=notedata.isLock();
                         if (isDeadLock()){
@@ -133,15 +149,14 @@ public class MainActivity extends AppCompatActivity {
                         }else {
                             if (islock){
                                 Intent lock=new Intent( MainActivity.this, LockToNoteActivity.class );
-                                lock.putExtra( "in_data",note.id );
+                                lock.putExtra( "in_data",id );
                                 startActivity( lock);
                             }else {
                                 Intent intent = new Intent(MainActivity.this, note_activity.class);
-                                intent.putExtra("in_data",note.id);
+                                intent.putExtra("in_data",id);
                                 startActivity(intent);
                             }
                         }
-
                     }
                 });
 
@@ -155,9 +170,6 @@ public class MainActivity extends AppCompatActivity {
                         DataSupport.delete(Notedata.class,note.id);
                     }
                 });
-
-
-
 
                 holder.setOnClickListener(R.id.alarm,new View.OnClickListener(){
                     @Override
@@ -200,16 +212,13 @@ public class MainActivity extends AppCompatActivity {
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                             am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
                                         }
                                     };
                                     TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
                                     my.setOnCancelListener(new DialogInterface.OnCancelListener() {
                                         public void onCancel(DialogInterface dialog) {
-
                                         }
                                     });
-
                                     my.show();
                                 }
                             });
@@ -227,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                     am.cancel( pendingIntent);
-
                                 }
                             });
                             dialog.show();
@@ -263,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                     am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
                                 }
                             };
                             TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
@@ -272,24 +279,17 @@ public class MainActivity extends AppCompatActivity {
 
                                 }
                             });
-
                             my.show();
                         }
-
-
-
                     }
                 } );
-
-
-
 
                 holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
                         final String opassword=pref.getString( "oldpassword","" );
-                        long id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
                         boolean islock=notedata.isLock();
                         //判断是否设置了密码
@@ -306,14 +306,13 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
                                 }else {
                                     Intent intent=new Intent( MainActivity.this, DeblockingActivity.class );
-                                    intent.putExtra("deblocking",note.id);
+                                    intent.putExtra("deblocking",id);
                                     startActivity( intent );
                                 }
                             }
                         }
                     }
                 });
-
             }
         });
         mLv.setOnTouchListener(new View.OnTouchListener() {
@@ -328,24 +327,24 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
     }
 
-
-    boolean isDeadLock(){
-        SharedPreferences pref=getSharedPreferences( "time",MODE_PRIVATE );
-        Long wt=pref.getLong( "wrongtime",0 );
-        if (System.currentTimeMillis()-wt<=30000){
-            return true;
-        }else {
-            return false;
-        }
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
     }
 
-
-
+    @Override
     protected void onStart(){
         super.onStart();
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
+        //onStart中注册Calligraphy
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(tftf)
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
         mLv = (ListView) findViewById(R.id.list);
         initdata();
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -360,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
                 //((CstSwipeDelMenu)holder.getConvertView()).setIos(false);//这句话关掉IOS阻塞式交互效果
-                long iddd=note.id;
+                int iddd=note.id;
                 Notedata nd=DataSupport.find( Notedata.class,iddd );
                 boolean lock=nd.isLock();
                 if(lock){
@@ -368,11 +367,12 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     holder.setText(R.id.content, note.note);
                 }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
-                        long id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
                         boolean islock=notedata.isLock();
                         if (isDeadLock()){
@@ -380,15 +380,14 @@ public class MainActivity extends AppCompatActivity {
                         }else {
                             if (islock){
                                 Intent lock=new Intent( MainActivity.this, LockToNoteActivity.class );
-                                lock.putExtra( "in_data",note.id );
+                                lock.putExtra( "in_data",id );
                                 startActivity(lock);
                             }else {
                                 Intent intent = new Intent(MainActivity.this, note_activity.class);
-                                intent.putExtra("in_data",note.id);
+                                intent.putExtra("in_data",id);
                                 startActivity(intent);
                             }
                         }
-
                     }
                 });
 
@@ -445,16 +444,13 @@ public class MainActivity extends AppCompatActivity {
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                             am.set(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
                                         }
                                     };
                                     TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
                                     my.setOnCancelListener(new DialogInterface.OnCancelListener() {
                                         public void onCancel(DialogInterface dialog) {
-
                                         }
                                     });
-
                                     my.show();
                                 }
                             });
@@ -472,7 +468,6 @@ public class MainActivity extends AppCompatActivity {
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                     am.cancel( pendingIntent);
-
                                 }
                             });
                             dialog.show();
@@ -514,25 +509,19 @@ public class MainActivity extends AppCompatActivity {
                             TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
                             my.setOnCancelListener(new DialogInterface.OnCancelListener() {
                                 public void onCancel(DialogInterface dialog) {
-
                                 }
                             });
-
                             my.show();
                         }
-
-
-
                     }
                 } );
-
 
                 holder.setOnClickListener(R.id.btnLock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         SharedPreferences pref=getSharedPreferences( "data",MODE_PRIVATE );
                         final String opassword=pref.getString( "oldpassword","" );
-                        long id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
                         boolean islock=notedata.isLock();
                         //判断是否设置了密码
@@ -549,14 +538,13 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
                                 }else {
                                     Intent intent=new Intent( MainActivity.this, DeblockingActivity.class );
-                                    intent.putExtra("deblocking",note.id);
+                                    intent.putExtra("deblocking",id);
                                     startActivity( intent );
                                 }
                             }
                         }
                     }
                 });
-
             }
         });
         mLv.setOnTouchListener(new View.OnTouchListener() {
@@ -579,6 +567,16 @@ public class MainActivity extends AppCompatActivity {
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
             mDatas.add(new Note(notedata.getNote(),notedata.getId(),notedata.isAlarm()));
+        }
+    }
+
+    boolean isDeadLock(){
+        SharedPreferences pref=getSharedPreferences( "time",MODE_PRIVATE );
+        Long wt=pref.getLong( "wrongtime",0 );
+        if (System.currentTimeMillis()-wt<=30000){
+            return true;
+        }else {
+            return false;
         }
     }
 }

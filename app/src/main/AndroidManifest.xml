@@ -34,12 +34,6 @@
         <activity android:name="com.gongyunhaoyyy.password.ThemeSelectActivity">
         </activity>
 
-            android:theme="@style/BarTheme" />
-        <activity android:name="com.gongyunhaoyyy.password.LockActivity" />
-        <activity android:name="com.gongyunhaoyyy.password.DeblockingActivity" />
-        <activity android:name="com.gongyunhaoyyy.password.SetPasswordActivity" />
-        <activity android:name="com.gongyunhaoyyy.password.LockToNoteActivity" />
-
         <receiver
             android:name=".AlarmReceiver"
             android:enabled="true"
