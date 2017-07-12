@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -48,6 +49,8 @@ import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
+import com.nightonke.boommenu.BoomButtons.HamButton;
+import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.ButtonEnum;
 import com.nightonke.boommenu.Piece.PiecePlaceEnum;
@@ -58,6 +61,8 @@ import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -84,15 +89,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initdata();
+
         //BoomMenuButton相关配置
         bmb = (BoomMenuButton) findViewById(R.id.bmb);
         assert bmb != null;
         bmb.setButtonEnum( ButtonEnum.Ham);
-        bmb.setPiecePlaceEnum( PiecePlaceEnum.HAM_4);
-        bmb.setButtonPlaceEnum( ButtonPlaceEnum.HAM_4);
+        bmb.setPiecePlaceEnum( PiecePlaceEnum.HAM_3);
+        bmb.setButtonPlaceEnum( ButtonPlaceEnum.HAM_3);
         bmb.setShadowEffect( false );
         for (int i = 0; i < bmb.getPiecePlaceEnum().pieceNumber(); i++){
-            bmb.addBuilder(BuilderManager.getHamButtonBuilder(i));
+//            bmb.addBuilder(BuilderManager.getHamButtonBuilder(i));
+            addBuilder(i);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -128,48 +135,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 return false;
-            }
-        });
-        menu = (FloatingActionButton) findViewById(R.id.menu);
-        menu.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    SwipeMenuLayout viewCache = SwipeMenuLayout.getViewCache();
-                    if (null != viewCache) {
-                        viewCache.smoothClose();
-                    }
-                }
-                return false;
-            }
-        });
-        menu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popup = new PopupMenu(MainActivity.this,menu);
-                popup.getMenuInflater().inflate(R.menu.menu_pop, popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()){
-                            case R.id.passwordsetting:
-                                //设置新密码or修改密码
-                                if (isDeadLock()){
-                                    Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
-                                }else {
-                                    Intent it=new Intent( MainActivity.this,LockActivity.class );
-                                    startActivity( it );
-                                }
-                                break;
-                            case R.id.themeselect:
-                                Intent intent=new Intent( MainActivity.this, ThemeSelectActivity.class );
-                                startActivity( intent );
-                                break;
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
             }
         });
 
@@ -390,6 +355,48 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //设置menu的监听功能
+    private void addBuilder(int i) {
+        bmb.addBuilder(new HamButton.Builder()
+                .normalImageRes(BuilderManager.getImageResource())
+                .normalTextRes(  BuilderManager.getHamButtonBuildertext( i )  )
+                .subNormalTextRes( BuilderManager.getHamButtonBuildersubtext( i ) )
+                .pieceColor( Color.WHITE)
+                .listener(new OnBMClickListener() {
+                    @Override
+                    public void onBoomButtonClick(int index) {
+                        switch (index){
+                            case 0:
+                                //设置新密码or修改密码
+                                if (isDeadLock()){
+                                    Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
+                                }else {
+                                    //调用Timer函数使Intent延迟400ms后跳转，使BMB动画效果显示出来
+                                    //如果用Thread.sleep，系统会休眠，MBM动画效果并不会显示
+                                    new Timer().schedule( new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            startActivity(new Intent(MainActivity.this,LockActivity.class));
+                                        }
+                                    }, 400);//这里停留时间为1000=1s。
+                                }
+                                break;
+                            case 1:
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        startActivity(new Intent(MainActivity.this,ThemeSelectActivity.class));
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
+                                break;
+                            case 2:
+                                Toast.makeText(MainActivity.this, "关于我们", Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                }));
+    }
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
@@ -592,7 +599,7 @@ public class MainActivity extends AppCompatActivity {
                         boolean islock=notedata.isLock();
                         //判断是否设置了密码
                         if (opassword==null||opassword.length()<=0){
-                            Toast.makeText( MainActivity.this,"未设置密码,点左下角设置",Toast.LENGTH_SHORT ).show();
+                            Toast.makeText( MainActivity.this,"未设置密码,点左上角设置",Toast.LENGTH_SHORT ).show();
                         }else{
                             if (!islock){//上锁
                                 notedata.setLock( true );

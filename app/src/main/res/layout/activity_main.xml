@@ -29,15 +29,6 @@
     android:layout_margin="16dp"
     />
 
-    <android.support.design.widget.FloatingActionButton
-        android:src="@mipmap/menu"
-        android:id="@+id/menu"
-        android:layout_gravity="bottom|start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        />
-
     <com.nightonke.boommenu.BoomMenuButton
         android:id="@+id/bmb"
         android:layout_width="wrap_content"
@@ -48,6 +39,5 @@
         app:bmb_inFragment="true"
         app:bmb_normalColor="@color/titlecolor"
         />
-
 
 </FrameLayout>

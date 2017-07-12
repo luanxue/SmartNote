@@ -13,7 +13,6 @@ public class BuilderManager {
     private static int[] imageResources = new int[]{
             R.drawable.bat,
             R.drawable.bear,
-            R.drawable.bee,
             R.drawable.butterfly,
             R.drawable.cat,
             R.drawable.deer,
@@ -29,9 +28,29 @@ public class BuilderManager {
 
     private static int imageResourceIndex = 0;
 
-    static int getImageResource() {
+    public static int getImageResource() {
         if (imageResourceIndex >= imageResources.length) imageResourceIndex = 0;
         return imageResources[imageResourceIndex++];
+    }
+
+    public static int getHamButtonBuildertext(int i) {
+        if(i==0){
+            return R.string.password;
+        }else if (i==1){
+            return R.string.typeface;
+        }else {
+            return R.string.abutus;
+        }
+    }
+
+    public static int getHamButtonBuildersubtext(int i) {
+        if(i==0){
+            return R.string.password_sub;
+        }else if (i==1){
+            return R.string.typeface_sub;
+        }else {
+            return R.string.aboutus_sub;
+        }
     }
 
     public static HamButton.Builder getHamButtonBuilder(int i) {
