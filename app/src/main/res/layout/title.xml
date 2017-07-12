@@ -3,8 +3,8 @@
     android:fitsSystemWindows="true"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="75dp"
-    android:background="#fa8678"
+    android:layout_height="72dp"
+    android:background="@color/titlecolor"
     android:clipToPadding="true">
 
     <Button

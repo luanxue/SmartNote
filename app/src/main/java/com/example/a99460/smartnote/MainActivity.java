@@ -39,6 +39,7 @@ import android.widget.TimePicker;
 
 import android.widget.Toast;
 
+import com.gongyunhaoyyy.password.BuilderManager;
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
 import com.gongyunhaoyyy.password.LockToNoteActivity;
@@ -46,6 +47,10 @@ import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
+import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
+import com.nightonke.boommenu.BoomMenuButton;
+import com.nightonke.boommenu.ButtonEnum;
+import com.nightonke.boommenu.Piece.PiecePlaceEnum;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
@@ -65,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     private FloatingActionButton menu;
     String result = "";
+    BoomMenuButton bmb;
     long triggerAtTime;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -78,6 +84,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initdata();
+        //BoomMenuButton相关配置
+        bmb = (BoomMenuButton) findViewById(R.id.bmb);
+        assert bmb != null;
+        bmb.setButtonEnum( ButtonEnum.Ham);
+        bmb.setPiecePlaceEnum( PiecePlaceEnum.HAM_4);
+        bmb.setButtonPlaceEnum( ButtonPlaceEnum.HAM_4);
+        bmb.setShadowEffect( false );
+        for (int i = 0; i < bmb.getPiecePlaceEnum().pieceNumber(); i++){
+            bmb.addBuilder(BuilderManager.getHamButtonBuilder(i));
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
         //onCreat中注册Calligraphy
