@@ -16,7 +16,7 @@
         android:textSize="25sp"
         android:textColor = "#1a3939"
         android:hint="Please add your notes."
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="72dp"
         android:background="#fff2f0"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="0dp"
