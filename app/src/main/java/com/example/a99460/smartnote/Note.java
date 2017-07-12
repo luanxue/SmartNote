@@ -11,6 +11,8 @@ public class Note {
 
     public int id;
 
+    public String date;
+
     public int hour;
 
     public int minute;
@@ -23,7 +25,8 @@ public class Note {
         this.id = id;
     }
 
-    public Note(String note,int id,boolean isalarm){
+    public Note(String date,String note,int id,boolean isalarm){
+        this.date=date;
         this.note=note;
         this.id=id;
         this.isalarm=isalarm;

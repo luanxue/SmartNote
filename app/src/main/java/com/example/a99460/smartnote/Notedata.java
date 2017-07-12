@@ -6,6 +6,9 @@ import org.litepal.crud.DataSupport;
  * Created by 99460 on 2017/7/3.
  */
 
+
+
+
 public class Notedata extends DataSupport{
 
     public int getId() {
@@ -17,6 +20,7 @@ public class Notedata extends DataSupport{
         this.id = id;
 
     }
+
 
     public boolean isAlarm() {
         return isAlarm;
@@ -71,5 +75,26 @@ public class Notedata extends DataSupport{
     }
 
     private int minute;
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    private String date;
+
+    public String getAudio() {
+        return audio;
+    }
+
+    public void setAudio(String audio) {
+        this.audio = audio;
+    }
+
+    private String audio;
+
 
 }

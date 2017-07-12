@@ -161,11 +161,19 @@ public class MainActivity extends AppCompatActivity {
                 Notedata nd=DataSupport.find( Notedata.class,iddd );
                 boolean lock=nd.isLock();
                 if(lock){
-                    holder.setText(R.id.content,"已上锁" );
+                    holder.setText(R.id.content1,"已上锁" );
                 }else {
-                    holder.setText(R.id.content, note.note.trim());
+                    holder.setText(R.id.content1, note.note.trim());
                 }
 
+                holder.setText(R.id.content2,note.date);
+                if (note.isalarm==true){
+                holder.setVisible(R.id.content3,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content3,false);
+                }
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -255,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                                     my.show();
+                                    holder.setVisible(R.id.content3,true);
                                 }
                             });
                             dialog.setNegativeButton("取消该闹钟",new DialogInterface.OnClickListener(){
@@ -271,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                     am.cancel( pendingIntent);
+                                    holder.setVisible(R.id.content3,false);
                                 }
                             });
                             dialog.show();
@@ -307,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
 
                                     am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
+                                    holder.setVisible(R.id.content3,true);
 
                                 }
                             };
@@ -338,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!islock){//上锁
                                 notedata.setLock( true );
                                 notedata.save();
-                                holder.setText(R.id.content,"已上锁" );
+                                holder.setText(R.id.content1,"已上锁" );
                                 Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
                             }else {//解锁
                                 if (isDeadLock()){
@@ -402,11 +412,19 @@ public class MainActivity extends AppCompatActivity {
                 Notedata nd=DataSupport.find( Notedata.class,iddd );
                 boolean lock=nd.isLock();
                 if(lock){
-                    holder.setText(R.id.content,"已上锁" );
+                    holder.setText(R.id.content1,"已上锁" );
                 }else {
-                    holder.setText(R.id.content, note.note.trim());
+                    holder.setText(R.id.content1, note.note.trim());
                 }
 
+                holder.setText(R.id.content2,note.date);
+                if (note.isalarm==true){
+                    holder.setVisible(R.id.content3,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content3,false);
+                }
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -495,6 +513,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                                     my.show();
+                                    holder.setVisible(R.id.content3,true);
                                 }
                             });
                             dialog.setNegativeButton("取消该闹钟",new DialogInterface.OnClickListener(){
@@ -511,6 +530,7 @@ public class MainActivity extends AppCompatActivity {
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                     am.cancel( pendingIntent);
+                                    holder.setVisible(R.id.content3,false);
                                 }
                             });
                             dialog.show();
@@ -546,6 +566,7 @@ public class MainActivity extends AppCompatActivity {
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                     AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
                                     am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
+                                    holder.setVisible(R.id.content3,true);
 
                                 }
                             };
@@ -555,6 +576,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             my.show();
+
                         }
                     }
                 } );
@@ -575,7 +597,7 @@ public class MainActivity extends AppCompatActivity {
                             if (!islock){//上锁
                                 notedata.setLock( true );
                                 notedata.save();
-                                holder.setText(R.id.content,"已上锁" );
+                                holder.setText(R.id.content1,"已上锁" );
                                 Toast.makeText( MainActivity.this,"上锁成功",Toast.LENGTH_SHORT ).show();
                             }else {//解锁
                                 if (isDeadLock()){
@@ -611,7 +633,7 @@ public class MainActivity extends AppCompatActivity {
         mDatas = new ArrayList<>();
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
-            mDatas.add(new Note(notedata.getNote(),notedata.getId(),notedata.isAlarm()));
+            mDatas.add(new Note(notedata.getDate(),notedata.getNote(),notedata.getId(),notedata.isAlarm()));
         }
     }
 

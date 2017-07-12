@@ -8,6 +8,8 @@
     android:background="#fff2f0">
 
 <ListView
+    android:divider="#fff2f0"
+    android:dividerHeight="10dp"
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

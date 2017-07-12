@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 public class note_activity extends AppCompatActivity {
@@ -32,6 +35,18 @@ public class note_activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
+
+        FloatingActionButton record = (FloatingActionButton)findViewById(R.id.record);
+
+        record.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(note_activity.this,Record.class);
+                intent.putExtra("id",myid);
+                startActivity(intent);
+            }
+        });
+
         editText = (EditText)findViewById(R.id.edit_note);
 
         Intent intent = getIntent();
@@ -71,6 +86,7 @@ public class note_activity extends AppCompatActivity {
                     Notedata notedata = new Notedata();
                     if(Issave(word1))
                     {
+                        notedata.setDate(GetDate());
                         notedata.setNote(word1);
                         notedata.save();
                     }
@@ -80,10 +96,12 @@ public class note_activity extends AppCompatActivity {
                     String word1 = editText.getText().toString();
                     if(Issave(word1))
                     {
+                        notedata.setDate(GetDate());
                         notedata.setNote(word1);
                         notedata.save();
                     }
                 }
+
                 finish();
             }
         });
@@ -108,6 +126,7 @@ public class note_activity extends AppCompatActivity {
                                 Notedata notedata = new Notedata();
                                 if(word1!=null&&Issave(word1))
                                 {
+                                    notedata.setDate(GetDate());
                                     notedata.setNote(word1);
                                     notedata.save();
                                 }
@@ -117,6 +136,7 @@ public class note_activity extends AppCompatActivity {
                                 String word1 = editText.getText().toString();
                                 if(word1!=null&&Issave(word1))
                                 {
+                                    notedata.setDate(GetDate());
                                     notedata.setNote(word1);
                                     notedata.save();
                                 }
@@ -134,6 +154,7 @@ public class note_activity extends AppCompatActivity {
                 }
             }
         });
+
     }
     @Override
     public void onBackPressed(){
@@ -154,6 +175,7 @@ public class note_activity extends AppCompatActivity {
                         Notedata notedata = new Notedata();
                         if(word1!=null&&Issave(word1))
                         {
+                            notedata.setDate(GetDate());
                             notedata.setNote(word1);
                             notedata.save();
                         }
@@ -163,6 +185,7 @@ public class note_activity extends AppCompatActivity {
                         String word1 = editText.getText().toString();
                         if(word1!=null&&Issave(word1))
                         {
+                            notedata.setDate(GetDate());
                             notedata.setNote(word1);
                             notedata.save();
                         }
@@ -191,5 +214,12 @@ public class note_activity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    protected String GetDate(){
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+        String date = sDateFormat.format(new java.util.Date());
+        Toast.makeText(note_activity.this,date,Toast.LENGTH_SHORT).show();
+        return date;
     }
 }
