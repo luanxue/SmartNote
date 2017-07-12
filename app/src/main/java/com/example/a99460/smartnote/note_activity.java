@@ -33,6 +33,7 @@ public class note_activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
         editText = (EditText)findViewById(R.id.edit_note);
+
         Intent intent = getIntent();
         myid=intent.getIntExtra( "in_data",-1 );
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -41,6 +42,7 @@ public class note_activity extends AppCompatActivity {
         }
 
 
+      
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
 
