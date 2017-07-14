@@ -24,11 +24,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,6 +42,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.gongyunhaoyyy.password.BuilderManager;
+import com.gongyunhaoyyy.password.ThemeSelectActivity;
+import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
@@ -55,12 +61,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class note_activity extends AppCompatActivity {
+
+    private WaveView mWaveView;
     EditText editText;
     String wordfirst;
     BoomMenuButton bmb_note;
     int myid;
     boolean Isrecording;
-    boolean Isplaying;
+   // boolean Isplaying;
     static final int START = 0;
     static final int DISPLAY = 1;
     static final int PLAY = 2;
@@ -73,11 +81,11 @@ public class note_activity extends AppCompatActivity {
     ImageButton change;
     ImageButton delete;
     Thread timeThread; // 记录录音时长的线程
-    Thread timeThread2;
+    //Thread timeThread2;
     int timeCount;
-    int timeCount2;// 录音时长 计数
+   // int timeCount2;// 录音时长 计数
     final int TIME_COUNT = 0x101;
-    final int TIME_COUNT2 = 0x102;
+   // final int TIME_COUNT2 = 0x102;
     TextView time;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +94,7 @@ public class note_activity extends AppCompatActivity {
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
         STATUS = START;
-        change.setBackgroundResource(R.drawable.record);
+        change.setBackgroundResource(R.drawable.record1);
 
         if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -131,6 +139,22 @@ public class note_activity extends AppCompatActivity {
                 editText.setSelection(wordfirst.length());
             }
         }
+
+        ImageButton record_ok=(ImageButton)findViewById( R.id.ok_record );
+        record_ok.setOnClickListener( new View.OnClickListener( ) {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutfi = (RelativeLayout)findViewById(R.id.record_layout);
+                // 从原位置下滑到底部的动画
+                //从当前的位置向下移动700px
+                TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                animation.setDuration(600);
+                recordlayoutfi.startAnimation(animation);
+                recordlayoutfi.setVisibility(View.GONE);
+                EditText hh = (EditText)findViewById(R.id.edit_note);
+                hh.setInputType(InputType.TYPE_CLASS_TEXT);
+            }
+        } );
 
         Button back = (Button)findViewById(R.id.cancle);
         back.setOnClickListener(new View.OnClickListener() {
@@ -183,8 +207,6 @@ public class note_activity extends AppCompatActivity {
         });
 
     }
-
-
     //设置menu的监听功能
     private void addBuilder(int i) {
         bmb_note.addBuilder(new SimpleCircleButton.Builder()
@@ -193,15 +215,38 @@ public class note_activity extends AppCompatActivity {
                 .listener(new OnBMClickListener() {
                     @Override
                     public void onBoomButtonClick(int index) {
+                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(bmb_note.getWindowToken(),0);
+
                         switch (index){
                             case 0:
-                                Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
                                 break;
                             case 1:
-                                Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
                                 break;
                             case 2:
-                                Toast.makeText( note_activity.this,"录音(待完成)",Toast.LENGTH_SHORT ).show();
+                                RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
+                                // 从屏幕底部进入的动画
+                                TranslateAnimation animation = new TranslateAnimation(
+                                        Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
+                                        Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
+                                );
+                                animation.setDuration(800);
+                                recordlayout.setVisibility(View.VISIBLE);
+                                recordlayout.startAnimation(animation);
+                                EditText hh = (EditText)findViewById(R.id.edit_note);
+                                hh.setInputType(InputType.TYPE_NULL);
                                 break;
                             default:
                         }
@@ -218,7 +263,7 @@ public class note_activity extends AppCompatActivity {
     }
 
 
-    public void openKeyboard(View view) {
+   /* public void openKeyboard(View view) {
         // 获取焦点
         editText.setFocusable(true);
         editText.setFocusableInTouchMode(true);
@@ -227,7 +272,7 @@ public class note_activity extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editText, 0);
     }
-
+*/
     @Override
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();
@@ -298,7 +343,7 @@ public class note_activity extends AppCompatActivity {
     public void startRecording() {
         STATUS = RECORDING;
         //设置为录制状态
-        change.setBackgroundResource(R.drawable.stoprecord);
+        change.setBackgroundResource(R.drawable.record2);
         //开始录制的设置
         Isrecording = true;
         timeThread = new Thread(new Runnable() {
@@ -308,7 +353,7 @@ public class note_activity extends AppCompatActivity {
             }
         });
         timeThread.start();
-
+        mWaveView.setVisibility(View.VISIBLE);
         mediaRecorder.reset();  // You can reuse the object by going back to setAudioSource() step
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -327,6 +372,7 @@ public class note_activity extends AppCompatActivity {
 
     public void stopRecording() {
         Isrecording = false;
+        mWaveView.setVisibility(View.INVISIBLE);
         STATUS = STOPRECORDING;
         //说明正在录制,设置停止信息
         change.setBackgroundResource(R.drawable.record3);
@@ -344,7 +390,7 @@ public class note_activity extends AppCompatActivity {
                 //播放完设置
                 change.setBackgroundResource(R.drawable.record3);
                 STATUS=DISPLAY;
-                Isplaying = false;
+               // Isplaying = false;
                 //  int count2 = (int) timeCount;
                 //time.setText(FormatMiss(count2));
             }
@@ -360,16 +406,16 @@ public class note_activity extends AppCompatActivity {
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                Isplaying = true;
+                //Isplaying = true;
                 STATUS = PLAY;
                 change.setBackgroundResource(R.drawable.record4);
-                timeThread2 = new Thread(new Runnable() {
+              /*  timeThread2 = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         countTime2();
                     }
                 });
-                timeThread2.start();
+                timeThread2.start();*/
                 mediaPlayer.start();
             }
         });
@@ -377,7 +423,7 @@ public class note_activity extends AppCompatActivity {
 
     public void stopPlay(){
         STATUS = DISPLAY;
-        Isplaying = false;
+       // Isplaying = false;
         change.setBackgroundResource(R.drawable.record3);
         mediaPlayer.stop();
     }
@@ -398,7 +444,7 @@ public class note_activity extends AppCompatActivity {
     }
 
 
-    private void countTime2() {
+ /*   private void countTime2() {
         timeCount2 = timeCount;
         while (Isplaying) {
             timeCount2--;
@@ -417,7 +463,7 @@ public class note_activity extends AppCompatActivity {
         msg.obj = timeCount;
         myHandler.sendMessage(msg);
     }
-
+*/
 
     public static String FormatMiss(int miss) {
         String hh = miss / 3600 > 9 ? miss / 3600 + "" : "0" + miss / 3600;
@@ -435,9 +481,9 @@ public class note_activity extends AppCompatActivity {
                     int count = (int) msg.obj;
                     time.setText(FormatMiss(count));
                     break;
-                case TIME_COUNT2:
+               /* case TIME_COUNT2:
                     int count2 = (int) msg.obj;
-                    time.setText(FormatMiss(count2));
+                    time.setText(FormatMiss(count2));*/
             }
         }
     };
@@ -474,6 +520,8 @@ public class note_activity extends AppCompatActivity {
 
 
     protected void init() {
+        mWaveView = (WaveView) findViewById(R.id.wave);
+        mWaveView.setVisibility(View.INVISIBLE);
         time = (TextView)findViewById(R.id.time);
         //?
         time.setText("00:00:00");
@@ -505,7 +553,7 @@ public class note_activity extends AppCompatActivity {
             change.setBackgroundResource(R.drawable.record3);
         }
         else{
-            change.setBackgroundResource(R.drawable.record);
+            change.setBackgroundResource(R.drawable.record1);
         }
 
         change = (ImageButton) findViewById(R.id.change);
@@ -534,18 +582,18 @@ public class note_activity extends AppCompatActivity {
                 if (STATUS==STOPRECORDING||STATUS==DISPLAY){
                     file.delete();
                     Isrecording = false;
-                    Isplaying = false;
+                    //Isplaying = false;
                     STATUS = START;
-                    change.setBackgroundResource(R.drawable.record);
+                    change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
                     timeCount = 0;
                 }
                 else if (STATUS==START&&file.exists()){
                     file.delete();
                     Isrecording = false;
-                    Isplaying = false;
+                   // Isplaying = false;
                     STATUS = START;
-                    change.setBackgroundResource(R.drawable.record);
+                    change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
                     timeCount=0;
                 }
@@ -554,16 +602,16 @@ public class note_activity extends AppCompatActivity {
                     file.delete();
                     Isrecording = false;
                     STATUS = START;
-                    change.setBackgroundResource(R.drawable.record);
+                    change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
                     timeCount=0;
                 }
                 else if (STATUS==RECORDING){
                     stopRecording();
                     file.delete();
-                    Isplaying = false;
+                   // Isplaying = false;
                     STATUS = START;
-                    change.setBackgroundResource(R.drawable.record);
+                    change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
                     timeCount=0;
                 }
