@@ -23,6 +23,7 @@
         android:id="@+id/bianji"
         android:gravity="center"
         android:textSize="20sp"
+
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:text="编辑"

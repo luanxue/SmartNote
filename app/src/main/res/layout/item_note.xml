@@ -9,17 +9,21 @@
     app:ios="false"
     app:leftSwipe="true"
     app:swipeEnable="true">
-
     <LinearLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/white"
+            />
         <TextView
 
             android:id="@+id/content1"
             android:layout_width="match_parent"
+
             android:layout_height="44dp"
             android:gravity="left"
             android:maxLines="1"
@@ -30,6 +34,7 @@
             android:text="我是任意复杂的原Item布局"
             android:textColor="@color/black"
             android:textSize="19sp"
+
             android:textStyle="italic" />
 
         <LinearLayout
@@ -40,7 +45,9 @@
 
             <TextView
                 android:id="@+id/content2"
+
                 android:layout_width="250dp"
+
                 android:layout_height="match_parent"
                 android:layout_weight="1.5"
                 android:gravity="left"
@@ -51,14 +58,23 @@
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 android:textStyle="italic" />
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="match_parent"
+                android:id="@+id/content4"
+                android:visibility="visible"
+                android:src="@mipmap/microphone"
+                />
 
             <ImageView
                 android:id="@+id/content3"
+
                 android:layout_weight="1"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/alarm1"
                 android:visibility="invisible"/>
+
 
         </LinearLayout>
 
@@ -67,7 +83,9 @@
     <!-- 以下都是侧滑菜单的内容依序排列 -->
     <Button
         android:id="@+id/btnLock"
+
         android:layout_width="75dp"
+
         android:layout_height="match_parent"
         android:background="#d9dee4"
         android:text="上锁"
@@ -75,7 +93,9 @@
 
     <Button
         android:id="@+id/alarm"
+
         android:layout_width="90dp"
+
         android:layout_height="match_parent"
         android:background="#e8d310"
         android:clickable="true"
@@ -84,7 +104,9 @@
 
     <Button
         android:id="@+id/btnDelete"
+
         android:layout_width="75dp"
+
         android:layout_height="match_parent"
         android:background="@android:color/holo_red_dark"
         android:text="删除"

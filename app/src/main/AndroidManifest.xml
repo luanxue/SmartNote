@@ -42,8 +42,10 @@
             </intent-filter>
         </receiver>
 
+
         <activity android:name="com.gongyunhaoyyy.password.AboutUsActivity">
         </activity>
+
     </application>
 
 </manifest>
