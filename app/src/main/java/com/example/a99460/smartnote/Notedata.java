@@ -96,5 +96,14 @@ public class Notedata extends DataSupport{
 
     private String audio;
 
+    public void setRecordTime(int recordTime) {
+        RecordTime = recordTime;
+    }
+
+    public int getRecordTime() {
+        return RecordTime;
+    }
+
+    int RecordTime;
 
 }

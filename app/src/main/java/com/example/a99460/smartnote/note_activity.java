@@ -74,9 +74,10 @@ public class note_activity extends AppCompatActivity {
     static int STATUS=START;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
-    String PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
+    String PATH_NAME;
     ImageButton change;
     ImageButton delete;
+    ImageButton ok_record;
     Thread timeThread; // 记录录音时长的线程
     //Thread timeThread2;
     int timeCount;
@@ -88,18 +89,12 @@ public class note_activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
+       PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
+        ok_record = (ImageButton) findViewById(R.id.ok_record);
         STATUS = START;
         change.setBackgroundResource(R.drawable.record1);
-
-        if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            init();
-        } else {
-            ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-
         //BoomMenuButton相关配置
         bmb_note = (BoomMenuButton) findViewById(R.id.bmb_note);
         assert bmb_note != null;
@@ -110,9 +105,9 @@ public class note_activity extends AppCompatActivity {
         bmb_note.getCustomButtonPlacePositions().add(new PointF(Util.dp2px(+30), Util.dp2px(-160)));
         bmb_note.getCustomButtonPlacePositions().add(new PointF(Util.dp2px(+110), Util.dp2px(-80)));
         editText = (EditText)findViewById(R.id.edit_note);
-
         Intent intent = getIntent();
         myid=intent.getIntExtra( "in_data",-1 );
+        PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -207,6 +202,12 @@ public class note_activity extends AppCompatActivity {
                                 Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
                                 break;
                             case 2:
+                                if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                                        ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                                    init();
+                                } else {
+                                    ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                                }
                                 final RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
                                  recordlayout.setVisibility(View.VISIBLE);
                                 EditText hh = (EditText)findViewById(R.id.edit_note);
@@ -300,7 +301,7 @@ public class note_activity extends AppCompatActivity {
     protected String GetDate(){
         SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
         String date = sDateFormat.format(new java.util.Date());
-        Toast.makeText(note_activity.this,date,Toast.LENGTH_SHORT).show();
+
         return date;
     }
 
@@ -341,6 +342,8 @@ public class note_activity extends AppCompatActivity {
         //说明正在录制,设置停止信息
         change.setBackgroundResource(R.drawable.record3);
         mediaRecorder.stop();
+        delete.setVisibility(View.VISIBLE);
+        ok_record.setVisibility(View.VISIBLE);
     }
 
     public void startPlay() {
@@ -354,9 +357,6 @@ public class note_activity extends AppCompatActivity {
                 //播放完设置
                 change.setBackgroundResource(R.drawable.record3);
                 STATUS=DISPLAY;
-               // Isplaying = false;
-                //  int count2 = (int) timeCount;
-                //time.setText(FormatMiss(count2));
             }
         });
         try {
@@ -541,8 +541,6 @@ public class note_activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 File file = new File(PATH_NAME);
-
-
                 if (STATUS==STOPRECORDING||STATUS==DISPLAY){
                     file.delete();
                     Isrecording = false;
@@ -579,7 +577,8 @@ public class note_activity extends AppCompatActivity {
                     time.setText("00:00:00");
                     timeCount=0;
                 }
-
+           delete.setVisibility(View.INVISIBLE);
+                ok_record.setVisibility(View.INVISIBLE);
             }
         });
     }
