@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#272a2c"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:gravity="center"
-        android:textSize="30dp"/>
+        android:textSize="27dp"/>
 
 
     <TextView
@@ -22,20 +22,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="55dp"
         android:fontFamily="sans-serif-thin"
         android:gravity="center"
         android:maxLines="1"
         android:text="Welcome"
         android:textColor="@color/text"
-        android:textSize="25sp"/>
+        android:textSize="22sp"/>
 
     <com.andrognito.patternlockview.PatternLockView
         android:id="@+id/patter_lock_view"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="73dp"
         app:aspectRatio="square"
         app:aspectRatioEnabled="true"
         app:dotAnimationDuration="150"

@@ -1,7 +1,9 @@
 package com.gongyunhaoyyy.password;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +22,8 @@ import com.example.a99460.smartnote.note_activity;
 import java.util.List;
 
 import io.reactivex.functions.Consumer;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LockActivity extends AppCompatActivity {
     private PatternLockView mPatternLockView;
@@ -38,6 +42,16 @@ public class LockActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_lock );
+
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
+        //onCreat中注册Calligraphy
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(tftf)
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
+
         TextView titlt_tv=(TextView)findViewById( R.id.title_TextView );
         final TextView hint_tv=(TextView)findViewById( R.id.hint_TextView );
         //记录输入错误次数
@@ -150,4 +164,18 @@ public class LockActivity extends AppCompatActivity {
                 });
 
     }
+
+    @Override
+    protected void onResume() {
+        if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
+    }
+
 }
