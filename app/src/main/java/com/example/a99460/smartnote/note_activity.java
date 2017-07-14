@@ -148,7 +148,7 @@ public class note_activity extends AppCompatActivity {
                 // 从原位置下滑到底部的动画
                 //从当前的位置向下移动700px
                 TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
-                animation.setDuration(600);
+                animation.setDuration(400);
                 recordlayoutfi.startAnimation(animation);
                 recordlayoutfi.setVisibility(View.GONE);
                 EditText hh = (EditText)findViewById(R.id.edit_note);
@@ -165,43 +165,49 @@ public class note_activity extends AppCompatActivity {
                 if(wordsecond.equals( wordfirst )||wordsecond==null||!Issave( wordsecond )){
                     finish();
                 }else {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
-                    dialog.setTitle("提醒");
-                    dialog.setMessage("是否保存？");
-                    dialog.setCancelable(false);
-                    dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dialog,int which){
-                            if(wordfirst==null){
-                                String word1 = editText.getText().toString();
-                                Notedata notedata = new Notedata();
-                                if(word1!=null&&Issave(word1))
-                                {
-                                    notedata.setDate(GetDate());
-                                    notedata.setNote(word1);
-                                    notedata.save();
+                    if (wordfirst == null && Issave( wordsecond )) {
+                        String word1 = editText.getText( ).toString( );
+                        Notedata notedata = new Notedata( );
+                        notedata.setDate( GetDate( ) );
+                        notedata.setNote( word1 );
+                        notedata.save( );
+                        finish();
+                    } else {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder( note_activity.this );
+                        dialog.setTitle( "提醒" );
+                        dialog.setMessage( "是否保存？" );
+                        dialog.setCancelable( false );
+                        dialog.setPositiveButton( "是", new DialogInterface.OnClickListener( ) {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (wordfirst == null) {
+                                    String word1 = editText.getText( ).toString( );
+                                    Notedata notedata = new Notedata( );
+                                    if (word1 != null && Issave( word1 )) {
+                                        notedata.setDate( GetDate( ) );
+                                        notedata.setNote( word1 );
+                                        notedata.save( );
+                                    }
+                                } else {
+                                    Notedata notedata = DataSupport.find( Notedata.class, myid );
+                                    String word1 = editText.getText( ).toString( );
+                                    if (word1 != null && Issave( word1 )) {
+                                        notedata.setDate( GetDate( ) );
+                                        notedata.setNote( word1 );
+                                        notedata.save( );
+                                    }
                                 }
+                                finish( );
                             }
-                            else {
-                                Notedata notedata = DataSupport.find(Notedata.class,myid);
-                                String word1 = editText.getText().toString();
-                                if(word1!=null&&Issave(word1))
-                                {
-                                    notedata.setDate(GetDate());
-                                    notedata.setNote(word1);
-                                    notedata.save();
-                                }
+                        } );
+                        dialog.setNegativeButton( "否", new DialogInterface.OnClickListener( ) {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish( );
                             }
-                            finish();
-                        }
-                    });
-                    dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dialog,int which){
-                            finish();
-                        }
-                    });
-                    dialog.show();
+                        } );
+                        dialog.show( );
+                    }
                 }
             }
         });
@@ -217,36 +223,29 @@ public class note_activity extends AppCompatActivity {
                     public void onBoomButtonClick(int index) {
                         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(bmb_note.getWindowToken(),0);
-
                         switch (index){
                             case 0:
-                                new Timer().schedule( new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
-                                    }
-                                }, 400);//这里停留时间为1000=1s。
+                                Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
                                 break;
                             case 1:
-                                new Timer().schedule( new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
-                                    }
-                                }, 400);//这里停留时间为1000=1s。
+                                Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
                                 break;
                             case 2:
                                 RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
-                                // 从屏幕底部进入的动画
-                                TranslateAnimation animation = new TranslateAnimation(
-                                        Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
-                                        Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
-                                );
-                                animation.setDuration(800);
-                                recordlayout.setVisibility(View.VISIBLE);
-                                recordlayout.startAnimation(animation);
-                                EditText hh = (EditText)findViewById(R.id.edit_note);
-                                hh.setInputType(InputType.TYPE_NULL);
+                                if(recordlayout.getVisibility()==View.VISIBLE){
+
+                                }else {
+                                    // 从屏幕底部进入的动画
+                                    TranslateAnimation animation = new TranslateAnimation(
+                                            Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
+                                            Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
+                                    );
+                                    animation.setDuration(600);
+                                    recordlayout.setVisibility(View.VISIBLE);
+                                    recordlayout.startAnimation(animation);
+                                    EditText hh = (EditText)findViewById(R.id.edit_note);
+                                    hh.setInputType(InputType.TYPE_NULL);
+                                }
                                 break;
                             default:
                         }
@@ -262,63 +261,71 @@ public class note_activity extends AppCompatActivity {
         super.onResume();
     }
 
-
-   /* public void openKeyboard(View view) {
-        // 获取焦点
-        editText.setFocusable(true);
-        editText.setFocusableInTouchMode(true);
-        editText.requestFocus();
-        // 弹出软键盘
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, 0);
-    }
-*/
     @Override
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();
-        //空笔记或者没有改变笔记都不会弹dialog
-        if(wordsecond.equals( wordfirst )||wordsecond==null||!Issave( wordsecond )){
-            finish();
+
+        RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
+        if(recordlayoutback.getVisibility()==View.VISIBLE){
+            TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+            animation.setDuration(400);
+            recordlayoutback.startAnimation(animation);
+            recordlayoutback.setVisibility(View.GONE);
+            EditText hh = (EditText)findViewById(R.id.edit_note);
+            hh.setInputType(InputType.TYPE_CLASS_TEXT);
         }else {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
-            dialog.setTitle("提醒");
-            dialog.setMessage("是否保存？");
-            dialog.setCancelable(false);
-            dialog.setPositiveButton("是",new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialog,int which){
-                    if(wordfirst==null){
-                        String word1 = editText.getText().toString();
-                        Notedata notedata = new Notedata();
-                        if(word1!=null&&Issave(word1))
-                        {
-                            notedata.setDate(GetDate());
-                            notedata.setNote(word1);
-                            notedata.save();
+            //空笔记或者没有改变笔记都不会弹dialog
+            if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
+                finish( );
+            } else {
+                if (wordfirst == null && Issave( wordsecond )) {
+                    String word1 = editText.getText( ).toString( );
+                    Notedata notedata = new Notedata( );
+                    notedata.setDate( GetDate( ) );
+                    notedata.setNote( word1 );
+                    notedata.save( );
+                    finish( );
+                } else {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder( note_activity.this );
+                    dialog.setTitle( "提醒" );
+                    dialog.setMessage( "是否保存？" );
+                    dialog.setCancelable( false );
+                    dialog.setPositiveButton( "是", new DialogInterface.OnClickListener( ) {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (wordfirst == null) {
+                                String word1 = editText.getText( ).toString( );
+                                Notedata notedata = new Notedata( );
+                                if (word1 != null && Issave( word1 )) {
+                                    notedata.setDate( GetDate( ) );
+                                    notedata.setNote( word1 );
+                                    notedata.save( );
+                                }
+                            } else {
+                                Notedata notedata = DataSupport.find( Notedata.class, myid );
+                                String word1 = editText.getText( ).toString( );
+                                if (word1 != null && Issave( word1 )) {
+                                    notedata.setDate( GetDate( ) );
+                                    notedata.setNote( word1 );
+                                    notedata.save( );
+                                }
+                            }
+                            finish( );
                         }
-                    }
-                    else {
-                        Notedata notedata = DataSupport.find(Notedata.class,myid);
-                        String word1 = editText.getText().toString();
-                        if(word1!=null&&Issave(word1))
-                        {
-                            notedata.setDate(GetDate());
-                            notedata.setNote(word1);
-                            notedata.save();
+                    } );
+                    dialog.setNegativeButton( "否", new DialogInterface.OnClickListener( ) {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish( );
                         }
-                    }
-                    finish();
+                    } );
+                    dialog.show( );
                 }
-            });
-            dialog.setNegativeButton("否",new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialog,int which){
-                    finish();
-                }
-            });
-            dialog.show();
+            }
         }
+
     }
+
     protected boolean Issave(String word){
         int length = word.length();
         int i,flag=0;

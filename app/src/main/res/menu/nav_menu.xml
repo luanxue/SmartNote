@@ -3,19 +3,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu_lock"
-            android:icon="@drawable/nav_call"
+            android:icon="@drawable/lock_icon"
             android:title="@string/password"
-            android:textColor = "#FFB6C1"/>
+            android:textColor="@color/text"/>
         <item
             android:id="@+id/menu_typeface"
-            android:icon="@drawable/nav_friends"
+            android:icon="@drawable/typeface"
             android:title="@string/typeface"
-            android:textColor = "#FFB6C1"/>
+            android:textColor="@color/text"/>
         <item
             android:id="@+id/menu_aboutus"
-            android:icon="@drawable/nav_location"
+            android:icon="@drawable/squirrel"
             android:title="@string/abutus"
-            android:textColor = "#FFB6C1"/>
+            android:textColor="@color/text"/>
     </group>
 
 </menu>
