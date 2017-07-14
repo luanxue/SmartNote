@@ -21,8 +21,10 @@ import android.provider.ContactsContract;
 
 
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
     private ListView mLv;
     private List<Note> mDatas;
     private FloatingActionButton fab;
-    private FloatingActionButton menu;
     String result = "";
     BoomMenuButton bmb;
     long triggerAtTime;
@@ -90,18 +91,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initdata();
 
-        //BoomMenuButton相关配置
-        bmb = (BoomMenuButton) findViewById(R.id.bmb);
-        assert bmb != null;
-        bmb.setButtonEnum( ButtonEnum.Ham);
-        bmb.setPiecePlaceEnum( PiecePlaceEnum.HAM_3);
-        bmb.setButtonPlaceEnum( ButtonPlaceEnum.HAM_3);
-        bmb.setShadowEffect( false );
-        for (int i = 0; i < bmb.getPiecePlaceEnum().pieceNumber(); i++){
-//            bmb.addBuilder(BuilderManager.getHamButtonBuilder(i));
-            addBuilder(i);
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -115,6 +104,30 @@ public class MainActivity extends AppCompatActivity {
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+
+        NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
+        nav.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener( ) {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.menu_lock:
+                        //设置新密码or修改密码
+                        if (isDeadLock()){
+                            Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
+                        }else {
+                            startActivity(new Intent(MainActivity.this,LockActivity.class));
+                        }
+                        break;
+                    case R.id.menu_typeface:
+                        startActivity(new Intent(MainActivity.this,ThemeSelectActivity.class));
+                        break;
+                    case R.id.menu_aboutus:
+                        startActivity(new Intent(MainActivity.this,AboutUsActivity.class));
+                }
+                return false;
+            }
+        } );
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -363,54 +376,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-    }
-
-    //设置menu的监听功能
-    private void addBuilder(int i) {
-        bmb.addBuilder(new HamButton.Builder()
-                .normalImageRes(BuilderManager.getImageResource())
-                .normalTextRes(  BuilderManager.getHamButtonBuildertext( i )  )
-                .subNormalTextRes( BuilderManager.getHamButtonBuildersubtext( i ) )
-                .pieceColor( Color.WHITE)
-                .listener(new OnBMClickListener() {
-                    @Override
-                    public void onBoomButtonClick(int index) {
-                        switch (index){
-                            case 0:
-                                //设置新密码or修改密码
-                                if (isDeadLock()){
-                                    Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
-                                }else {
-                                    //调用Timer函数使Intent延迟400ms后跳转，使BMB动画效果显示出来
-                                    //如果用Thread.sleep，系统会休眠，MBM动画效果并不会显示
-                                    new Timer().schedule( new TimerTask() {
-                                        @Override
-                                        public void run() {
-                                            startActivity(new Intent(MainActivity.this,LockActivity.class));
-                                        }
-                                    }, 400);//这里停留时间为1000=1s。
-                                }
-                                break;
-                            case 1:
-                                new Timer().schedule( new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        startActivity(new Intent(MainActivity.this,ThemeSelectActivity.class));
-                                    }
-                                }, 400);//这里停留时间为1000=1s。
-                                break;
-                            case 2:
-                                new Timer().schedule( new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        startActivity(new Intent(MainActivity.this,AboutUsActivity.class));
-                                    }
-                                }, 400);//这里停留时间为1000=1s。
-                                Toast.makeText(MainActivity.this, "关于我们(待完成)", Toast.LENGTH_SHORT).show();
-                                break;
-                        }
-                    }
-                }));
     }
 
     @Override

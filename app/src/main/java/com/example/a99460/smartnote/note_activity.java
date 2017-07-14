@@ -31,6 +31,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +42,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.gongyunhaoyyy.password.BuilderManager;
+import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
@@ -137,6 +140,22 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
+        ImageButton record_ok=(ImageButton)findViewById( R.id.ok_record );
+        record_ok.setOnClickListener( new View.OnClickListener( ) {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutfi = (RelativeLayout)findViewById(R.id.record_layout);
+                // 从原位置下滑到底部的动画
+                //从当前的位置向下移动700px
+                TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                animation.setDuration(600);
+                recordlayoutfi.startAnimation(animation);
+                recordlayoutfi.setVisibility(View.GONE);
+                EditText hh = (EditText)findViewById(R.id.edit_note);
+                hh.setInputType(InputType.TYPE_CLASS_TEXT);
+            }
+        } );
+
         Button back = (Button)findViewById(R.id.cancle);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,14 +220,31 @@ public class note_activity extends AppCompatActivity {
 
                         switch (index){
                             case 0:
-                                Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
                                 break;
                             case 1:
-                                Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
                                 break;
                             case 2:
-                                final RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
-                                 recordlayout.setVisibility(View.VISIBLE);
+                                RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
+                                // 从屏幕底部进入的动画
+                                TranslateAnimation animation = new TranslateAnimation(
+                                        Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
+                                        Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
+                                );
+                                animation.setDuration(800);
+                                recordlayout.setVisibility(View.VISIBLE);
+                                recordlayout.startAnimation(animation);
                                 EditText hh = (EditText)findViewById(R.id.edit_note);
                                 hh.setInputType(InputType.TYPE_NULL);
                                 break;
