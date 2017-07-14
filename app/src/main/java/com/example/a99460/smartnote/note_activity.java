@@ -1,13 +1,23 @@
 
 package com.example.a99460.smartnote;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,13 +26,19 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -31,19 +47,50 @@ public class note_activity extends AppCompatActivity {
     EditText editText;
     String wordfirst;
     int myid;
+    boolean Isrecording;
+    boolean Isplaying;
+    static final int START = 0;
+    static final int DISPLAY = 1;
+    static final int PLAY = 2;
+    static final int RECORDING = 3;
+    static final int STOPRECORDING = 4;
+    static int STATUS=START;
+    MediaRecorder mediaRecorder;
+    MediaPlayer mediaPlayer;
+    String PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
+    ImageButton change;
+    ImageButton delete;
+    Thread timeThread; // 记录录音时长的线程
+    Thread timeThread2;
+    int timeCount;
+    int timeCount2;// 录音时长 计数
+    final int TIME_COUNT = 0x101;
+    final int TIME_COUNT2 = 0x102;
+    TextView time;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
+        delete = (ImageButton) findViewById(R.id.delete);
+        change = (ImageButton) findViewById(R.id.change);
+        STATUS = START;
+        change.setBackgroundResource(R.drawable.record);
+
+        if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            init();
+        } else {
+            ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
 
         FloatingActionButton record = (FloatingActionButton)findViewById(R.id.record);
 
         record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(note_activity.this,Record.class);
-                intent.putExtra("id",myid);
-                startActivity(intent);
+                RelativeLayout xx = (RelativeLayout)findViewById(R.id.record_layout);
+                xx.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -156,6 +203,15 @@ public class note_activity extends AppCompatActivity {
         });
 
     }
+    public void openKeyboard(View view) {
+        // 获取焦点
+        editText.setFocusable(true);
+        editText.setFocusableInTouchMode(true);
+        editText.requestFocus();
+        // 弹出软键盘
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(editText, 0);
+    }
     @Override
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();
@@ -221,5 +277,282 @@ public class note_activity extends AppCompatActivity {
         String date = sDateFormat.format(new java.util.Date());
         Toast.makeText(note_activity.this,date,Toast.LENGTH_SHORT).show();
         return date;
+    }
+
+    public void startRecording() {
+        STATUS = RECORDING;
+        //设置为录制状态
+        change.setBackgroundResource(R.drawable.stoprecord);
+        //开始录制的设置
+        Isrecording = true;
+        timeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                countTime();
+            }
+        });
+        timeThread.start();
+
+        mediaRecorder.reset();  // You can reuse the object by going back to setAudioSource() step
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        try {
+            //设置储存路径
+            mediaRecorder.setOutputFile(PATH_NAME);
+            mediaRecorder.prepare();
+            mediaRecorder.start();   // Recording is now started
+        } catch (IOException e) {
+            Toast.makeText(this, "准备录制文件失败", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            finish();
+        }
+    }
+
+    public void stopRecording() {
+        Isrecording = false;
+        STATUS = STOPRECORDING;
+        //说明正在录制,设置停止信息
+        change.setBackgroundResource(R.drawable.record3);
+        mediaRecorder.stop();
+    }
+
+    public void startPlay() {
+
+        //设置音频播放器
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                //播放完设置
+                change.setBackgroundResource(R.drawable.record3);
+                STATUS=DISPLAY;
+                Isplaying = false;
+                //  int count2 = (int) timeCount;
+                //time.setText(FormatMiss(count2));
+            }
+        });
+        try {
+            mediaPlayer.setDataSource(PATH_NAME);
+            mediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "录音文件已丢失", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                Isplaying = true;
+                STATUS = PLAY;
+                change.setBackgroundResource(R.drawable.record4);
+                timeThread2 = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        countTime2();
+                    }
+                });
+                timeThread2.start();
+                mediaPlayer.start();
+            }
+        });
+    }
+
+    public void stopPlay(){
+        STATUS = DISPLAY;
+        Isplaying = false;
+        change.setBackgroundResource(R.drawable.record3);
+        mediaPlayer.stop();
+    }
+
+    private void countTime() {
+        while (Isrecording) {
+            timeCount++;
+            Message msg = Message.obtain();
+            msg.what = TIME_COUNT;
+            msg.obj = timeCount;
+            myHandler.sendMessage(msg);
+            try {
+                timeThread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private void countTime2() {
+        timeCount2 = timeCount;
+        while (Isplaying) {
+            timeCount2--;
+            Message msg = Message.obtain();
+            msg.what = TIME_COUNT2;
+            msg.obj = timeCount2;
+            myHandler.sendMessage(msg);
+            try {
+                timeThread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Message msg = Message.obtain();
+        msg.what = TIME_COUNT2;
+        msg.obj = timeCount;
+        myHandler.sendMessage(msg);
+    }
+
+
+    public static String FormatMiss(int miss) {
+        String hh = miss / 3600 > 9 ? miss / 3600 + "" : "0" + miss / 3600;
+        String mm = (miss % 3600) / 60 > 9 ? (miss % 3600) / 60 + "" : "0" + (miss % 3600) / 60;
+        String ss = (miss % 3600) % 60 > 9 ? (miss % 3600) % 60 + "" : "0" + (miss % 3600) % 60;
+        return hh + ":" + mm + ":" + ss;
+    }
+
+
+    Handler myHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case TIME_COUNT:
+                    int count = (int) msg.obj;
+                    time.setText(FormatMiss(count));
+                    break;
+                case TIME_COUNT2:
+                    int count2 = (int) msg.obj;
+                    time.setText(FormatMiss(count2));
+            }
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (PLAY == STATUS) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
+        if (RECORDING == STATUS) {
+            mediaRecorder.stop();
+            mediaRecorder.release();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String [] permissions,int[] grantResults){
+        switch (requestCode){
+            case 1:
+                if (grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if(ContextCompat.checkSelfPermission(note_activity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED&&
+                            ContextCompat.checkSelfPermission(note_activity.this,Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED) {
+                        init();
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+
+
+    protected void init() {
+        time = (TextView)findViewById(R.id.time);
+        //?
+        time.setText("00:00:00");
+        mediaRecorder = new MediaRecorder();
+        //设置到达最大录制长度时重头开始录制
+        mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+            @Override
+            public void onInfo(MediaRecorder mr, int what, int extra) {
+                switch (what) {
+                    case MediaRecorder.MEDIA_RECORDER_ERROR_UNKNOWN:
+                        Toast.makeText(note_activity.this, "未知错误", Toast.LENGTH_SHORT).show();
+                        finish();
+                        break;
+                    case MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED:
+                        Toast.makeText(note_activity.this, "已达到最大录制长度，开始重新录制", Toast.LENGTH_SHORT).show();
+                        startRecording();
+                        break;
+                    case MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED:
+                        Toast.makeText(note_activity.this, "空间不足，无法录制", Toast.LENGTH_SHORT).show();
+                        mediaRecorder.stop();
+                        break;
+
+                }
+            }
+        });
+        File file = new File(PATH_NAME);
+        if (file.exists()){
+            STATUS = DISPLAY;
+            change.setBackgroundResource(R.drawable.record3);
+        }
+        else{
+            change.setBackgroundResource(R.drawable.record);
+        }
+
+        change = (ImageButton) findViewById(R.id.change);
+        change.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (STATUS == START) {
+                    startRecording();
+                } else if (STATUS == RECORDING) {
+                    stopRecording();
+                } else if (STATUS == STOPRECORDING || STATUS == DISPLAY) {
+                    startPlay();
+                }
+                else if (PLAY==STATUS){
+                    stopPlay();
+                }
+            }
+        });
+        delete = (ImageButton) findViewById(R.id.delete);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File file = new File(PATH_NAME);
+
+
+                if (STATUS==STOPRECORDING||STATUS==DISPLAY){
+                    file.delete();
+                    Isrecording = false;
+                    Isplaying = false;
+                    STATUS = START;
+                    change.setBackgroundResource(R.drawable.record);
+                    time.setText("00:00:00");
+                    timeCount = 0;
+                }
+                else if (STATUS==START&&file.exists()){
+                    file.delete();
+                    Isrecording = false;
+                    Isplaying = false;
+                    STATUS = START;
+                    change.setBackgroundResource(R.drawable.record);
+                    time.setText("00:00:00");
+                    timeCount=0;
+                }
+                else if (STATUS==PLAY){
+                    stopPlay();
+                    file.delete();
+                    Isrecording = false;
+                    STATUS = START;
+                    change.setBackgroundResource(R.drawable.record);
+                    time.setText("00:00:00");
+                    timeCount=0;
+                }
+                else if (STATUS==RECORDING){
+                    stopRecording();
+                    file.delete();
+                    Isplaying = false;
+                    STATUS = START;
+                    change.setBackgroundResource(R.drawable.record);
+                    time.setText("00:00:00");
+                    timeCount=0;
+                }
+
+            }
+        });
     }
 }

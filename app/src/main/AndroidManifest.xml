@@ -42,7 +42,6 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".Record" />
     </application>
 
 </manifest>
