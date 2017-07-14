@@ -78,7 +78,7 @@ public class LockToNoteActivity extends AppCompatActivity {
         mPatternLockView.setCorrectStateColor(ResourceUtils.getColor(this, R.color.line));
         mPatternLockView.setNormalStateColor( ResourceUtils.getColor(this, R.color.line) );
         mPatternLockView.setInStealthMode(false);
-        mPatternLockView.setTactileFeedbackEnabled(true);
+        mPatternLockView.setTactileFeedbackEnabled(false);
         mPatternLockView.setInputEnabled(true);
         mPatternLockView.addPatternLockListener(mPatternLockViewListener);
 

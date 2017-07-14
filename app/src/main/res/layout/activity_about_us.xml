@@ -32,7 +32,7 @@
 
         <TextView
             android:gravity="center"
-            android:text="v3.2.0"
+            android:text="@string/version"
             android:layout_width="match_parent"
             android:textSize="18dp"
             android:layout_height="20dp"/>

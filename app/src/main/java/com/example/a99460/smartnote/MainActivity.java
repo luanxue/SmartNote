@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initdata();
 
+        NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -105,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                         .build()
         );
 
-        NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
         nav.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener( ) {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.menu_aboutus:
                         startActivity(new Intent(MainActivity.this,AboutUsActivity.class));
+                        Toast.makeText( MainActivity.this,"关于我们(待完成)",Toast.LENGTH_SHORT ).show();
                 }
                 return false;
             }
