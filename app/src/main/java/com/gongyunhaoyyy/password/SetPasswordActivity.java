@@ -1,6 +1,8 @@
 package com.gongyunhaoyyy.password;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -17,6 +19,8 @@ import com.example.a99460.smartnote.R;
 import java.util.List;
 
 import io.reactivex.functions.Consumer;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class SetPasswordActivity extends AppCompatActivity {
     private PatternLockView mPatternLockView;
@@ -35,6 +39,15 @@ public class SetPasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_set_password );
+
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
+        //onCreat中注册Calligraphy
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(tftf)
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
 
         //记录新密码次数
         final int[] i = {0};
@@ -107,4 +120,18 @@ public class SetPasswordActivity extends AppCompatActivity {
                 });
 
     }
+
+    @Override
+    protected void onResume() {
+        if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
+    }
+
 }

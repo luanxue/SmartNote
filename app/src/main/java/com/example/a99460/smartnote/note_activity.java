@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.PointF;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.media.AudioManager;
@@ -34,6 +37,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.gongyunhaoyyy.password.BuilderManager;
+import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
+import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
+import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
+import com.nightonke.boommenu.BoomMenuButton;
+import com.nightonke.boommenu.Util;
 
 import org.litepal.crud.DataSupport;
 
@@ -42,10 +51,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class note_activity extends AppCompatActivity {
     EditText editText;
     String wordfirst;
+    BoomMenuButton bmb_note;
     int myid;
     boolean Isrecording;
     boolean Isplaying;
@@ -83,17 +95,15 @@ public class note_activity extends AppCompatActivity {
             ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
-        FloatingActionButton record = (FloatingActionButton)findViewById(R.id.record);
-
-        record.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RelativeLayout xx = (RelativeLayout)findViewById(R.id.record_layout);
-                xx.setVisibility(View.VISIBLE);
-
-            }
-        });
-
+        //BoomMenuButton相关配置
+        bmb_note = (BoomMenuButton) findViewById(R.id.bmb_note);
+        assert bmb_note != null;
+        bmb_note.setShadowEffect( false );
+        bmb_note.setButtonPlaceEnum( ButtonPlaceEnum.Custom );
+        for (int i = 0; i < bmb_note.getPiecePlaceEnum().pieceNumber(); i++) addBuilder( i+3 );
+        bmb_note.getCustomButtonPlacePositions().add(new PointF( Util.dp2px(-50), Util.dp2px(-240)));
+        bmb_note.getCustomButtonPlacePositions().add(new PointF(Util.dp2px(+30), Util.dp2px(-160)));
+        bmb_note.getCustomButtonPlacePositions().add(new PointF(Util.dp2px(+110), Util.dp2px(-80)));
         editText = (EditText)findViewById(R.id.edit_note);
 
         Intent intent = getIntent();
@@ -102,8 +112,6 @@ public class note_activity extends AppCompatActivity {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
-
-
       
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
@@ -124,34 +132,6 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
-        Button yes = (Button)findViewById(R.id.yes);
-        yes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(wordfirst==null){
-                    String word1 = editText.getText().toString();
-                    Notedata notedata = new Notedata();
-                    if(Issave(word1))
-                    {
-                        notedata.setDate(GetDate());
-                        notedata.setNote(word1);
-                        notedata.save();
-                    }
-                }
-                else {
-                    Notedata notedata = DataSupport.find(Notedata.class,myid);
-                    String word1 = editText.getText().toString();
-                    if(Issave(word1))
-                    {
-                        notedata.setDate(GetDate());
-                        notedata.setNote(word1);
-                        notedata.save();
-                    }
-                }
-
-                finish();
-            }
-        });
         Button back = (Button)findViewById(R.id.cancle);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,6 +183,41 @@ public class note_activity extends AppCompatActivity {
         });
 
     }
+
+
+    //设置menu的监听功能
+    private void addBuilder(int i) {
+        bmb_note.addBuilder(new SimpleCircleButton.Builder()
+                .normalImageRes(BuilderManager.getImageResourcenote(i))
+                .pieceColor( Color.WHITE)
+                .listener(new OnBMClickListener() {
+                    @Override
+                    public void onBoomButtonClick(int index) {
+                        switch (index){
+                            case 0:
+                                Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                break;
+                            case 1:
+                                Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                break;
+                            case 2:
+                                Toast.makeText( note_activity.this,"录音(待完成)",Toast.LENGTH_SHORT ).show();
+                                break;
+                            default:
+                        }
+                    }
+                }));
+    }
+
+    @Override
+    protected void onResume() {
+        if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onResume();
+    }
+
+
     public void openKeyboard(View view) {
         // 获取焦点
         editText.setFocusable(true);
@@ -212,6 +227,7 @@ public class note_activity extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(editText, 0);
     }
+
     @Override
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();

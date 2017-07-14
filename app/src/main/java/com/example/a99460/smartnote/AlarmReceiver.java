@@ -25,7 +25,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         //  playIntent.putExtra("id",id);
         PendingIntent pendingIntent = PendingIntent.getActivity(context,1,playIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setContentText(word).setSmallIcon(R.mipmap.app_icon).setDefaults(Notification.DEFAULT_ALL).setContentIntent(pendingIntent);
+        builder.setContentText(word).setSmallIcon(R.drawable.app_icon).setDefaults(Notification.DEFAULT_ALL).setContentIntent(pendingIntent);
         manager.notify(1,builder.build());
     }
 }

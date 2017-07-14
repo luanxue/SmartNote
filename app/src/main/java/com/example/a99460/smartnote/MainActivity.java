@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -25,8 +26,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -40,6 +39,7 @@ import android.widget.TimePicker;
 
 import android.widget.Toast;
 
+import com.gongyunhaoyyy.password.AboutUsActivity;
 import com.gongyunhaoyyy.password.BuilderManager;
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
@@ -400,7 +400,13 @@ public class MainActivity extends AppCompatActivity {
                                 }, 400);//这里停留时间为1000=1s。
                                 break;
                             case 2:
-                                Toast.makeText(MainActivity.this, "关于我们", Toast.LENGTH_SHORT).show();
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        startActivity(new Intent(MainActivity.this,AboutUsActivity.class));
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
+                                Toast.makeText(MainActivity.this, "关于我们(待完成)", Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -410,6 +416,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
+    protected void onResume() {
+        if(getRequestedOrientation()!=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onResume();
     }
 
     @Override
