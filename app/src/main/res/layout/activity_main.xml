@@ -11,6 +11,7 @@
     <include layout="@layout/main_title"/>
 
 <ListView
+
     android:divider="#fff2f0"
     android:dividerHeight="8dp"
     android:id="@+id/list"
