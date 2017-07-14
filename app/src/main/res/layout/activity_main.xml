@@ -40,18 +40,6 @@
     android:layout_height="64dp"
     android:layout_margin="22dp"
     />
-
-    <com.nightonke.boommenu.BoomMenuButton
-        android:id="@+id/bmb"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="80dp"
-        app:bmb_highlightedColor="@color/titlecolor"
-        app:bmb_inFragment="true"
-        app:bmb_normalColor="@color/titlecolor"
-        />
 </FrameLayout>
     <android.support.design.widget.NavigationView
     android:id="@+id/nav_view"

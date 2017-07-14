@@ -86,16 +86,6 @@ public class Notedata extends DataSupport{
 
     private String date;
 
-    public String getAudio() {
-        return audio;
-    }
-
-    public void setAudio(String audio) {
-        this.audio = audio;
-    }
-
-    private String audio;
-
     public void setRecordTime(int recordTime) {
         RecordTime = recordTime;
     }
@@ -104,6 +94,16 @@ public class Notedata extends DataSupport{
         return RecordTime;
     }
 
-    int RecordTime;
+    private int RecordTime;
+
+    public boolean isRecord() {
+        return record;
+    }
+
+    public void setRecord(boolean record) {
+        this.record = record;
+    }
+
+    private boolean record;
 
 }

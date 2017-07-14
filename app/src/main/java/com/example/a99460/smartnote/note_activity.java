@@ -31,6 +31,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,15 +42,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.gongyunhaoyyy.password.BuilderManager;
+import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
 import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.Util;
-
 import org.litepal.crud.DataSupport;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -65,7 +66,6 @@ public class note_activity extends AppCompatActivity {
     BoomMenuButton bmb_note;
     int myid;
     boolean Isrecording;
-   // boolean Isplaying;
     static final int START = 0;
     static final int DISPLAY = 1;
     static final int PLAY = 2;
@@ -79,17 +79,14 @@ public class note_activity extends AppCompatActivity {
     ImageButton delete;
     ImageButton ok_record;
     Thread timeThread; // 记录录音时长的线程
-    //Thread timeThread2;
     int timeCount;
-   // int timeCount2;// 录音时长 计数
     final int TIME_COUNT = 0x101;
-   // final int TIME_COUNT2 = 0x102;
     TextView time;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
-       PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
         ok_record = (ImageButton) findViewById(R.id.ok_record);
@@ -131,6 +128,22 @@ public class note_activity extends AppCompatActivity {
                 editText.setSelection(wordfirst.length());
             }
         }
+
+        ImageButton record_ok=(ImageButton)findViewById( R.id.ok_record );
+        record_ok.setOnClickListener( new View.OnClickListener( ) {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutfi = (RelativeLayout)findViewById(R.id.record_layout);
+                // 从原位置下滑到底部的动画
+                //从当前的位置向下移动700px
+                TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                animation.setDuration(600);
+                recordlayoutfi.startAnimation(animation);
+                recordlayoutfi.setVisibility(View.GONE);
+                EditText hh = (EditText)findViewById(R.id.edit_note);
+                hh.setInputType(InputType.TYPE_CLASS_TEXT);
+            }
+        } );
 
         Button back = (Button)findViewById(R.id.cancle);
         back.setOnClickListener(new View.OnClickListener() {
@@ -196,10 +209,20 @@ public class note_activity extends AppCompatActivity {
 
                         switch (index){
                             case 0:
-                                Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
                                 break;
                             case 1:
-                                Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                new Timer().schedule( new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                    }
+                                }, 400);//这里停留时间为1000=1s。
                                 break;
                             case 2:
                                 if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
@@ -210,6 +233,15 @@ public class note_activity extends AppCompatActivity {
                                 }
                                 final RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
                                  recordlayout.setVisibility(View.VISIBLE);
+
+                                // 从屏幕底部进入的动画
+                                TranslateAnimation animation = new TranslateAnimation(
+                                        Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
+                                        Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
+                                );
+                                animation.setDuration(800);
+                                recordlayout.setVisibility(View.VISIBLE);
+                                recordlayout.startAnimation(animation);
                                 EditText hh = (EditText)findViewById(R.id.edit_note);
                                 hh.setInputType(InputType.TYPE_NULL);
                                 break;
@@ -227,17 +259,6 @@ public class note_activity extends AppCompatActivity {
         super.onResume();
     }
 
-
-   /* public void openKeyboard(View view) {
-        // 获取焦点
-        editText.setFocusable(true);
-        editText.setFocusableInTouchMode(true);
-        editText.requestFocus();
-        // 弹出软键盘
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText, 0);
-    }
-*/
     @Override
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();
@@ -370,16 +391,8 @@ public class note_activity extends AppCompatActivity {
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                //Isplaying = true;
                 STATUS = PLAY;
                 change.setBackgroundResource(R.drawable.record4);
-              /*  timeThread2 = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        countTime2();
-                    }
-                });
-                timeThread2.start();*/
                 mediaPlayer.start();
             }
         });
@@ -387,7 +400,6 @@ public class note_activity extends AppCompatActivity {
 
     public void stopPlay(){
         STATUS = DISPLAY;
-       // Isplaying = false;
         change.setBackgroundResource(R.drawable.record3);
         mediaPlayer.stop();
     }
@@ -407,35 +419,12 @@ public class note_activity extends AppCompatActivity {
         }
     }
 
-
- /*   private void countTime2() {
-        timeCount2 = timeCount;
-        while (Isplaying) {
-            timeCount2--;
-            Message msg = Message.obtain();
-            msg.what = TIME_COUNT2;
-            msg.obj = timeCount2;
-            myHandler.sendMessage(msg);
-            try {
-                timeThread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        Message msg = Message.obtain();
-        msg.what = TIME_COUNT2;
-        msg.obj = timeCount;
-        myHandler.sendMessage(msg);
-    }
-*/
-
     public static String FormatMiss(int miss) {
         String hh = miss / 3600 > 9 ? miss / 3600 + "" : "0" + miss / 3600;
         String mm = (miss % 3600) / 60 > 9 ? (miss % 3600) / 60 + "" : "0" + (miss % 3600) / 60;
         String ss = (miss % 3600) % 60 > 9 ? (miss % 3600) % 60 + "" : "0" + (miss % 3600) % 60;
         return hh + ":" + mm + ":" + ss;
     }
-
 
     Handler myHandler = new Handler() {
         @Override
@@ -445,9 +434,6 @@ public class note_activity extends AppCompatActivity {
                     int count = (int) msg.obj;
                     time.setText(FormatMiss(count));
                     break;
-               /* case TIME_COUNT2:
-                    int count2 = (int) msg.obj;
-                    time.setText(FormatMiss(count2));*/
             }
         }
     };
@@ -480,8 +466,6 @@ public class note_activity extends AppCompatActivity {
                 break;
         }
     }
-
-
 
     protected void init() {
         mWaveView = (WaveView) findViewById(R.id.wave);
@@ -544,7 +528,6 @@ public class note_activity extends AppCompatActivity {
                 if (STATUS==STOPRECORDING||STATUS==DISPLAY){
                     file.delete();
                     Isrecording = false;
-                    //Isplaying = false;
                     STATUS = START;
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
@@ -553,7 +536,6 @@ public class note_activity extends AppCompatActivity {
                 else if (STATUS==START&&file.exists()){
                     file.delete();
                     Isrecording = false;
-                   // Isplaying = false;
                     STATUS = START;
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
@@ -571,7 +553,6 @@ public class note_activity extends AppCompatActivity {
                 else if (STATUS==RECORDING){
                     stopRecording();
                     file.delete();
-                   // Isplaying = false;
                     STATUS = START;
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
