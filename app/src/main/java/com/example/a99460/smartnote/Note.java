@@ -5,6 +5,9 @@ package com.example.a99460.smartnote;
  */
 
 public class Note {
+
+    public boolean isrecord;
+
     public String note;
 
     public boolean isalarm;
@@ -25,11 +28,12 @@ public class Note {
         this.id = id;
     }
 
-    public Note(String date,String note,int id,boolean isalarm){
+    public Note(String date,String note,int id,boolean isalarm,boolean isrecord){
         this.date=date;
         this.note=note;
         this.id=id;
         this.isalarm=isalarm;
+        this.isrecord=isrecord;
     }
 
 

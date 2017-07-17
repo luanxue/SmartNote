@@ -60,6 +60,7 @@ import com.nightonke.boommenu.Piece.PiecePlaceEnum;
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -90,9 +91,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initdata();
-
         NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -165,10 +164,13 @@ public class MainActivity extends AppCompatActivity {
                 if(lock){
                     holder.setText(R.id.content1,"已上锁" );
                 }else {
+                    if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    }
                 }
 
                 holder.setText(R.id.content2,note.date);
+
                 if (note.isalarm==true){
                 holder.setVisible(R.id.content3,true);
                 }
@@ -176,6 +178,15 @@ public class MainActivity extends AppCompatActivity {
                 {
                     holder.setVisible(R.id.content3,false);
                 }
+
+                if (note.isrecord==true){
+                    holder.setVisible(R.id.content4,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content4,false);
+                }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -210,6 +221,8 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
+                        File file = new File("/data/data/com.example.a99460.smartnote" + "/smartnote" + note.id + ".mp3");
+                        file.delete();
                     }
                 });
 
@@ -253,9 +266,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
                                             am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
 
                                         }
                                     };
@@ -424,10 +435,13 @@ public class MainActivity extends AppCompatActivity {
                 if(lock){
                     holder.setText(R.id.content1,"已上锁" );
                 }else {
+                    if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    }
                 }
 
                 holder.setText(R.id.content2,note.date);
+
                 if (note.isalarm==true){
                     holder.setVisible(R.id.content3,true);
                 }
@@ -435,14 +449,21 @@ public class MainActivity extends AppCompatActivity {
                 {
                     holder.setVisible(R.id.content3,false);
                 }
+
+                if (note.isrecord==true){
+                    holder.setVisible(R.id.content4,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content4,false);
+                }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
                         ((SwipeMenuLayout) holder.getConvertView()).quickClose();
-       int id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
-
                         boolean islock=notedata.isLock();
                         if (isDeadLock()){
                             Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
@@ -468,6 +489,8 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
+                        File file = new File("/data/data/com.example.a99460.smartnote" + "/smartnote" + note.id + ".mp3");
+                        file.delete();
                     }
                 });
 
@@ -512,9 +535,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
                                             am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
                          }
                                     };
                                     TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
@@ -635,7 +656,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        //setContentView(R.layout.activity_main);
     }
 
 
@@ -643,7 +663,9 @@ public class MainActivity extends AppCompatActivity {
         mDatas = new ArrayList<>();
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
-            mDatas.add(new Note(notedata.getDate(),notedata.getNote(),notedata.getId(),notedata.isAlarm()));
+            if (notedata.isEdit()||notedata.isRecord()) {
+                mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord()));
+            }
         }
     }
 
