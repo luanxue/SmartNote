@@ -31,6 +31,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
@@ -91,6 +92,7 @@ public class note_activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
+
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
         STATUS = START;
@@ -151,8 +153,6 @@ public class note_activity extends AppCompatActivity {
                 animation.setDuration(400);
                 recordlayoutfi.startAnimation(animation);
                 recordlayoutfi.setVisibility(View.GONE);
-                EditText hh = (EditText)findViewById(R.id.edit_note);
-                hh.setInputType(InputType.TYPE_CLASS_TEXT);
             }
         } );
 
@@ -233,7 +233,6 @@ public class note_activity extends AppCompatActivity {
                             case 2:
                                 RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
                                 if(recordlayout.getVisibility()==View.VISIBLE){
-
                                 }else {
                                     // 从屏幕底部进入的动画
                                     TranslateAnimation animation = new TranslateAnimation(
@@ -243,8 +242,6 @@ public class note_activity extends AppCompatActivity {
                                     animation.setDuration(600);
                                     recordlayout.setVisibility(View.VISIBLE);
                                     recordlayout.startAnimation(animation);
-                                    EditText hh = (EditText)findViewById(R.id.edit_note);
-                                    hh.setInputType(InputType.TYPE_NULL);
                                 }
                                 break;
                             default:
@@ -271,8 +268,6 @@ public class note_activity extends AppCompatActivity {
             animation.setDuration(400);
             recordlayoutback.startAnimation(animation);
             recordlayoutback.setVisibility(View.GONE);
-            EditText hh = (EditText)findViewById(R.id.edit_note);
-            hh.setInputType(InputType.TYPE_CLASS_TEXT);
         }else {
             //空笔记或者没有改变笔记都不会弹dialog
             if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
@@ -341,9 +336,8 @@ public class note_activity extends AppCompatActivity {
     }
 
     protected String GetDate(){
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 hh时mm分");
         String date = sDateFormat.format(new java.util.Date());
-        Toast.makeText(note_activity.this,date,Toast.LENGTH_SHORT).show();
         return date;
     }
 

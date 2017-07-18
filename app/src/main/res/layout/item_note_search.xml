@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="78dp"
+    android:layout_height="65dp"
     android:clickable="true"
     android:paddingBottom="1dp"
     app:ios="false"
@@ -15,19 +15,18 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
         <TextView
-
             android:id="@+id/content1"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="38dp"
             android:gravity="left"
             android:maxLines="1"
-            android:paddingLeft="12dp"
-            android:paddingTop="15dp"
+            android:paddingLeft="14dp"
+            android:paddingTop="12dp"
             android:paddingRight="10dp"
             android:background="@color/white"
             android:text="我是任意复杂的原Item布局"
             android:textColor="@color/black"
-            android:textSize="19sp"
+            android:textSize="17sp"
             android:textStyle="italic" />
 
         <LinearLayout
@@ -43,11 +42,11 @@
                 android:layout_weight="1.5"
                 android:gravity="left"
                 android:paddingTop="5dp"
-                android:paddingLeft="12dp"
+                android:paddingLeft="14dp"
                 android:paddingRight="5dp"
                 android:text="2017年9月12日"
                 android:textColor="@color/line"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="italic" />
             <ImageView
                 android:layout_width="22dp"
@@ -65,57 +64,8 @@
                 android:src="@drawable/alarm1"
                 android:visibility="invisible"/>
 
-
         </LinearLayout>
 
-
-</LinearLayout>
-    <!-- 以下都是侧滑菜单的内容依序排列 -->
-    <Button
-        android:id="@+id/btnLock"
-        android:layout_width="78dp"
-        android:layout_height="match_parent"
-        android:background="#bbc2ca"
-        android:textSize="17dp"
-        android:text="上锁"
-        android:textColor="@android:color/white" />
-
-    <Button
-        android:id="@+id/alarm"
-        android:layout_width="92dp"
-        android:textSize="17dp"
-        android:layout_height="match_parent"
-        android:background="#e8d310"
-        android:clickable="true"
-        android:text="设置闹钟"
-        android:textColor="@android:color/white"/>
-
-    <Button
-        android:id="@+id/btnDelete"
-        android:layout_width="78dp"
-        android:textSize="17dp"
-        android:layout_height="match_parent"
-        android:background="@android:color/holo_red_dark"
-        android:text="删除"
-        android:textColor="@android:color/white"/>
-
-
-    <!--    <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@color/red_ff4a57"
-            android:clickable="true">
-
-            <TextView
-                android:id="@+id/tv_delete"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:drawablePadding="5dp"
-                android:drawableTop="@drawable/point_icon_delete"
-                android:gravity="center"
-                android:text="删除"
-                android:textColor="@android:color/white"/>
-        </RelativeLayout>-->
+    </LinearLayout>
 
 </com.mcxtzhang.swipemenulib.SwipeMenuLayout>
