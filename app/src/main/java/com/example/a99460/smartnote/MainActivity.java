@@ -6,41 +6,24 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
-import android.graphics.Color;
-import android.graphics.Typeface;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
-
-import android.content.SharedPreferences;
-import android.os.SystemClock;
-import android.provider.CalendarContract;
-
-import android.provider.ContactsContract;
-
-
-import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.ThemedSpinnerAdapter;
-import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
-
-import android.widget.TextView;
-
 import android.widget.TimePicker;
-
 import android.widget.Toast;
 
-import com.gongyunhaoyyy.password.BuilderManager;
+import com.gongyunhaoyyy.password.AboutUsActivity;
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
 import com.gongyunhaoyyy.password.LockToNoteActivity;
@@ -48,22 +31,15 @@ import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
-import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
-import com.nightonke.boommenu.BoomButtons.HamButton;
-import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomMenuButton;
-import com.nightonke.boommenu.ButtonEnum;
-import com.nightonke.boommenu.Piece.PiecePlaceEnum;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -73,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private ListView mLv;
     private List<Note> mDatas;
     private FloatingActionButton fab;
-    private FloatingActionButton menu;
     String result = "";
     BoomMenuButton bmb;
     long triggerAtTime;
@@ -89,19 +64,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initdata();
-
-        //BoomMenuButton相关配置
-        bmb = (BoomMenuButton) findViewById(R.id.bmb);
-        assert bmb != null;
-        bmb.setButtonEnum( ButtonEnum.Ham);
-        bmb.setPiecePlaceEnum( PiecePlaceEnum.HAM_3);
-        bmb.setButtonPlaceEnum( ButtonPlaceEnum.HAM_3);
-        bmb.setShadowEffect( false );
-        for (int i = 0; i < bmb.getPiecePlaceEnum().pieceNumber(); i++){
-//            bmb.addBuilder(BuilderManager.getHamButtonBuilder(i));
-            addBuilder(i);
-        }
-
+        NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -115,6 +78,30 @@ public class MainActivity extends AppCompatActivity {
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+
+        nav.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener( ) {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.menu_lock:
+                        //设置新密码or修改密码
+                        if (isDeadLock()){
+                            Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
+                        }else {
+                            startActivity(new Intent(MainActivity.this,LockActivity.class));
+                        }
+                        break;
+                    case R.id.menu_typeface:
+                        startActivity(new Intent(MainActivity.this,ThemeSelectActivity.class));
+                        break;
+                    case R.id.menu_aboutus:
+                        startActivity(new Intent(MainActivity.this,AboutUsActivity.class));
+                        Toast.makeText( MainActivity.this,"关于我们(待完成)",Toast.LENGTH_SHORT ).show();
+                }
+                return false;
+            }
+        } );
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,10 +137,13 @@ public class MainActivity extends AppCompatActivity {
                 if(lock){
                     holder.setText(R.id.content1,"已上锁" );
                 }else {
+                    if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    }
                 }
 
                 holder.setText(R.id.content2,note.date);
+
                 if (note.isalarm==true){
                 holder.setVisible(R.id.content3,true);
                 }
@@ -161,6 +151,15 @@ public class MainActivity extends AppCompatActivity {
                 {
                     holder.setVisible(R.id.content3,false);
                 }
+
+                if (note.isrecord==true){
+                    holder.setVisible(R.id.content4,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content4,false);
+                }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -195,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
+                        File file = new File("/data/data/com.example.a99460.smartnote" + "/smartnote" + note.id + ".mp3");
+                        file.delete();
                     }
                 });
 
@@ -238,9 +239,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
                                             am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
 
                                         }
                                     };
@@ -365,51 +364,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //设置menu的监听功能
-    private void addBuilder(int i) {
-        bmb.addBuilder(new HamButton.Builder()
-                .normalImageRes(BuilderManager.getImageResource())
-                .normalTextRes(  BuilderManager.getHamButtonBuildertext( i )  )
-                .subNormalTextRes( BuilderManager.getHamButtonBuildersubtext( i ) )
-                .pieceColor( Color.WHITE)
-                .listener(new OnBMClickListener() {
-                    @Override
-                    public void onBoomButtonClick(int index) {
-                        switch (index){
-                            case 0:
-                                //设置新密码or修改密码
-                                if (isDeadLock()){
-                                    Toast.makeText( MainActivity.this,"密码功能锁定中...",Toast.LENGTH_SHORT ).show();
-                                }else {
-                                    //调用Timer函数使Intent延迟400ms后跳转，使BMB动画效果显示出来
-                                    //如果用Thread.sleep，系统会休眠，MBM动画效果并不会显示
-                                    new Timer().schedule( new TimerTask() {
-                                        @Override
-                                        public void run() {
-                                            startActivity(new Intent(MainActivity.this,LockActivity.class));
-                                        }
-                                    }, 400);//这里停留时间为1000=1s。
-                                }
-                                break;
-                            case 1:
-                                new Timer().schedule( new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        startActivity(new Intent(MainActivity.this,ThemeSelectActivity.class));
-                                    }
-                                }, 400);//这里停留时间为1000=1s。
-                                break;
-                            case 2:
-                                Toast.makeText(MainActivity.this, "关于我们", Toast.LENGTH_SHORT).show();
-                                break;
-                        }
-                    }
-                }));
-    }
-
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
+    protected void onResume() {
+        if(getRequestedOrientation()!=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onResume();
     }
 
     @Override
@@ -443,10 +408,13 @@ public class MainActivity extends AppCompatActivity {
                 if(lock){
                     holder.setText(R.id.content1,"已上锁" );
                 }else {
+                    if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    }
                 }
 
                 holder.setText(R.id.content2,note.date);
+
                 if (note.isalarm==true){
                     holder.setVisible(R.id.content3,true);
                 }
@@ -454,14 +422,21 @@ public class MainActivity extends AppCompatActivity {
                 {
                     holder.setVisible(R.id.content3,false);
                 }
+
+                if (note.isrecord==true){
+                    holder.setVisible(R.id.content4,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content4,false);
+                }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
                         ((SwipeMenuLayout) holder.getConvertView()).quickClose();
-       int id=note.id;
+                        int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
-
                         boolean islock=notedata.isLock();
                         if (isDeadLock()){
                             Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
@@ -487,6 +462,8 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
+                        File file = new File("/data/data/com.example.a99460.smartnote" + "/smartnote" + note.id + ".mp3");
+                        file.delete();
                     }
                 });
 
@@ -531,9 +508,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
                                             am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
                          }
                                     };
                                     TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
@@ -654,7 +629,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        //setContentView(R.layout.activity_main);
     }
 
 
@@ -662,7 +636,9 @@ public class MainActivity extends AppCompatActivity {
         mDatas = new ArrayList<>();
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
-            mDatas.add(new Note(notedata.getDate(),notedata.getNote(),notedata.getId(),notedata.isAlarm()));
+            if (notedata.isEdit()||notedata.isRecord()) {
+                mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord()));
+            }
         }
     }
 

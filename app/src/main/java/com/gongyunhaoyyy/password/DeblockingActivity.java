@@ -1,7 +1,9 @@
 package com.gongyunhaoyyy.password;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -22,6 +24,8 @@ import org.litepal.crud.DataSupport;
 import java.util.List;
 
 import io.reactivex.functions.Consumer;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class DeblockingActivity extends AppCompatActivity {
     private PatternLockView mPatternLockView;
@@ -40,6 +44,15 @@ public class DeblockingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_deblocking );
+        SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
+        String tftf=typef.getString( "typefacehaha","" );
+        //onCreat中注册Calligraphy
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath(tftf)
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
+
         TextView db_titlt_tv=(TextView)findViewById( R.id.db_title_TextView );
         final TextView db_hint_tv=(TextView)findViewById( R.id.db_hint_TextView );
         db_titlt_tv.setText( "输入密码以解锁" );
@@ -63,7 +76,7 @@ public class DeblockingActivity extends AppCompatActivity {
         mPatternLockView.setCorrectStateColor(ResourceUtils.getColor(this, R.color.line));
         mPatternLockView.setNormalStateColor( ResourceUtils.getColor(this, R.color.line) );
         mPatternLockView.setInStealthMode(false);
-        mPatternLockView.setTactileFeedbackEnabled(true);
+        mPatternLockView.setTactileFeedbackEnabled(false);
         mPatternLockView.setInputEnabled(true);
         mPatternLockView.addPatternLockListener(mPatternLockViewListener);
 
@@ -114,4 +127,18 @@ public class DeblockingActivity extends AppCompatActivity {
                 });
 
     }
+
+    @Override
+    protected void onResume() {
+        if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
+    }
+
 }

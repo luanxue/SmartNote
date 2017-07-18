@@ -86,15 +86,33 @@ public class Notedata extends DataSupport{
 
     private String date;
 
-    public String getAudio() {
-        return audio;
+    public void setRecordTime(int recordTime) {
+        RecordTime = recordTime;
     }
 
-    public void setAudio(String audio) {
-        this.audio = audio;
+    public int getRecordTime() {
+        return RecordTime;
     }
 
-    private String audio;
+    private int RecordTime;
 
+    public boolean isRecord() {
+        return record;
+    }
 
+    public void setRecord(boolean record) {
+        this.record = record;
+    }
+
+    private boolean record;
+
+    public void setEdit(boolean edit) {
+        this.edit = edit;
+    }
+
+    private boolean edit;
+
+    public boolean isEdit() {
+        return edit;
+    }
 }

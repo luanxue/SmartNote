@@ -2,20 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_call"
-            android:icon="@drawable/nav_call"
-            android:title="加密小锁"
-            android:textColor = "#FFB6C1"/>
+            android:id="@+id/menu_lock"
+            android:icon="@drawable/lock_icon"
+            android:title="@string/password"
+            android:textColor="@color/text"/>
         <item
-            android:id="@+id/nav_friends"
-            android:icon="@drawable/nav_friends"
-            android:title="我的字体"
-            android:textColor = "#FFB6C1"/>
+            android:id="@+id/menu_typeface"
+            android:icon="@drawable/typeface"
+            android:title="@string/typeface"
+            android:textColor="@color/text"/>
         <item
-            android:id="@+id/nav_location"
-            android:icon="@drawable/nav_location"
-            android:title="关于我们"
-            android:textColor = "#FFB6C1"/>
+            android:id="@+id/menu_aboutus"
+            android:icon="@drawable/squirrel"
+            android:title="@string/abutus"
+            android:textColor="@color/text"/>
     </group>
 
 </menu>

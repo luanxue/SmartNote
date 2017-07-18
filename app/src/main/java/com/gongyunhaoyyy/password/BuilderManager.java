@@ -4,6 +4,8 @@ import android.graphics.Color;
 
 import com.nightonke.boommenu.BoomButtons.HamButton;
 import com.example.a99460.smartnote.R;
+import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
+
 /**
  * Created by acer on 2017/7/12.
  */
@@ -11,19 +13,12 @@ import com.example.a99460.smartnote.R;
 public class BuilderManager {
 
     private static int[] imageResources = new int[]{
-            R.drawable.bat,
-            R.drawable.bear,
-            R.drawable.butterfly,
-            R.drawable.cat,
-            R.drawable.deer,
-            R.drawable.dolphin,
-            R.drawable.eagle,
-            R.drawable.horse,
-            R.drawable.elephant,
-            R.drawable.owl,
-            R.drawable.peacock,
-            R.drawable.rat,
-            R.drawable.squirrel
+            R.drawable.lock_icon,      //0
+            R.drawable.typeface,       //1
+            R.drawable.squirrel,       //2
+            R.drawable.take_photo,     //3
+            R.drawable.insert_photo,   //4
+            R.drawable.record          //5
     };
 
     private static int imageResourceIndex = 0;
@@ -32,6 +27,12 @@ public class BuilderManager {
         if (imageResourceIndex >= imageResources.length) imageResourceIndex = 0;
         return imageResources[imageResourceIndex++];
     }
+
+    public static int getImageResourcenote(int i) {
+        if(i>5) i=3;
+        return imageResources[i];
+    }
+
 
     public static int getHamButtonBuildertext(int i) {
         if(i==0){
