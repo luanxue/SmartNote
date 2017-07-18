@@ -19,8 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="1"
-    tools:context="com.example.a99460.smartnote.note_activity"
-    >
+    tools:context="com.example.a99460.smartnote.note_activity">
 
     <include layout="@layout/title"
         android:id="@+id/include"/>

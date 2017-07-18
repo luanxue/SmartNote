@@ -6,43 +6,24 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-
-import android.content.SharedPreferences;
-import android.os.SystemClock;
-import android.provider.CalendarContract;
-
-import android.provider.ContactsContract;
-
-
-import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
-
-import android.widget.TextView;
-
 import android.widget.TimePicker;
-
 import android.widget.Toast;
 
 import com.gongyunhaoyyy.password.AboutUsActivity;
-import com.gongyunhaoyyy.password.BuilderManager;
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
 import com.gongyunhaoyyy.password.LockToNoteActivity;
@@ -50,12 +31,7 @@ import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
-import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
-import com.nightonke.boommenu.BoomButtons.HamButton;
-import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomMenuButton;
-import com.nightonke.boommenu.ButtonEnum;
-import com.nightonke.boommenu.Piece.PiecePlaceEnum;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
@@ -64,9 +40,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;

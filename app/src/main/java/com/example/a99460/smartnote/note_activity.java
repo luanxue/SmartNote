@@ -2,34 +2,28 @@
 package com.example.a99460.smartnote;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -37,26 +31,22 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.gongyunhaoyyy.password.BuilderManager;
-import com.gongyunhaoyyy.password.ThemeSelectActivity;
-import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
 import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.Util;
+
 import org.litepal.crud.DataSupport;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class note_activity extends AppCompatActivity {
 
@@ -96,6 +86,7 @@ public class note_activity extends AppCompatActivity {
         Isedit = false;
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
+        Button sendText = (Button) findViewById(R.id.share_button);
         STATUS = START;
         change.setBackgroundResource(R.drawable.record1);
         time = (TextView)findViewById(R.id.time);
@@ -214,6 +205,16 @@ public class note_activity extends AppCompatActivity {
                     }
                 }
             }
+            }
+        });
+        sendText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent textIntent = new Intent(Intent.ACTION_SEND);
+                textIntent.setType("text/plain");
+                Notedata notedata = DataSupport.find(Notedata.class,myid);
+                textIntent.putExtra(Intent.EXTRA_TEXT,notedata.getNote());
+                startActivity(Intent.createChooser(textIntent, "分享"));
             }
         });
 
