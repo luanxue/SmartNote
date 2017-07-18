@@ -50,9 +50,7 @@ import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
 import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.Util;
-
 import org.litepal.crud.DataSupport;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -69,7 +67,6 @@ public class note_activity extends AppCompatActivity {
     BoomMenuButton bmb_note;
     int myid;
     boolean Isrecording;
-   // boolean Isplaying;
     static final int START = 0;
     static final int DISPLAY = 1;
     static final int PLAY = 2;
@@ -78,16 +75,15 @@ public class note_activity extends AppCompatActivity {
     static int STATUS=START;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
-    String PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
+    String PATH_NAME;
     ImageButton change;
     ImageButton delete;
+    ImageButton ok_record;
     Thread timeThread; // 记录录音时长的线程
-    //Thread timeThread2;
     int timeCount;
-   // int timeCount2;// 录音时长 计数
     final int TIME_COUNT = 0x101;
-   // final int TIME_COUNT2 = 0x102;
     TextView time;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,16 +91,9 @@ public class note_activity extends AppCompatActivity {
 
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
+        ok_record = (ImageButton) findViewById(R.id.ok_record);
         STATUS = START;
         change.setBackgroundResource(R.drawable.record1);
-
-        if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            init();
-        } else {
-            ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-
         //BoomMenuButton相关配置
         bmb_note = (BoomMenuButton) findViewById(R.id.bmb_note);
         assert bmb_note != null;
@@ -115,9 +104,9 @@ public class note_activity extends AppCompatActivity {
         bmb_note.getCustomButtonPlacePositions().add(new PointF(Util.dp2px(+30), Util.dp2px(-160)));
         bmb_note.getCustomButtonPlacePositions().add(new PointF(Util.dp2px(+110), Util.dp2px(-80)));
         editText = (EditText)findViewById(R.id.edit_note);
-
         Intent intent = getIntent();
         myid=intent.getIntExtra( "in_data",-1 );
+        PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -231,6 +220,7 @@ public class note_activity extends AppCompatActivity {
                                 Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
                                 break;
                             case 2:
+
                                 RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
                                 if(recordlayout.getVisibility()==View.VISIBLE){
                                 }else {
@@ -243,6 +233,12 @@ public class note_activity extends AppCompatActivity {
                                     recordlayout.setVisibility(View.VISIBLE);
                                     recordlayout.startAnimation(animation);
                                 }
+                                if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                                        ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                                    init();
+                                } else {
+                                    ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                                }            
                                 break;
                             default:
                         }
@@ -338,6 +334,10 @@ public class note_activity extends AppCompatActivity {
     protected String GetDate(){
         SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 hh时mm分");
         String date = sDateFormat.format(new java.util.Date());
+<<<<<<< HEAD
+=======
+
+>>>>>>> d66a0263cd108ec59d9475ced5372c2f11540887
         return date;
     }
 
@@ -378,6 +378,8 @@ public class note_activity extends AppCompatActivity {
         //说明正在录制,设置停止信息
         change.setBackgroundResource(R.drawable.record3);
         mediaRecorder.stop();
+        delete.setVisibility(View.VISIBLE);
+        ok_record.setVisibility(View.VISIBLE);
     }
 
     public void startPlay() {
@@ -391,9 +393,6 @@ public class note_activity extends AppCompatActivity {
                 //播放完设置
                 change.setBackgroundResource(R.drawable.record3);
                 STATUS=DISPLAY;
-               // Isplaying = false;
-                //  int count2 = (int) timeCount;
-                //time.setText(FormatMiss(count2));
             }
         });
         try {
@@ -407,16 +406,8 @@ public class note_activity extends AppCompatActivity {
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                //Isplaying = true;
                 STATUS = PLAY;
                 change.setBackgroundResource(R.drawable.record4);
-              /*  timeThread2 = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        countTime2();
-                    }
-                });
-                timeThread2.start();*/
                 mediaPlayer.start();
             }
         });
@@ -424,7 +415,6 @@ public class note_activity extends AppCompatActivity {
 
     public void stopPlay(){
         STATUS = DISPLAY;
-       // Isplaying = false;
         change.setBackgroundResource(R.drawable.record3);
         mediaPlayer.stop();
     }
@@ -444,35 +434,12 @@ public class note_activity extends AppCompatActivity {
         }
     }
 
-
- /*   private void countTime2() {
-        timeCount2 = timeCount;
-        while (Isplaying) {
-            timeCount2--;
-            Message msg = Message.obtain();
-            msg.what = TIME_COUNT2;
-            msg.obj = timeCount2;
-            myHandler.sendMessage(msg);
-            try {
-                timeThread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        Message msg = Message.obtain();
-        msg.what = TIME_COUNT2;
-        msg.obj = timeCount;
-        myHandler.sendMessage(msg);
-    }
-*/
-
     public static String FormatMiss(int miss) {
         String hh = miss / 3600 > 9 ? miss / 3600 + "" : "0" + miss / 3600;
         String mm = (miss % 3600) / 60 > 9 ? (miss % 3600) / 60 + "" : "0" + (miss % 3600) / 60;
         String ss = (miss % 3600) % 60 > 9 ? (miss % 3600) % 60 + "" : "0" + (miss % 3600) % 60;
         return hh + ":" + mm + ":" + ss;
     }
-
 
     Handler myHandler = new Handler() {
         @Override
@@ -482,9 +449,6 @@ public class note_activity extends AppCompatActivity {
                     int count = (int) msg.obj;
                     time.setText(FormatMiss(count));
                     break;
-               /* case TIME_COUNT2:
-                    int count2 = (int) msg.obj;
-                    time.setText(FormatMiss(count2));*/
             }
         }
     };
@@ -517,8 +481,6 @@ public class note_activity extends AppCompatActivity {
                 break;
         }
     }
-
-
 
     protected void init() {
         mWaveView = (WaveView) findViewById(R.id.wave);
@@ -578,12 +540,9 @@ public class note_activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 File file = new File(PATH_NAME);
-
-
                 if (STATUS==STOPRECORDING||STATUS==DISPLAY){
                     file.delete();
                     Isrecording = false;
-                    //Isplaying = false;
                     STATUS = START;
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
@@ -592,7 +551,6 @@ public class note_activity extends AppCompatActivity {
                 else if (STATUS==START&&file.exists()){
                     file.delete();
                     Isrecording = false;
-                   // Isplaying = false;
                     STATUS = START;
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
@@ -610,13 +568,13 @@ public class note_activity extends AppCompatActivity {
                 else if (STATUS==RECORDING){
                     stopRecording();
                     file.delete();
-                   // Isplaying = false;
                     STATUS = START;
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
                     timeCount=0;
                 }
-
+           delete.setVisibility(View.INVISIBLE);
+                ok_record.setVisibility(View.INVISIBLE);
             }
         });
     }
