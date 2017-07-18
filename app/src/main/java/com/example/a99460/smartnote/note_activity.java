@@ -25,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
@@ -82,8 +83,10 @@ public class note_activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
+
         Issave = false;
         Isedit = false;
+
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
         Button sendText = (Button) findViewById(R.id.share_button);
@@ -139,6 +142,22 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
+
+        ImageButton record_ok=(ImageButton)findViewById( R.id.ok_record );
+        record_ok.setOnClickListener( new View.OnClickListener( ) {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutfi = (RelativeLayout)findViewById(R.id.record_layout);
+                // 从原位置下滑到底部的动画
+                //从当前的位置向下移动700px
+                TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                animation.setDuration(400);
+                recordlayoutfi.startAnimation(animation);
+                recordlayoutfi.setVisibility(View.GONE);
+            }
+        } );
+
+  
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -247,12 +266,13 @@ public class note_activity extends AppCompatActivity {
                                     );
                                     animation.setDuration(600);
                                     recordlayout.setVisibility(View.VISIBLE);
-                                    recordlayout.startAnimation(animation); if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+    recordlayout.startAnimation(animation); if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                                             ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                                         init();
                                     } else {
                                         ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                                     }
+
                                 }
                                 break;
                             default:
@@ -278,6 +298,9 @@ public class note_activity extends AppCompatActivity {
             animation.setDuration(400);
             recordlayoutback.startAnimation(animation);
             recordlayoutback.setVisibility(View.GONE);
+
+     
+
         }
         else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
             stopPlay();
@@ -289,6 +312,7 @@ public class note_activity extends AppCompatActivity {
             Issave = false;
             stopRecording();
         } else {
+
             //空笔记或者没有改变笔记都不会弹dialog
             if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
                 finish( );
@@ -357,8 +381,9 @@ public class note_activity extends AppCompatActivity {
     }
 
     protected String GetDate(){
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 hh时mm分");
         String date = sDateFormat.format(new java.util.Date());
+
         return date;
     }
 

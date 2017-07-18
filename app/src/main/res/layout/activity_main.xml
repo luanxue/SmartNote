@@ -6,21 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.a99460.smartnote.MainActivity"
     android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-    android:background="#fff2f0">
+    android:background="@color/activity_background">
 
     <include layout="@layout/main_title"/>
 
-<ListView
 
-    android:divider="#fff2f0"
-    android:dividerHeight="8dp"
+    <ListView
+    android:visibility="visible"
+    android:divider="@color/activity_background"
+    android:dividerHeight="6dp"
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -32,6 +34,7 @@
     <android.support.design.widget.FloatingActionButton
     android:id="@+id/fab"
     app:elevation="10dp"
+    android:visibility="visible"
     android:src="@drawable/add2"
     app:rippleColor="@color/yellow"
     app:backgroundTint="@color/titlecolor"
@@ -40,6 +43,57 @@
     android:layout_height="64dp"
     android:layout_margin="22dp"
     />
+
+    <RelativeLayout
+        android:id="@+id/search_layout"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="38dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:srcCompat="@drawable/find_note"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/search_et"/>
+
+        <EditText
+            android:id="@+id/search_et"
+            android:layout_width="250dp"
+            android:textColorHint="@color/white"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/white"
+            android:maxLines="1"
+            android:backgroundTint="@color/white"
+            android:hint="请输入搜索内容"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_marginTop="72dp"
+        android:id="@+id/find_note_linear"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/search_lv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+        </ListView>
+
+
+    </LinearLayout>
+
 </FrameLayout>
     <android.support.design.widget.NavigationView
     android:id="@+id/nav_view"

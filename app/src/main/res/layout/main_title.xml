@@ -10,6 +10,7 @@
     <TextView
         android:id="@+id/diandi"
         android:gravity="center"
+        android:visibility="visible"
         android:textSize="18sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,6 +22,7 @@
         android:layout_alignParentBottom="true"/>
 
     <Button
+        android:id="@+id/search_btn"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:background="@drawable/find_note"

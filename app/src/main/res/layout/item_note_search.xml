@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.mcxtzhang.swipemenulib.SwipeMenuLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:clickable="true"
+    android:paddingBottom="1dp"
+    app:ios="false"
+    app:leftSwipe="true"
+    app:swipeEnable="true">
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/content1"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:gravity="left"
+            android:maxLines="1"
+            android:paddingLeft="14dp"
+            android:paddingTop="12dp"
+            android:paddingRight="10dp"
+            android:background="@color/white"
+            android:text="我是任意复杂的原Item布局"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="italic" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/content2"
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:gravity="left"
+                android:paddingTop="5dp"
+                android:paddingLeft="14dp"
+                android:paddingRight="5dp"
+                android:text="2017年9月12日"
+                android:textColor="@color/line"
+                android:textSize="12sp"
+                android:textStyle="italic" />
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="match_parent"
+                android:id="@+id/content4"
+                android:visibility="invisible"
+                android:src="@mipmap/microphone"
+                />
+
+            <ImageView
+                android:id="@+id/content3"
+                android:layout_weight="1"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/alarm1"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.mcxtzhang.swipemenulib.SwipeMenuLayout>
