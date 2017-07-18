@@ -106,4 +106,13 @@ public class Notedata extends DataSupport{
 
     private boolean record;
 
+    public void setEdit(boolean edit) {
+        this.edit = edit;
+    }
+
+    private boolean edit;
+
+    public boolean isEdit() {
+        return edit;
+    }
 }

@@ -6,32 +6,21 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-
-import android.content.SharedPreferences;
-import android.os.SystemClock;
-import android.provider.CalendarContract;
-
-import android.provider.ContactsContract;
-
-
-import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -48,12 +37,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import android.widget.TextView;
-import android.widget.TimePicker;
 
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.gongyunhaoyyy.password.AboutUsActivity;
-import com.gongyunhaoyyy.password.BuilderManager;
 import com.gongyunhaoyyy.password.DeblockingActivity;
 import com.gongyunhaoyyy.password.LockActivity;
 import com.gongyunhaoyyy.password.LockToNoteActivity;
@@ -62,15 +50,16 @@ import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 
+import com.nightonke.boommenu.BoomMenuButton;
+
+
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -101,9 +90,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initdata();
-
         NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
+
         searchbt=(Button)findViewById( R.id.search_btn );
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
@@ -210,16 +200,28 @@ public class MainActivity extends AppCompatActivity {
                 if(lock){
                     holder.setText(R.id.content1,"已上锁" );
                 }else {
+                    if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    }
                 }
 
                 holder.setText(R.id.content2,note.date);
+
                 if (note.isalarm==true){
                 holder.setVisible(R.id.content3,true);
                 }
                 else {
                     holder.setVisible(R.id.content3,false);
                 }
+
+                if (note.isrecord==true){
+                    holder.setVisible(R.id.content4,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content4,false);
+                }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -254,6 +256,8 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
+                        File file = new File("/data/data/com.example.a99460.smartnote" + "/smartnote" + note.id + ".mp3");
+                        file.delete();
                     }
                 });
 
@@ -297,9 +301,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
                                             am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
 
                                         }
                                     };
@@ -572,10 +574,13 @@ public class MainActivity extends AppCompatActivity {
                 if(lock){
                     holder.setText(R.id.content1,"已上锁" );
                 }else {
+                    if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    }
                 }
 
                 holder.setText(R.id.content2,note.date);
+
                 if (note.isalarm==true){
                     holder.setVisible(R.id.content3,true);
                 }
@@ -583,13 +588,21 @@ public class MainActivity extends AppCompatActivity {
                 {
                     holder.setVisible(R.id.content3,false);
                 }
+
+                if (note.isrecord==true){
+                    holder.setVisible(R.id.content4,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content4,false);
+                }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         ((SwipeMenuLayout) holder.getConvertView()).quickClose();
                         int id=note.id;
                         Notedata notedata = DataSupport.find(Notedata.class, id);
-
                         boolean islock=notedata.isLock();
                         if (isDeadLock()){
                             Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
@@ -615,6 +628,8 @@ public class MainActivity extends AppCompatActivity {
                         mDatas.remove(position);
                         notifyDataSetChanged();
                         DataSupport.delete(Notedata.class,note.id);
+                        File file = new File("/data/data/com.example.a99460.smartnote" + "/smartnote" + note.id + ".mp3");
+                        file.delete();
                     }
                 });
 
@@ -659,9 +674,7 @@ public class MainActivity extends AppCompatActivity {
                                             intent.setClass(MainActivity.this, AlarmReceiver.class);
                                             PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,note.id, intent, 0);
                                             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
                                             am.setExact(AlarmManager.RTC_WAKEUP,triggerAtTime, pendingIntent);
-
                          }
                                     };
                                     TimePickerDialog my = new TimePickerDialog(MainActivity.this,mTimeSetListener,cale2.get(Calendar.HOUR_OF_DAY), cale2.get(Calendar.MINUTE),true);
@@ -782,7 +795,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        //setContentView(R.layout.activity_main);
     }
 
 
@@ -790,7 +802,9 @@ public class MainActivity extends AppCompatActivity {
         mDatas = new ArrayList<>();
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
-            mDatas.add(new Note(notedata.getDate(),notedata.getNote(),notedata.getId(),notedata.isAlarm()));
+            if (notedata.isEdit()||notedata.isRecord()) {
+                mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord()));
+            }
         }
     }
 

@@ -2,34 +2,28 @@
 package com.example.a99460.smartnote;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -38,26 +32,22 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.gongyunhaoyyy.password.BuilderManager;
-import com.gongyunhaoyyy.password.ThemeSelectActivity;
-import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
 import com.nightonke.boommenu.BoomButtons.ButtonPlaceEnum;
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener;
 import com.nightonke.boommenu.BoomButtons.SimpleCircleButton;
 import com.nightonke.boommenu.BoomMenuButton;
 import com.nightonke.boommenu.Util;
+
 import org.litepal.crud.DataSupport;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class note_activity extends AppCompatActivity {
 
@@ -78,22 +68,31 @@ public class note_activity extends AppCompatActivity {
     String PATH_NAME;
     ImageButton change;
     ImageButton delete;
-    ImageButton ok_record;
+    ImageButton record_ok;
     Thread timeThread; // 记录录音时长的线程
     int timeCount;
     final int TIME_COUNT = 0x101;
     TextView time;
+    boolean Issave;
+    boolean Isedit;
+    Button back;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
 
+        Issave = false;
+        Isedit = false;
+
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
-        ok_record = (ImageButton) findViewById(R.id.ok_record);
+        Button sendText = (Button) findViewById(R.id.share_button);
         STATUS = START;
         change.setBackgroundResource(R.drawable.record1);
+        time = (TextView)findViewById(R.id.time);
         //BoomMenuButton相关配置
         bmb_note = (BoomMenuButton) findViewById(R.id.bmb_note);
         assert bmb_note != null;
@@ -106,12 +105,24 @@ public class note_activity extends AppCompatActivity {
         editText = (EditText)findViewById(R.id.edit_note);
         Intent intent = getIntent();
         myid=intent.getIntExtra( "in_data",-1 );
-        PATH_NAME = "/data/data/com.example.a99460.smartnote" + "/smartnote" + myid + ".mp3";
+        //处理是否有保存
+        if(myid!=-1){
+            Notedata notedata = DataSupport.find(Notedata.class,myid);
+            Issave = notedata.isRecord();
+            Isedit = notedata.isEdit();
+        }
+        record_ok=(ImageButton)findViewById( R.id.ok_record );
+        time = (TextView)findViewById(R.id.time);
+        mWaveView = (WaveView) findViewById(R.id.wave);
+        change = (ImageButton) findViewById(R.id.change);
+        delete = (ImageButton) findViewById(R.id.delete);
+        back = (Button)findViewById(R.id.cancle);
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
-      
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
 
@@ -131,6 +142,7 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
+
         ImageButton record_ok=(ImageButton)findViewById( R.id.ok_record );
         record_ok.setOnClickListener( new View.OnClickListener( ) {
             @Override
@@ -145,59 +157,83 @@ public class note_activity extends AppCompatActivity {
             }
         } );
 
-        Button back = (Button)findViewById(R.id.cancle);
+  
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final String wordsecond = editText.getText().toString();
                 //空笔记或者没有改变笔记都不会弹dialog
-                if(wordsecond.equals( wordfirst )||wordsecond==null||!Issave( wordsecond )){
+                RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
+                if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    notedata.setRecord(false);
+                    notedata.save();
+                    Issave = false;
+                    stopRecording();
+                }
+                else{
+                if (wordsecond.equals(wordfirst) || wordsecond == null || !Issave(wordsecond)) {
                     finish();
-                }else {
-                    if (wordfirst == null && Issave( wordsecond )) {
-                        String word1 = editText.getText( ).toString( );
-                        Notedata notedata = new Notedata( );
-                        notedata.setDate( GetDate( ) );
-                        notedata.setNote( word1 );
-                        notedata.save( );
-                        finish();
+                } else {
+                    if (wordfirst == null && Issave(wordsecond)) {
+                        String word1 = editText.getText().toString();
+                        if (myid == -1) {
+                            Notedata notedata = new Notedata();
+                            notedata.setDate(GetDate());
+                            notedata.setNote(word1);
+                            notedata.setEdit(true);
+                            notedata.save();
+                            myid = notedata.getId();
+                            Isedit = true;
+                            finish();
+                        } else {
+                            Notedata notedata = DataSupport.find(Notedata.class, myid);
+                            notedata.setDate(GetDate());
+                            notedata.setNote(word1);
+                            notedata.setEdit(true);
+                            notedata.save();
+                            Isedit = true;
+                            finish();
+
+                        }
                     } else {
-                        AlertDialog.Builder dialog = new AlertDialog.Builder( note_activity.this );
-                        dialog.setTitle( "提醒" );
-                        dialog.setMessage( "是否保存？" );
-                        dialog.setCancelable( false );
-                        dialog.setPositiveButton( "是", new DialogInterface.OnClickListener( ) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+                        dialog.setTitle("提醒");
+                        dialog.setMessage("是否保存？");
+                        dialog.setCancelable(false);
+                        dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (wordfirst == null) {
-                                    String word1 = editText.getText( ).toString( );
-                                    Notedata notedata = new Notedata( );
-                                    if (word1 != null && Issave( word1 )) {
-                                        notedata.setDate( GetDate( ) );
-                                        notedata.setNote( word1 );
-                                        notedata.save( );
-                                    }
-                                } else {
-                                    Notedata notedata = DataSupport.find( Notedata.class, myid );
-                                    String word1 = editText.getText( ).toString( );
-                                    if (word1 != null && Issave( word1 )) {
-                                        notedata.setDate( GetDate( ) );
-                                        notedata.setNote( word1 );
-                                        notedata.save( );
-                                    }
+                                Notedata notedata = DataSupport.find(Notedata.class, myid);
+                                String word1 = editText.getText().toString();
+                                if (word1 != null && Issave(word1)) {
+                                    notedata.setDate(GetDate());
+                                    notedata.setNote(word1);
+                                    notedata.save();
                                 }
-                                finish( );
+                                finish();
                             }
-                        } );
-                        dialog.setNegativeButton( "否", new DialogInterface.OnClickListener( ) {
+                        });
+                        dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                finish( );
+                                finish();
                             }
-                        } );
-                        dialog.show( );
+                        });
+                        dialog.show();
                     }
                 }
+            }
+            }
+        });
+        sendText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent textIntent = new Intent(Intent.ACTION_SEND);
+                textIntent.setType("text/plain");
+                Notedata notedata = DataSupport.find(Notedata.class,myid);
+                textIntent.putExtra(Intent.EXTRA_TEXT,notedata.getNote());
+                startActivity(Intent.createChooser(textIntent, "分享"));
             }
         });
 
@@ -220,7 +256,6 @@ public class note_activity extends AppCompatActivity {
                                 Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
                                 break;
                             case 2:
-
                                 RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
                                 if(recordlayout.getVisibility()==View.VISIBLE){
                                 }else {
@@ -231,14 +266,14 @@ public class note_activity extends AppCompatActivity {
                                     );
                                     animation.setDuration(600);
                                     recordlayout.setVisibility(View.VISIBLE);
-                                    recordlayout.startAnimation(animation);
+    recordlayout.startAnimation(animation); if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                                            ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                                        init();
+                                    } else {
+                                        ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                                    }
+
                                 }
-                                if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
-                                        ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                                    init();
-                                } else {
-                                    ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                                }            
                                 break;
                             default:
                         }
@@ -248,73 +283,87 @@ public class note_activity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        super.onResume();
         if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-        super.onResume();
     }
 
     @Override
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();
-
         RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
-        if(recordlayoutback.getVisibility()==View.VISIBLE){
+        if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS!=RECORDING&&STATUS!=PLAY){
             TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
             animation.setDuration(400);
             recordlayoutback.startAnimation(animation);
             recordlayoutback.setVisibility(View.GONE);
-        }else {
+
+     
+
+        }
+        else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
+            stopPlay();
+        }
+        else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
+            Notedata notedata = DataSupport.find(Notedata.class,myid);
+            notedata.setRecord(false);
+            notedata.save();
+            Issave = false;
+            stopRecording();
+        } else {
+
             //空笔记或者没有改变笔记都不会弹dialog
             if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
                 finish( );
             } else {
+                //这是第一次不用询问的时候
                 if (wordfirst == null && Issave( wordsecond )) {
                     String word1 = editText.getText( ).toString( );
+                    if (myid==-1){
                     Notedata notedata = new Notedata( );
                     notedata.setDate( GetDate( ) );
                     notedata.setNote( word1 );
-                    notedata.save( );
+                    notedata.save( ); Isedit = true;
+                        myid = notedata.getId();
                     finish( );
-                } else {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder( note_activity.this );
-                    dialog.setTitle( "提醒" );
-                    dialog.setMessage( "是否保存？" );
-                    dialog.setCancelable( false );
-                    dialog.setPositiveButton( "是", new DialogInterface.OnClickListener( ) {
+
+                    }else{
+                        Notedata notedata = DataSupport.find(Notedata.class,myid);
+                        notedata.setDate( GetDate( ) );
+                        notedata.setNote( word1 );
+                        notedata.save( );Isedit = true;
+                        finish( );
+
+                    }
+                }else {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+                    dialog.setTitle("提醒");
+                    dialog.setMessage("是否保存？");
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (wordfirst == null) {
-                                String word1 = editText.getText( ).toString( );
-                                Notedata notedata = new Notedata( );
-                                if (word1 != null && Issave( word1 )) {
-                                    notedata.setDate( GetDate( ) );
-                                    notedata.setNote( word1 );
-                                    notedata.save( );
-                                }
-                            } else {
-                                Notedata notedata = DataSupport.find( Notedata.class, myid );
-                                String word1 = editText.getText( ).toString( );
-                                if (word1 != null && Issave( word1 )) {
-                                    notedata.setDate( GetDate( ) );
-                                    notedata.setNote( word1 );
-                                    notedata.save( );
-                                }
+                            Notedata notedata = DataSupport.find(Notedata.class, myid);
+                            String word1 = editText.getText().toString();
+                            if (word1 != null && Issave(word1)) {
+                                notedata.setDate(GetDate());
+                                notedata.setNote(word1);
+                                notedata.save();
                             }
-                            finish( );
+                            finish();
                         }
-                    } );
-                    dialog.setNegativeButton( "否", new DialogInterface.OnClickListener( ) {
+                    });
+                    dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            finish( );
+                            finish();
                         }
-                    } );
-                    dialog.show( );
+                    });
+                    dialog.show();
                 }
             }
         }
-
     }
 
     protected boolean Issave(String word){
@@ -334,10 +383,7 @@ public class note_activity extends AppCompatActivity {
     protected String GetDate(){
         SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 hh时mm分");
         String date = sDateFormat.format(new java.util.Date());
-<<<<<<< HEAD
-=======
 
->>>>>>> d66a0263cd108ec59d9475ced5372c2f11540887
         return date;
     }
 
@@ -360,7 +406,15 @@ public class note_activity extends AppCompatActivity {
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         try {
-            //设置储存路径
+            //设置储存路径，这里新建了数据库
+            if (myid==-1){
+                Notedata notedata = new Notedata();
+                notedata.save();
+                myid = notedata.getId();
+                PATH_NAME = "/data/data/com.example.a99460.smartnote/smartnote"+notedata.getId()+".mp3";
+            }else{
+                PATH_NAME = "/data/data/com.example.a99460.smartnote/smartnote"+myid+".mp3";
+            }
             mediaRecorder.setOutputFile(PATH_NAME);
             mediaRecorder.prepare();
             mediaRecorder.start();   // Recording is now started
@@ -373,17 +427,16 @@ public class note_activity extends AppCompatActivity {
 
     public void stopRecording() {
         Isrecording = false;
-        mWaveView.setVisibility(View.INVISIBLE);
+        mWaveView.setVisibility(View.GONE);
         STATUS = STOPRECORDING;
         //说明正在录制,设置停止信息
         change.setBackgroundResource(R.drawable.record3);
         mediaRecorder.stop();
         delete.setVisibility(View.VISIBLE);
-        ok_record.setVisibility(View.VISIBLE);
+        record_ok.setVisibility(View.VISIBLE);
     }
 
     public void startPlay() {
-
         //设置音频播放器
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -453,6 +506,7 @@ public class note_activity extends AppCompatActivity {
         }
     };
 
+    //这个要关注一下,这真他妈是一个好东西。
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -464,6 +518,21 @@ public class note_activity extends AppCompatActivity {
             mediaRecorder.stop();
             mediaRecorder.release();
         }
+        //我感觉这里的逻辑有问题
+        if(!Issave&&Isedit){
+            Notedata notedata = DataSupport.find(Notedata.class,myid);
+            File file = new File("/data/data/com.example.a99460.smartnote/smartnote"+notedata.getId()+".mp3");
+            file.delete();
+        }
+        //这里不对
+         if(PATH_NAME!=null) {
+             File file = new File(PATH_NAME);
+             if (!Issave && !Isedit && file.exists()) {
+                DataSupport.delete(Notedata.class,myid);
+                 Toast.makeText(note_activity.this,"删除了哦",Toast.LENGTH_SHORT).show();
+                 file.delete();
+             }
+         }
     }
 
     @Override
@@ -483,11 +552,8 @@ public class note_activity extends AppCompatActivity {
     }
 
     protected void init() {
-        mWaveView = (WaveView) findViewById(R.id.wave);
-        mWaveView.setVisibility(View.INVISIBLE);
-        time = (TextView)findViewById(R.id.time);
-        //?
-        time.setText("00:00:00");
+        PATH_NAME = "/data/data/com.example.a99460.smartnote/smartnote"+myid+".mp3";
+        mWaveView.setVisibility(View.GONE);
         mediaRecorder = new MediaRecorder();
         //设置到达最大录制长度时重头开始录制
         mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
@@ -510,16 +576,17 @@ public class note_activity extends AppCompatActivity {
                 }
             }
         });
-        File file = new File(PATH_NAME);
-        if (file.exists()){
-            STATUS = DISPLAY;
+           // change.setBackgroundResource(R.drawable.record1);
+        if( (STATUS==STOPRECORDING||STATUS==DISPLAY||STATUS==PLAY||STATUS==START)&&Issave){
+            delete.setVisibility(View.VISIBLE);
+            record_ok.setVisibility(View.GONE);
+            STATUS = STOPRECORDING;
             change.setBackgroundResource(R.drawable.record3);
-        }
-        else{
-            change.setBackgroundResource(R.drawable.record1);
+            Notedata notedata = DataSupport.find(Notedata.class, myid);
+            time.setText(FormatMiss( notedata.getRecordTime()));
         }
 
-        change = (ImageButton) findViewById(R.id.change);
+
         change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -535,28 +602,20 @@ public class note_activity extends AppCompatActivity {
                 }
             }
         });
-        delete = (ImageButton) findViewById(R.id.delete);
+
+
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 File file = new File(PATH_NAME);
-                if (STATUS==STOPRECORDING||STATUS==DISPLAY){
+                if (STATUS==STOPRECORDING||STATUS==DISPLAY||STATUS==START&&file.exists()){
                     file.delete();
                     Isrecording = false;
                     STATUS = START;
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
                     timeCount = 0;
-                }
-                else if (STATUS==START&&file.exists()){
-                    file.delete();
-                    Isrecording = false;
-                    STATUS = START;
-                    change.setBackgroundResource(R.drawable.record1);
-                    time.setText("00:00:00");
-                    timeCount=0;
-                }
-                else if (STATUS==PLAY){
+                } else if (STATUS==PLAY){
                     stopPlay();
                     file.delete();
                     Isrecording = false;
@@ -564,8 +623,7 @@ public class note_activity extends AppCompatActivity {
                     change.setBackgroundResource(R.drawable.record1);
                     time.setText("00:00:00");
                     timeCount=0;
-                }
-                else if (STATUS==RECORDING){
+                } else if (STATUS==RECORDING){
                     stopRecording();
                     file.delete();
                     STATUS = START;
@@ -573,9 +631,34 @@ public class note_activity extends AppCompatActivity {
                     time.setText("00:00:00");
                     timeCount=0;
                 }
-           delete.setVisibility(View.INVISIBLE);
-                ok_record.setVisibility(View.INVISIBLE);
+                delete.setVisibility(View.GONE);
+                record_ok.setVisibility(View.GONE);
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    notedata.setRecordTime(0);
+                    notedata.setRecord(false);
+                    notedata.save();
+                    Issave = false;
             }
         });
+
+
+        record_ok.setOnClickListener( new View.OnClickListener( ) {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutfi = (RelativeLayout)findViewById(R.id.record_layout);
+                // 从原位置下滑到底部的动画
+                //从当前的位置向下移动700px
+                TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                animation.setDuration(400);
+                recordlayoutfi.startAnimation(animation);
+                recordlayoutfi.setVisibility(View.GONE);
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    notedata.setRecordTime(timeCount);
+                    notedata.setRecord(true);
+                    notedata.setDate(GetDate());
+                    notedata.save();
+                Issave = true;
+            }
+        } );
     }
 }
