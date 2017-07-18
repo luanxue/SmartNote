@@ -18,13 +18,12 @@
     <include layout="@layout/main_title"/>
 
 <ListView
-
+    android:layout_marginTop="72dp"
     android:divider="#fff2f0"
     android:dividerHeight="8dp"
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="72dp"
     android:textStyle="bold"
     android:textColor="#3a3f3a">
 </ListView>
