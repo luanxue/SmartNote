@@ -14,11 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <TextView
 
+        <TextView
             android:id="@+id/content1"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="40dp"
             android:gravity="left"
             android:maxLines="1"
             android:paddingLeft="12dp"
@@ -37,11 +37,11 @@
 
             <TextView
                 android:id="@+id/content2"
-                android:layout_width="250dp"
+                android:layout_width="240dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1.5"
                 android:gravity="left"
-                android:paddingTop="5dp"
+                android:paddingTop="6dp"
                 android:paddingLeft="12dp"
                 android:paddingRight="5dp"
                 android:text="2017年9月12日"
@@ -50,15 +50,17 @@
                 android:textStyle="italic" />
             <ImageView
                 android:id="@+id/content4"
-                android:layout_width="22dp"
+                android:layout_width="23dp"
+                android:layout_marginRight="2dp"
                 android:layout_height="match_parent"
                 android:visibility="invisible"
                 android:src="@drawable/isrecord"
                 />
             <ImageView
                 android:id="@+id/content3"
-                android:layout_width="22dp"
+                android:layout_width="23dp"
                 android:layout_height="match_parent"
+                android:layout_marginRight="6dp"
                 android:visibility="invisible"
                 android:src="@drawable/isalarm"/>
         </LinearLayout>

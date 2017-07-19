@@ -77,8 +77,6 @@ public class note_activity extends AppCompatActivity {
     boolean Isedit;
     Button back;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,9 +197,9 @@ public class note_activity extends AppCompatActivity {
                     } else {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
                         dialog.setTitle("提醒");
-                        dialog.setMessage("是否保存？");
+                        dialog.setMessage("是否保存当前更改？");
                         dialog.setCancelable(false);
-                        dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        dialog.setPositiveButton("保存", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Notedata notedata = DataSupport.find(Notedata.class, myid);
@@ -214,7 +212,7 @@ public class note_activity extends AppCompatActivity {
                                 finish();
                             }
                         });
-                        dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                        dialog.setNegativeButton("放弃", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish();
@@ -290,79 +288,78 @@ public class note_activity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
-        final String wordsecond = editText.getText().toString();
-        RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
-        if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS!=RECORDING&&STATUS!=PLAY){
-            TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
-            animation.setDuration(400);
-            recordlayoutback.startAnimation(animation);
-            recordlayoutback.setVisibility(View.GONE);
-
-     
-
-        }
-        else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
-            stopPlay();
-        }
-        else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
-            Notedata notedata = DataSupport.find(Notedata.class,myid);
-            notedata.setRecord(false);
-            notedata.save();
-            Issave = false;
-            stopRecording();
-        } else {
-
-            //空笔记或者没有改变笔记都不会弹dialog
-            if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
-                finish( );
+    public void onBackPressed() {
+        final String wordsecond = editText.getText( ).toString( );
+        RelativeLayout recordlayoutback = (RelativeLayout) findViewById( R.id.record_layout );
+        if (recordlayoutback.getVisibility( ) == View.VISIBLE && STATUS != RECORDING && STATUS != PLAY) {
+            TranslateAnimation animation = new TranslateAnimation( 0.0f, 0.0f, 0.0f, 700.0f );
+            animation.setDuration( 400 );
+            recordlayoutback.startAnimation( animation );
+            recordlayoutback.setVisibility( View.GONE );
+        } else if (recordlayoutback.getVisibility( ) == View.VISIBLE && STATUS == PLAY) {
+                stopPlay( );
+            } else if (recordlayoutback.getVisibility( ) == View.VISIBLE && STATUS == RECORDING) {
+                Notedata notedata = DataSupport.find( Notedata.class, myid );
+                notedata.setRecord( false );
+                notedata.save( );
+                Issave = false;
+                stopRecording( );
             } else {
-                //这是第一次不用询问的时候
-                if (wordfirst == null && Issave( wordsecond )) {
-                    String word1 = editText.getText( ).toString( );
-                    if (myid==-1){
-                    Notedata notedata = new Notedata( );
-                    notedata.setDate( GetDate( ) );
-                    notedata.setNote( word1 );
-                    notedata.save( ); Isedit = true;
-                        myid = notedata.getId();
+                //空笔记或者没有改变笔记都不会弹dialog
+                if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
                     finish( );
+                } else {
+                    //这是第一次不用询问的时候
+                    if (wordfirst == null && Issave( wordsecond )) {
+                        String word1 = editText.getText( ).toString( );
+                        if (myid == -1) {
+                            Notedata notedata = new Notedata( );
+                            notedata.setDate( GetDate( ) );
+                            notedata.setNote( word1 );
+                            notedata.setEdit( true );
+                            notedata.save( );
 
-                    }else{
-                        Notedata notedata = DataSupport.find(Notedata.class,myid);
-                        notedata.setDate( GetDate( ) );
-                        notedata.setNote( word1 );
-                        notedata.save( );Isedit = true;
-                        finish( );
+                            Isedit = true;
+                            myid = notedata.getId( );
+                            finish( );
 
-                    }
-                }else {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
-                    dialog.setTitle("提醒");
-                    dialog.setMessage("是否保存？");
-                    dialog.setCancelable(false);
-                    dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Notedata notedata = DataSupport.find(Notedata.class, myid);
-                            String word1 = editText.getText().toString();
-                            if (word1 != null && Issave(word1)) {
-                                notedata.setDate(GetDate());
-                                notedata.setNote(word1);
-                                notedata.save();
+                        } else {
+                            Notedata notedata = DataSupport.find( Notedata.class, myid );
+                            notedata.setDate( GetDate( ) );
+                            notedata.setNote( word1 );
+                            notedata.setEdit( true );
+                            notedata.save( );
+                            Isedit = true;
+                            finish( );
+
+                        }
+                    } else {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder( note_activity.this );
+                        dialog.setTitle( "提醒" );
+                        dialog.setMessage( "是否保存？" );
+                        dialog.setCancelable( false );
+                        dialog.setPositiveButton( "是", new DialogInterface.OnClickListener( ) {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Notedata notedata = DataSupport.find( Notedata.class, myid );
+                                String word1 = editText.getText( ).toString( );
+                                if (word1 != null && Issave( word1 )) {
+                                    notedata.setDate( GetDate( ) );
+                                    notedata.setNote( word1 );
+                                    notedata.save( );
+                                }
+                                finish( );
                             }
-                            finish();
-                        }
-                    });
-                    dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    });
-                    dialog.show();
+                        } );
+                        dialog.setNegativeButton( "否", new DialogInterface.OnClickListener( ) {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish( );
+                            }
+                        } );
+                        dialog.show( );
+                    }
                 }
-            }
         }
     }
 
