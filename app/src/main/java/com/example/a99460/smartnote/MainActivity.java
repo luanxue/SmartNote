@@ -219,6 +219,14 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    } else if((note.isphoto||note.isalbum)&&!note.isrecord){
+                        holder.setText(R.id.content1,"照片文件");
+                    }
+                    else if (note.isrecord&&!(note.isphoto||note.isalbum)){
+                        holder.setText(R.id.content1,"音频文件");
+                    }
+                    else if (note.isrecord&&(note.isphoto||note.isalbum)){
+                        holder.setText(R.id.content1,"照片文件&&音频文件");
                     }
                 }
 
@@ -606,6 +614,14 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     if(note.note!=null){
                     holder.setText(R.id.content1, note.note.trim());
+                    } else if((note.isphoto||note.isalbum)&&!note.isrecord){
+                        holder.setText(R.id.content1,"照片文件");
+                    }
+                    else if (note.isrecord&&!(note.isphoto||note.isalbum)){
+                        holder.setText(R.id.content1,"音频文件");
+                    }
+                    else if (note.isrecord&&(note.isphoto||note.isalbum)){
+                        holder.setText(R.id.content1,"照片文件&&音频文件");
                     }
                 }
 
@@ -840,7 +856,7 @@ public class MainActivity extends AppCompatActivity {
         mDatas = new ArrayList<>();
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
-            if (notedata.isEdit()||notedata.isRecord()) {
+            if (notedata.isEdit()||notedata.isRecord()||notedata.isAlbum()||notedata.isAlarm()) {
                 mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlbum()));
             }
         }

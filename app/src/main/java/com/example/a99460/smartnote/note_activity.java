@@ -101,9 +101,10 @@ public class note_activity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
-
+    //    AndroidBug5497Workaround.assistActivity(this);
         Issave = false;
         Isedit = false;
         Isphoto = false;
@@ -137,7 +138,7 @@ public class note_activity extends AppCompatActivity {
             imagePath = notedata.getImagepath();
         }
         if (Isphoto==true||IsAlbum==true){
-            Bitmap bitmap = getImageThumbnail(imagePath,250,250);
+            Bitmap bitmap = getImageThumbnail(imagePath,400,400);
             picture.setVisibility(View.VISIBLE);
             picture.setImageBitmap(bitmap);
         }
@@ -289,6 +290,9 @@ public class note_activity extends AppCompatActivity {
                 }
                 else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
                     stopPlay();
+                   //closeSoftKeybord(editText,note_activity.this);
+
+
                 }
                 else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
                     Notedata notedata = DataSupport.find(Notedata.class,myid);
@@ -296,10 +300,17 @@ public class note_activity extends AppCompatActivity {
                     notedata.save();
                     Issave = false;
                     stopRecording();
+                    // closeSoftKeybord(editText,note_activity.this);
                 }
             }
         });
 
+    }
+
+
+    public static void closeSoftKeybord(EditText mEditText, Context mContext) {
+        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
     }
 
 
@@ -490,7 +501,7 @@ public class note_activity extends AppCompatActivity {
                         Isphoto = true;
                         IsAlbum = false;
                         imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg";
-                        Bitmap bitmap = getImageThumbnail(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg",250,250);
+                        Bitmap bitmap = getImageThumbnail(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg",400,400);
                 picture.setVisibility(View.VISIBLE);
                 picture.setImageBitmap(bitmap);
         }
@@ -900,7 +911,7 @@ public class note_activity extends AppCompatActivity {
                 IsAlbum = true;
                 Isphoto = false;
             }
-            Bitmap bitmap = getImageThumbnail(imagePath,250,250);
+            Bitmap bitmap = getImageThumbnail(imagePath,400,400);
             picture.setVisibility(View.VISIBLE);
             picture.setImageBitmap(bitmap);
         }else{
