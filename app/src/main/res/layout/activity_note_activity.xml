@@ -2,6 +2,7 @@
 
 <LinearLayout
 
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
 
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,73 +15,71 @@
     >
 
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/edit"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"
-
-    tools:context="com.example.a99460.smartnote.note_activity"
-    >
-
-
-    <include layout="@layout/title"
-        android:id="@+id/include"/>
-
-    <com.nightonke.boommenu.BoomMenuButton
-        android:id="@+id/bmb_note"
-        android:layout_width="54dp"
-        android:layout_height="62dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="2dp"
-        android:layout_marginRight="5dp"
-        app:bmb_buttonEnum="simpleCircle"
-        app:bmb_piecePlaceEnum="piecePlace_dot_3_2"
-        app:bmb_highlightedColor="@color/titlecolor"
-        app:bmb_normalColor="@color/titlecolor"
-        android:layout_alignParentEnd="true"/>
-    <ScrollView
-        android:layout_marginTop="72dp"
+    <RelativeLayout
+        android:id="@+id/edit"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        tools:context="com.example.a99460.smartnote.note_activity">
 
 
+        <include
+            android:id="@+id/include"
+            layout="@layout/title" />
 
-        <ImageView
-            android:id="@+id/picture"
+        <com.nightonke.boommenu.BoomMenuButton
+            android:id="@+id/bmb_note"
+            android:layout_width="54dp"
+            android:layout_height="62dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="8dp"
+            app:bmb_buttonEnum="simpleCircle"
+            app:bmb_highlightedColor="@color/titlecolor"
+            app:bmb_normalColor="@color/titlecolor"
+            app:bmb_piecePlaceEnum="piecePlace_dot_3_2" />
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:src="@drawable/app_icon"
-            android:visibility="gone" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="72dp">
 
-        <EditText
-            android:id="@+id/edit_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minLines="50"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/bmb_note"
-            android:background="#fff2f0"
-            android:gravity="top"
-            android:hint="Please add your notes."
-            android:paddingBottom="5dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="3dp"
-            android:paddingTop="5dp"
-            android:textColor="#1a3939"
-            android:textSize="22sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-    </LinearLayout>
-</ScrollView>
-</RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/picture"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    android:layout_marginLeft="65dp"
+                    android:src="@drawable/app_icon"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/edit_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/bmb_note"
+                    android:background="#fff2f0"
+                    android:gravity="top"
+                    android:hint="Please add your notes."
+                    android:minLines="50"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="8dp"
+                    android:textColor="#1a3939"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
 
     <RelativeLayout
         android:focusableInTouchMode="true"
