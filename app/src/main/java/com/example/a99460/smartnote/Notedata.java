@@ -125,4 +125,24 @@ public class Notedata extends DataSupport{
     }
 
     private boolean isPhoto;
+
+    public boolean isAlbum() {
+        return isAlbum;
+    }
+
+    public void setAlbum(boolean album) {
+        isAlbum = album;
+    }
+
+    private boolean isAlbum;
+
+    public String getImagepath() {
+        return imagepath;
+    }
+
+    public void setImagepath(String imagepath) {
+        this.imagepath = imagepath;
+    }
+
+    private String imagepath;
 }

@@ -2,12 +2,15 @@
 package com.example.a99460.smartnote;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,12 +19,14 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -86,6 +91,8 @@ public class note_activity extends AppCompatActivity {
     boolean Issave;
     boolean Isedit;
     boolean Isphoto;
+    boolean IsAlbum;
+    String imagePath;
     Button back;
     public static final int TAKE_PHOTO = 1;
     private ImageView picture;
@@ -100,6 +107,7 @@ public class note_activity extends AppCompatActivity {
         Issave = false;
         Isedit = false;
         Isphoto = false;
+        IsAlbum = false;
         picture = (ImageView)findViewById(R.id.picture);
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
@@ -125,13 +133,15 @@ public class note_activity extends AppCompatActivity {
             Issave = notedata.isRecord();
             Isedit = notedata.isEdit();
             Isphoto = notedata.isPhoto();
-        }/*
-        if (Isphoto==true){
-            Bitmap bitmap = getLocalBitmap(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg");
+            IsAlbum = notedata.isAlbum();
+            imagePath = notedata.getImagepath();
+        }
+        if (Isphoto==true||IsAlbum==true){
+            Bitmap bitmap = getImageThumbnail(imagePath,250,250);
             picture.setVisibility(View.VISIBLE);
             picture.setImageBitmap(bitmap);
-            picture.setImageBitmap(bitmap);
-        }*/
+        }
+
         record_ok=(ImageButton)findViewById( R.id.ok_record );
         time = (TextView)findViewById(R.id.time);
         mWaveView = (WaveView) findViewById(R.id.wave);
@@ -292,17 +302,6 @@ public class note_activity extends AppCompatActivity {
 
     }
 
-    private Bitmap getLocalBitmap(String url) {
-        try {
-            FileInputStream fis = new FileInputStream(url);
-            return BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 
     //设置menu的监听功能
     private void addBuilder(int i) {
@@ -342,7 +341,11 @@ public class note_activity extends AppCompatActivity {
                                 startActivityForResult(intent,TAKE_PHOTO);
                                 break;
                             case 1:
-                                Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
+                                if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                                    ActivityCompat.requestPermissions(note_activity.this,new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE },2);
+                                }else{
+                                    openAlbum();
+                                }
                                 break;
                             case 2:
                                 RelativeLayout recordlayout = (RelativeLayout)findViewById(R.id.record_layout);
@@ -478,21 +481,21 @@ public class note_activity extends AppCompatActivity {
         switch(requestCode){
             case TAKE_PHOTO:
                 if (resultCode == RESULT_OK){
-                    try{
                         Notedata notedata = DataSupport.find(Notedata.class,myid);
                         notedata.setPhoto(true);
+                        notedata.setAlbum(false);
                         notedata.setDate(GetDate());
+                        notedata.setImagepath(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg");
                         notedata.save();
                         Isphoto = true;
-                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
-                        picture.setVisibility(View.VISIBLE);
-                        picture.setImageBitmap(bitmap);
-                    }catch (FileNotFoundException e){
-                        e.printStackTrace();
-                    }
-                }
+                        IsAlbum = false;
+                        imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg";
+                        Bitmap bitmap = getImageThumbnail(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg",250,250);
+                picture.setVisibility(View.VISIBLE);
+                picture.setImageBitmap(bitmap);
+        }
                 break;
-           /* case CHOOSE_PHOTO:
+            case CHOOSE_PHOTO:
                 if (resultCode == RESULT_OK){
                     if (Build.VERSION.SDK_INT >= 19){
                         handleImageOnKitKat(data);
@@ -500,11 +503,44 @@ public class note_activity extends AppCompatActivity {
                         handleImageBeforeKitKat(data);
                     }
                 }
-                break;*/
+                break;
             default:
                 break;
         }
     }
+
+    private Bitmap getImageThumbnail(String imagePath, int width, int height) {
+        Bitmap bitmap = null;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        // 获取这个图片的宽和高，注意此处的bitmap为null
+        bitmap = BitmapFactory.decodeFile(imagePath, options);
+        options.inJustDecodeBounds = false; // 设为 false
+        // 计算缩放比
+        int h = options.outHeight;
+        int w = options.outWidth;
+        int beWidth = w / width;
+        int beHeight = h / height;
+        int be = 1;
+        if (beWidth < beHeight) {
+            be = beWidth;
+        } else {
+            be = beHeight;
+        }
+        if (be <= 0) {
+            be = 1;
+        }
+        options.inSampleSize = be;
+        // 重新读入图片，读取缩放后的bitmap，注意这次要把options.inJustDecodeBounds 设为 false
+        bitmap = BitmapFactory.decodeFile(imagePath, options);
+        // 利用ThumbnailUtils来创建缩略图，这里要指定要缩放哪个Bitmap对象
+        bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height,
+                ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+        return bitmap;
+    }
+
+
+
 
     protected String GetDate(){
         SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 hh时mm分");
@@ -673,6 +709,13 @@ public class note_activity extends AppCompatActivity {
                     }
                 }
                 break;
+            case 2:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    openAlbum();
+                }else{
+                    Toast.makeText(this,"You denied the permission", Toast.LENGTH_SHORT).show();
+                }
+                break;
             default:
                 break;
         }
@@ -788,4 +831,81 @@ public class note_activity extends AppCompatActivity {
             }
         } );
     }
+
+    private void openAlbum(){
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        startActivityForResult(intent,CHOOSE_PHOTO);
+    }
+
+    @TargetApi(19)
+    private void handleImageOnKitKat(Intent data){
+        String imagePath = null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this,uri)) {
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+            } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
+                imagePath = getImagePath(contentUri, null);
+            }
+        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            imagePath = getImagePath(uri, null);
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            imagePath = uri.getPath();
+        }
+        displayImage(imagePath);
+    }
+
+    private void handleImageBeforeKitKat(Intent data) {
+        Uri uri = data.getData();
+        String imagePath = getImagePath(uri, null);
+        displayImage(imagePath);
+    }
+
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        Cursor cursor = getContentResolver().query(uri,null,selection,null,null);
+        if (cursor != null){
+            if (cursor.moveToFirst()){
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
+
+    private void displayImage(String imagePath){
+        if (imagePath != null){
+            if (myid==-1){
+                Notedata notedata = new Notedata();
+                notedata.setPhoto(false);
+                notedata.setAlbum(true);
+                notedata.setDate(GetDate());
+                notedata.setImagepath(imagePath);
+                notedata.save();
+                IsAlbum = true;
+                Isphoto = false;
+                myid = notedata.getId();
+            } else{
+                Notedata notedata = DataSupport.find(Notedata.class,myid);
+                notedata.setPhoto(false);
+                notedata.setAlbum(true);
+                notedata.setDate(GetDate());
+                notedata.setImagepath(imagePath);
+                notedata.save();
+                IsAlbum = true;
+                Isphoto = false;
+            }
+            Bitmap bitmap = getImageThumbnail(imagePath,250,250);
+            picture.setVisibility(View.VISIBLE);
+            picture.setImageBitmap(bitmap);
+        }else{
+            Toast.makeText(this,"failed to get image",Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

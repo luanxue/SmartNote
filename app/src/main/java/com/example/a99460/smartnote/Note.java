@@ -16,9 +16,11 @@ public class Note {
 
     public String date;
 
-    public int hour;
 
-    public int minute;
+    public boolean isphoto;
+
+    public boolean isalbum;
+
 
     public int getId() {
         return id;
@@ -28,12 +30,14 @@ public class Note {
         this.id = id;
     }
 
-    public Note(String date,String note,int id,boolean isalarm,boolean isrecord){
+    public Note(String date,String note,int id,boolean isalarm,boolean isrecord,boolean isphoto,boolean isalbum){
         this.date=date;
         this.note=note;
         this.id=id;
         this.isalarm=isalarm;
         this.isrecord=isrecord;
+        this.isphoto = isphoto;
+        this.isalbum = isalbum;
     }
 
 

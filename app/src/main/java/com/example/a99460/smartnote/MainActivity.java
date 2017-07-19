@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
         }
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
@@ -237,6 +238,15 @@ public class MainActivity extends AppCompatActivity {
                 {
                     holder.setVisible(R.id.content4,false);
                 }
+
+                if (note.isphoto==true||note.isalbum==true){
+                    holder.setVisible(R.id.content5,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content5,false);
+                }
+
 
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
@@ -617,6 +627,14 @@ public class MainActivity extends AppCompatActivity {
                     holder.setVisible(R.id.content4,false);
                 }
 
+                if (note.isphoto==true||note.isalbum==true){
+                    holder.setVisible(R.id.content5,true);
+                }
+                else
+                {
+                    holder.setVisible(R.id.content5,false);
+                }
+
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -823,7 +841,7 @@ public class MainActivity extends AppCompatActivity {
         List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
         for (Notedata notedata:notedatas){
             if (notedata.isEdit()||notedata.isRecord()) {
-                mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord()));
+                mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlbum()));
             }
         }
     }
@@ -833,7 +851,9 @@ public class MainActivity extends AppCompatActivity {
         List<Notedata> notedatas = DataSupport
                 .where("note like ?","%"+temp+"%").find( Notedata.class );
         for (Notedata notedata:notedatas){
-            searchData.add(new Note(notedata.getDate(),notedata.getNote(),notedata.getId(),notedata.isAlarm(),notedata.isRecord()));
+
+            searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlarm()));
+
         }
     }
 
