@@ -539,11 +539,8 @@ public class note_activity extends AppCompatActivity {
         return bitmap;
     }
 
-
-
-
     protected String GetDate(){
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 hh时mm分");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 E kk时mm分");
         String date = sDateFormat.format(new java.util.Date());
 
         return date;

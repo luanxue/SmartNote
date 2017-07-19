@@ -23,6 +23,7 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -97,14 +98,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initdata();
         nav=(NavigationView)findViewById( R.id.nav_view );
-
         searchbt=(Button)findViewById( R.id.search_btn);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-
         }
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
@@ -221,9 +219,7 @@ public class MainActivity extends AppCompatActivity {
                     holder.setText(R.id.content1, note.note.trim());
                     }
                 }
-
                 holder.setText(R.id.content2,note.date);
-
                 if (note.isalarm==true){
                 holder.setVisible(R.id.content3,true);
                 }
@@ -234,19 +230,16 @@ public class MainActivity extends AppCompatActivity {
                 if (note.isrecord==true){
                     holder.setVisible(R.id.content4,true);
                 }
-                else
-                {
+                else {
                     holder.setVisible(R.id.content4,false);
                 }
 
                 if (note.isphoto==true||note.isalbum==true){
                     holder.setVisible(R.id.content5,true);
                 }
-                else
-                {
+                else {
                     holder.setVisible(R.id.content5,false);
                 }
-
 
                 holder.setOnClickListener(R.id.content, new View.OnClickListener() {
                     @Override
@@ -525,6 +518,13 @@ public class MainActivity extends AppCompatActivity {
          *---------------------搜索功能实现方法----------------------------
          */
         search_et=(EditText)findViewById( R.id.search_et );
+        search_et.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                //限制回车,当按回车时返回true
+                return (event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
+            }
+        });
         //搜索框的文本变化实时监听
         search_et.addTextChangedListener(new TextWatcher() {
             @Override
