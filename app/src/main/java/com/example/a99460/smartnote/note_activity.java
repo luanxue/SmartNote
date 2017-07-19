@@ -99,8 +99,6 @@ public class note_activity extends AppCompatActivity {
     private Uri imageUri;
     public static final int CHOOSE_PHOTO = 2;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -232,9 +230,9 @@ public class note_activity extends AppCompatActivity {
                     } else {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
                         dialog.setTitle("提醒");
-                        dialog.setMessage("是否保存？");
+                        dialog.setMessage("是否保存当前更改？");
                         dialog.setCancelable(false);
-                        dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        dialog.setPositiveButton("保存", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Notedata notedata = DataSupport.find(Notedata.class, myid);
@@ -247,7 +245,7 @@ public class note_activity extends AppCompatActivity {
                                 finish();
                             }
                         });
-                        dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                        dialog.setNegativeButton("放弃", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish();
@@ -264,9 +262,18 @@ public class note_activity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent textIntent = new Intent(Intent.ACTION_SEND);
                 textIntent.setType("text/plain");
-                Notedata notedata = DataSupport.find(Notedata.class,myid);
-                textIntent.putExtra(Intent.EXTRA_TEXT,notedata.getNote());
-                startActivity(Intent.createChooser(textIntent, "分享"));
+                String word=editText.getText().toString();
+                if (!word.isEmpty()&&myid==-1){
+                    Toast.makeText( note_activity.this,"保存后再来分享吧",Toast.LENGTH_SHORT ).show();
+                }else if (myid!=-1&&word.isEmpty()) {
+                    Toast.makeText( note_activity.this,"这是要闹哪样 ？？？",Toast.LENGTH_SHORT ).show();
+                }else if (word.isEmpty()&&myid==-1){
+                    Toast.makeText( note_activity.this,"分享不能为空哦,去记录点东西吧",Toast.LENGTH_SHORT ).show();
+                }else {
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    textIntent.putExtra(Intent.EXTRA_TEXT,notedata.getNote()+"\n\n----来自《点滴记事》");
+                    startActivity(Intent.createChooser(textIntent, "点滴分享"));
+                }
             }
         });
 
@@ -351,7 +358,8 @@ public class note_activity extends AppCompatActivity {
                                     );
                                     animation.setDuration(600);
                                     recordlayout.setVisibility(View.VISIBLE);
-    recordlayout.startAnimation(animation); if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                                    recordlayout.startAnimation(animation);
+                                    if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                                             ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                                         init();
                                     } else {
@@ -375,6 +383,7 @@ public class note_activity extends AppCompatActivity {
     }
 
     @Override
+
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();
         RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
@@ -422,12 +431,12 @@ public class note_activity extends AppCompatActivity {
                         Isedit = true;
                         finish( );
                     }
-                }else {
+                }else{
                     AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
                     dialog.setTitle("提醒");
-                    dialog.setMessage("是否保存？");
+                    dialog.setMessage("是否保存修改？");
                     dialog.setCancelable(false);
-                    dialog.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    dialog.setPositiveButton("保存", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Notedata notedata = DataSupport.find(Notedata.class, myid);
@@ -440,15 +449,16 @@ public class note_activity extends AppCompatActivity {
                             finish();
                         }
                     });
-                    dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    dialog.setNegativeButton("放弃", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            finish();
+                            finish( );
+
                         }
                     });
-                    dialog.show();
+                        dialog.show( );
+                   }
                 }
-            }
         }
     }
 

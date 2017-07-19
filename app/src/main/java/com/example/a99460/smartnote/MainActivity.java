@@ -143,8 +143,6 @@ public class MainActivity extends AppCompatActivity {
                     TranslateAnimation animation3 = new TranslateAnimation(0.0f, 0.0f, 0.0f, -300.0f);
                     TranslateAnimation animation4 = new TranslateAnimation(1000.0f, 0.0f, 0.0f, 0.0f);
                     TranslateAnimation animation5 =new TranslateAnimation(0.0f,-300.0f,0.0f,0.0f);
-                    Animation animation = new AlphaAnimation(0.0f, 1.0f);
-                    animation.setDuration(400);
                     animation1.setDuration(330);
                     animation2.setDuration(330);
                     animation3.setDuration(330);
@@ -156,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
                     mLv.startAnimation( animation2 );
                     diandi.startAnimation( animation3 );
                     search_LL.setVisibility( View.VISIBLE );
-                    search_LL.startAnimation( animation );
                     search_lo.setVisibility( View.VISIBLE );
                     search_lo.startAnimation( animation4 );
                     mLv.setVisibility( View.GONE );
@@ -854,9 +851,10 @@ public class MainActivity extends AppCompatActivity {
         List<Notedata> notedatas = DataSupport
                 .where("note like ?","%"+temp+"%").find( Notedata.class );
         for (Notedata notedata:notedatas){
-            searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlarm()));
-        }
 
+            searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlarm()));
+
+        }
     }
 
     boolean isDeadLock(){

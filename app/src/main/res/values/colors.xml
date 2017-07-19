@@ -4,7 +4,6 @@
 
     <color name="colorAccent">#fb7a6a</color>
    <color name="white">#fffefe</color>
-
     <color name="yellow">#43a17f</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="black">#070708</color>
@@ -12,6 +11,5 @@
     <color name="titlecolor">#fb7a6a</color>
     <color name="line">#525252</color>
     <color name="text">#272a2c</color>
-
-    <color name="activity_background">#fff2f0</color>
+    <color name="activity_background">#fef4f3</color>
 </resources>
