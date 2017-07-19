@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
@@ -21,6 +22,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,6 +33,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -78,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout search_LL;
     String result = "";
     long triggerAtTime;
+    ImageButton open_navi;
+    NavigationView nav;
+    private DrawerLayout mdrawlayout;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -90,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initdata();
-        NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
+        nav=(NavigationView)findViewById( R.id.nav_view );
 
-        searchbt=(Button)findViewById( R.id.search_btn );
+        searchbt=(Button)findViewById( R.id.search_btn);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -114,6 +120,15 @@ public class MainActivity extends AppCompatActivity {
         searchLv = (ListView) findViewById( R.id.search_lv );
         searchLv.setTextFilterEnabled(true);
         search_LL=(LinearLayout)findViewById( R.id.find_note_linear ) ;
+        open_navi = (ImageButton)findViewById(R.id.open_navi);
+        mdrawlayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+
+        open_navi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mdrawlayout.openDrawer(Gravity.START);
+            }
+        });
 
         searchbt.setOnClickListener( new View.OnClickListener( ) {
             @Override
@@ -126,10 +141,14 @@ public class MainActivity extends AppCompatActivity {
                     TranslateAnimation animation2 = new TranslateAnimation(0.0f, -1100.0f, 0.0f, 0.0f);
                     TranslateAnimation animation3 = new TranslateAnimation(0.0f, 0.0f, 0.0f, -300.0f);
                     TranslateAnimation animation4 = new TranslateAnimation(1000.0f, 0.0f, 0.0f, 0.0f);
+                    TranslateAnimation animation5 =new TranslateAnimation(0.0f,-300.0f,0.0f,0.0f);
                     animation1.setDuration(330);
                     animation2.setDuration(330);
                     animation3.setDuration(330);
                     animation4.setDuration(330);
+                    animation5.setDuration(330);
+                    open_navi.startAnimation(animation5);
+                    open_navi.setVisibility(View.GONE);
                     fab.startAnimation( animation1 );
                     mLv.startAnimation( animation2 );
                     diandi.startAnimation( animation3 );
@@ -435,11 +454,15 @@ public class MainActivity extends AppCompatActivity {
             TranslateAnimation animation3 = new TranslateAnimation(0.0f, 1000.0f, 0.0f, 0.0f);
             TranslateAnimation animation4 = new TranslateAnimation(-1000.0f, 0.0f, 0.0f, 0.0f);
             TranslateAnimation animation5 = new TranslateAnimation(0.0f, 0.0f, -300.0f, 0.0f);
+            TranslateAnimation animation6 = new TranslateAnimation(-300.0f,0.0f,0.0f,0.0f);
+            animation6.setDuration(330);
             animation2.setDuration(330);
             animation.setDuration(330);
             animation3.setDuration(330);
             animation4.setDuration(330);
             animation5.setDuration(330);
+            open_navi.setVisibility(View.VISIBLE);
+            open_navi.startAnimation(animation6);
             search_LL.setVisibility( View.GONE );
             search_lo.startAnimation( animation3 );
             search_lo.setVisibility( View.GONE );
@@ -812,7 +835,6 @@ public class MainActivity extends AppCompatActivity {
         for (Notedata notedata:notedatas){
             searchData.add(new Note(notedata.getDate(),notedata.getNote(),notedata.getId(),notedata.isAlarm(),notedata.isRecord()));
         }
-
     }
 
     boolean isDeadLock(){

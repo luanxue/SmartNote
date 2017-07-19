@@ -8,21 +8,28 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -32,6 +39,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +54,8 @@ import com.nightonke.boommenu.Util;
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
@@ -75,7 +85,12 @@ public class note_activity extends AppCompatActivity {
     TextView time;
     boolean Issave;
     boolean Isedit;
+    boolean Isphoto;
     Button back;
+    public static final int TAKE_PHOTO = 1;
+    private ImageView picture;
+    private Uri imageUri;
+    public static final int CHOOSE_PHOTO = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +99,8 @@ public class note_activity extends AppCompatActivity {
 
         Issave = false;
         Isedit = false;
-
+        Isphoto = false;
+        picture = (ImageView)findViewById(R.id.picture);
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
         Button sendText = (Button) findViewById(R.id.share_button);
@@ -108,7 +124,14 @@ public class note_activity extends AppCompatActivity {
             Notedata notedata = DataSupport.find(Notedata.class,myid);
             Issave = notedata.isRecord();
             Isedit = notedata.isEdit();
-        }
+            Isphoto = notedata.isPhoto();
+        }/*
+        if (Isphoto==true){
+            Bitmap bitmap = getLocalBitmap(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg");
+            picture.setVisibility(View.VISIBLE);
+            picture.setImageBitmap(bitmap);
+            picture.setImageBitmap(bitmap);
+        }*/
         record_ok=(ImageButton)findViewById( R.id.ok_record );
         time = (TextView)findViewById(R.id.time);
         mWaveView = (WaveView) findViewById(R.id.wave);
@@ -229,13 +252,58 @@ public class note_activity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent textIntent = new Intent(Intent.ACTION_SEND);
                 textIntent.setType("text/plain");
-                Notedata notedata = DataSupport.find(Notedata.class,myid);
-                textIntent.putExtra(Intent.EXTRA_TEXT,notedata.getNote());
-                startActivity(Intent.createChooser(textIntent, "分享"));
+                String word=editText.getText().toString();
+                if (!word.isEmpty()&&myid==-1){
+                    Toast.makeText( note_activity.this,"保存后再来分享吧",Toast.LENGTH_SHORT ).show();
+                }else if (myid!=-1&&word.isEmpty()) {
+                    Toast.makeText( note_activity.this,"这是要闹哪样 ？？？",Toast.LENGTH_SHORT ).show();
+                }else if (word.isEmpty()&&myid==-1){
+                    Toast.makeText( note_activity.this,"分享不能为空哦,去记录点东西吧",Toast.LENGTH_SHORT ).show();
+                }else {
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    textIntent.putExtra(Intent.EXTRA_TEXT,notedata.getNote()+"\n\n----来自《点滴记事》");
+                    startActivity(Intent.createChooser(textIntent, "点滴分享"));
+                }
+            }
+        });
+
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
+                if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS!=RECORDING&&STATUS!=PLAY){
+                    TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                    animation.setDuration(400);
+                    recordlayoutback.startAnimation(animation);
+                    recordlayoutback.setVisibility(View.GONE);
+                }
+                else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
+                    stopPlay();
+                }
+                else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    notedata.setRecord(false);
+                    notedata.save();
+                    Issave = false;
+                    stopRecording();
+                }
             }
         });
 
     }
+
+    private Bitmap getLocalBitmap(String url) {
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            return BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
     //设置menu的监听功能
     private void addBuilder(int i) {
         bmb_note.addBuilder(new SimpleCircleButton.Builder()
@@ -248,7 +316,30 @@ public class note_activity extends AppCompatActivity {
                         imm.hideSoftInputFromWindow(bmb_note.getWindowToken(),0);
                         switch (index){
                             case 0:
-                                Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                if (myid==-1){
+                                    Notedata notedata = new Notedata();
+                                    notedata.save();
+                                    myid = notedata.getId();
+                                }
+                                File outputImage = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                                        myid+"output_image.jpg");
+                                try{
+                                    if (outputImage.exists()){
+                                        outputImage.delete();
+                                    }
+                                    outputImage.createNewFile();
+                                }catch (IOException e){
+                                    e.printStackTrace();
+                                }
+                                if (Build.VERSION.SDK_INT >= 24){
+                                    imageUri = FileProvider.getUriForFile(note_activity.this,
+                                            "com.example.cameraalbumtest.fileprovider",outputImage);
+                                }else{
+                                    imageUri = Uri.fromFile(outputImage);
+                                }
+                                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
+                                startActivityForResult(intent,TAKE_PHOTO);
                                 break;
                             case 1:
                                 Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
@@ -264,7 +355,8 @@ public class note_activity extends AppCompatActivity {
                                     );
                                     animation.setDuration(600);
                                     recordlayout.setVisibility(View.VISIBLE);
-    recordlayout.startAnimation(animation); if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                                    recordlayout.startAnimation(animation);
+                                    if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                                             ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                                         init();
                                     } else {
@@ -288,77 +380,81 @@ public class note_activity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        final String wordsecond = editText.getText( ).toString( );
-        RelativeLayout recordlayoutback = (RelativeLayout) findViewById( R.id.record_layout );
-        if (recordlayoutback.getVisibility( ) == View.VISIBLE && STATUS != RECORDING && STATUS != PLAY) {
-            TranslateAnimation animation = new TranslateAnimation( 0.0f, 0.0f, 0.0f, 700.0f );
-            animation.setDuration( 400 );
-            recordlayoutback.startAnimation( animation );
-            recordlayoutback.setVisibility( View.GONE );
-        } else if (recordlayoutback.getVisibility( ) == View.VISIBLE && STATUS == PLAY) {
-                stopPlay( );
-            } else if (recordlayoutback.getVisibility( ) == View.VISIBLE && STATUS == RECORDING) {
-                Notedata notedata = DataSupport.find( Notedata.class, myid );
-                notedata.setRecord( false );
-                notedata.save( );
-                Issave = false;
-                stopRecording( );
+
+    public void onBackPressed(){
+        final String wordsecond = editText.getText().toString();
+        RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
+        if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS!=RECORDING&&STATUS!=PLAY){
+            TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+            animation.setDuration(400);
+            recordlayoutback.startAnimation(animation);
+            recordlayoutback.setVisibility(View.GONE);
+
+        }
+        else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
+            stopPlay();
+        }
+        else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
+            Notedata notedata = DataSupport.find(Notedata.class,myid);
+            notedata.setRecord(false);
+            notedata.save();
+            Issave = false;
+            stopRecording();
+        } else {
+
+            //空笔记或者没有改变笔记都不会弹dialog
+            if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
+                finish( );
             } else {
-                //空笔记或者没有改变笔记都不会弹dialog
-                if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
+                //这是第一次不用询问的时候
+                if (wordfirst == null && Issave( wordsecond )) {
+                    String word1 = editText.getText( ).toString( );
+                    if (myid==-1){
+                    Notedata notedata = new Notedata( );
+                    notedata.setDate( GetDate( ) );
+                    notedata.setNote( word1 );
+                    notedata.setEdit(true);
+                    notedata.save( );
+
+                        Isedit = true;
+                        myid = notedata.getId();
                     finish( );
-                } else {
-                    //这是第一次不用询问的时候
-                    if (wordfirst == null && Issave( wordsecond )) {
-                        String word1 = editText.getText( ).toString( );
-                        if (myid == -1) {
-                            Notedata notedata = new Notedata( );
-                            notedata.setDate( GetDate( ) );
-                            notedata.setNote( word1 );
-                            notedata.setEdit( true );
-                            notedata.save( );
-
-                            Isedit = true;
-                            myid = notedata.getId( );
-                            finish( );
-
-                        } else {
-                            Notedata notedata = DataSupport.find( Notedata.class, myid );
-                            notedata.setDate( GetDate( ) );
-                            notedata.setNote( word1 );
-                            notedata.setEdit( true );
-                            notedata.save( );
-                            Isedit = true;
+                    }else{
+                        Notedata notedata = DataSupport.find(Notedata.class,myid);
+                        notedata.setDate( GetDate( ) );
+                        notedata.setNote( word1 );
+                        notedata.setEdit(true);
+                        notedata.save( );
+                        Isedit = true;
+                        finish( );
+                    }
+                }else{
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+                    dialog.setTitle("提醒");
+                    dialog.setMessage("是否保存修改？");
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("保存", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Notedata notedata = DataSupport.find(Notedata.class, myid);
+                            String word1 = editText.getText().toString();
+                            if (word1 != null && Issave(word1)) {
+                                notedata.setDate(GetDate());
+                                notedata.setNote(word1);
+                                notedata.save();
+                            }
+                            finish();
+                        }
+                    });
+                    dialog.setNegativeButton("放弃", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                             finish( );
 
                         }
-                    } else {
-                        AlertDialog.Builder dialog = new AlertDialog.Builder( note_activity.this );
-                        dialog.setTitle( "提醒" );
-                        dialog.setMessage( "是否保存？" );
-                        dialog.setCancelable( false );
-                        dialog.setPositiveButton( "是", new DialogInterface.OnClickListener( ) {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Notedata notedata = DataSupport.find( Notedata.class, myid );
-                                String word1 = editText.getText( ).toString( );
-                                if (word1 != null && Issave( word1 )) {
-                                    notedata.setDate( GetDate( ) );
-                                    notedata.setNote( word1 );
-                                    notedata.save( );
-                                }
-                                finish( );
-                            }
-                        } );
-                        dialog.setNegativeButton( "否", new DialogInterface.OnClickListener( ) {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish( );
-                            }
-                        } );
+                    });
                         dialog.show( );
-                    }
+                   }
                 }
         }
     }
@@ -375,6 +471,39 @@ public class note_activity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,int resultCode,Intent data){
+        switch(requestCode){
+            case TAKE_PHOTO:
+                if (resultCode == RESULT_OK){
+                    try{
+                        Notedata notedata = DataSupport.find(Notedata.class,myid);
+                        notedata.setPhoto(true);
+                        notedata.setDate(GetDate());
+                        notedata.save();
+                        Isphoto = true;
+                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                        picture.setVisibility(View.VISIBLE);
+                        picture.setImageBitmap(bitmap);
+                    }catch (FileNotFoundException e){
+                        e.printStackTrace();
+                    }
+                }
+                break;
+           /* case CHOOSE_PHOTO:
+                if (resultCode == RESULT_OK){
+                    if (Build.VERSION.SDK_INT >= 19){
+                        handleImageOnKitKat(data);
+                    }else{
+                        handleImageBeforeKitKat(data);
+                    }
+                }
+                break;*/
+            default:
+                break;
+        }
     }
 
     protected String GetDate(){
@@ -530,6 +659,7 @@ public class note_activity extends AppCompatActivity {
                  file.delete();
              }
          }
+
     }
 
     @Override

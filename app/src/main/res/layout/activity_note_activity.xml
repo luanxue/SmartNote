@@ -35,25 +35,45 @@
         app:bmb_buttonEnum="simpleCircle"
         app:bmb_piecePlaceEnum="piecePlace_dot_3_2"
         app:bmb_highlightedColor="@color/titlecolor"
-        app:bmb_normalColor="@color/titlecolor"
+        app:bmb_normalColor="@android:color/transparent"
         android:layout_alignParentEnd="true"/>
-
-    <EditText
-        android:id="@+id/edit_note"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="10dp"
-        android:paddingLeft="14dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="8dp"
-        android:gravity="top"
-        android:textSize="19sp"
-        android:textColor="@color/text"
+    <ScrollView
         android:layout_marginTop="72dp"
-        android:hint="Please add your notes."
-        android:background="@color/activity_background"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/picture"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:src="@drawable/app_icon"
+            android:visibility="gone" />
+
+        <EditText
+            android:id="@+id/edit_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.2"
+            android:minLines="35"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/bmb_note"
+            android:background="#fff2f0"
+            android:gravity="top"
+            android:hint="Please add your notes."
+            android:paddingBottom="18dp"
+            android:paddingLeft="14dp"
+            android:paddingRight="8dp"
+            android:paddingTop="12dp"
+            android:textColor="#1a3939"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+</ScrollView>
 
 </RelativeLayout>
 
