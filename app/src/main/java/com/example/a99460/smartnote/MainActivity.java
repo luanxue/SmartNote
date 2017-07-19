@@ -13,13 +13,34 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.AttributeSet;
+
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import android.widget.RelativeLayout;
+
+import android.widget.TextView;
+
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -31,7 +52,9 @@ import com.gongyunhaoyyy.password.ThemeSelectActivity;
 import com.mcxtzhang.commonadapter.lvgv.CommonAdapter;
 import com.mcxtzhang.commonadapter.lvgv.ViewHolder;
 import com.mcxtzhang.swipemenulib.SwipeMenuLayout;
+
 import com.nightonke.boommenu.BoomMenuButton;
+
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
@@ -48,10 +71,19 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class MainActivity extends AppCompatActivity {
     private ListView mLv;
     private List<Note> mDatas;
+    private List<Note> searchData;
     private FloatingActionButton fab;
+    private ListView searchLv;
+    private TextView diandi;
+    private RelativeLayout search_lo;
+    private Button searchbt;
+    private EditText search_et;
+    private LinearLayout search_LL;
     String result = "";
-    BoomMenuButton bmb;
     long triggerAtTime;
+    ImageButton open_navi;
+    NavigationView nav;
+    private DrawerLayout mdrawlayout;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -64,7 +96,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initdata();
-        NavigationView nav=(NavigationView)findViewById( R.id.nav_view );
+        nav=(NavigationView)findViewById( R.id.nav_view );
+
+        searchbt=(Button)findViewById( R.id.search_btn);
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -78,6 +114,56 @@ public class MainActivity extends AppCompatActivity {
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        diandi=(TextView)findViewById( R.id.diandi );
+        search_lo=(RelativeLayout)findViewById( R.id.search_layout );
+        searchLv = (ListView) findViewById( R.id.search_lv );
+        searchLv.setTextFilterEnabled(true);
+        search_LL=(LinearLayout)findViewById( R.id.find_note_linear ) ;
+        open_navi = (ImageButton)findViewById(R.id.open_navi);
+        mdrawlayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+
+        open_navi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mdrawlayout.openDrawer(Gravity.START);
+            }
+        });
+
+        searchbt.setOnClickListener( new View.OnClickListener( ) {
+            @Override
+            public void onClick(View v) {
+                if (fab.getVisibility()==View.GONE){
+
+                }else {
+                    searchbt.setVisibility( View.GONE );
+                    TranslateAnimation animation1 = new TranslateAnimation(0.0f, 0.0f, 0.0f, 400.0f);
+                    TranslateAnimation animation2 = new TranslateAnimation(0.0f, -1100.0f, 0.0f, 0.0f);
+                    TranslateAnimation animation3 = new TranslateAnimation(0.0f, 0.0f, 0.0f, -300.0f);
+                    TranslateAnimation animation4 = new TranslateAnimation(1000.0f, 0.0f, 0.0f, 0.0f);
+                    TranslateAnimation animation5 =new TranslateAnimation(0.0f,-300.0f,0.0f,0.0f);
+                    Animation animation = new AlphaAnimation(0.0f, 1.0f);
+                    animation.setDuration(400);
+                    animation1.setDuration(330);
+                    animation2.setDuration(330);
+                    animation3.setDuration(330);
+                    animation4.setDuration(330);
+                    animation5.setDuration(330);
+                    open_navi.startAnimation(animation5);
+                    open_navi.setVisibility(View.GONE);
+                    fab.startAnimation( animation1 );
+                    mLv.startAnimation( animation2 );
+                    diandi.startAnimation( animation3 );
+                    search_LL.setVisibility( View.VISIBLE );
+                    search_LL.startAnimation( animation );
+                    search_lo.setVisibility( View.VISIBLE );
+                    search_lo.startAnimation( animation4 );
+                    mLv.setVisibility( View.GONE );
+                    fab.setVisibility(View.GONE);
+                    diandi.setVisibility( View.GONE );
+                }
+            }
+        } );
 
         nav.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener( ) {
             @Override
@@ -101,15 +187,11 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         } );
-
-        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(MainActivity.this, note_activity.class);
                 startActivity(intent);
-
             }
         });
         fab.setOnTouchListener(new View.OnTouchListener() {
@@ -125,8 +207,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        search_et=(EditText)findViewById( R.id.search_et );
         mLv = (ListView)findViewById(R.id.list);
-
         mLv.setAdapter(new CommonAdapter<Note>(this, mDatas, R.layout./*item_swipe_menu*/item_note) {
             @Override
             public void convert(final ViewHolder holder, final Note note, final int position) {
@@ -147,8 +229,7 @@ public class MainActivity extends AppCompatActivity {
                 if (note.isalarm==true){
                 holder.setVisible(R.id.content3,true);
                 }
-                else
-                {
+                else {
                     holder.setVisible(R.id.content3,false);
                 }
 
@@ -365,10 +446,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        if(fab.getVisibility()==View.GONE){
+            TranslateAnimation animation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
+                    Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
+            );
+            TranslateAnimation animation2 = new TranslateAnimation(-1100.0f, 0.0f, 0.0f, 0.0f);
+            TranslateAnimation animation3 = new TranslateAnimation(0.0f, 1000.0f, 0.0f, 0.0f);
+            TranslateAnimation animation4 = new TranslateAnimation(-1000.0f, 0.0f, 0.0f, 0.0f);
+            TranslateAnimation animation5 = new TranslateAnimation(0.0f, 0.0f, -300.0f, 0.0f);
+            TranslateAnimation animation6 = new TranslateAnimation(-300.0f,0.0f,0.0f,0.0f);
+            animation6.setDuration(330);
+            animation2.setDuration(330);
+            animation.setDuration(330);
+            animation3.setDuration(330);
+            animation4.setDuration(330);
+            animation5.setDuration(330);
+            open_navi.setVisibility(View.VISIBLE);
+            open_navi.startAnimation(animation6);
+            search_LL.setVisibility( View.GONE );
+            search_lo.startAnimation( animation3 );
+            search_lo.setVisibility( View.GONE );
+            fab.setVisibility( View.VISIBLE );
+            fab.startAnimation(animation);
+            diandi.setVisibility( View.VISIBLE );
+            diandi.startAnimation( animation5 );
+            mLv.setVisibility( View.VISIBLE );
+            mLv.startAnimation( animation2 );
+            searchbt.startAnimation( animation4 );
+            searchbt.setVisibility( View.VISIBLE );
+            search_et.setText( null );
+        }else {
+            finish();
+        }
+    }
+
+    @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext( CalligraphyContextWrapper.wrap(newBase));
     }
 
+    //强制竖屏
     @Override
     protected void onResume() {
         if(getRequestedOrientation()!=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT){
@@ -388,8 +508,77 @@ public class MainActivity extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
+        searchLv = (ListView) findViewById( R.id.search_lv );
+        searchLv.setTextFilterEnabled(true);
         mLv = (ListView) findViewById(R.id.list);
         initdata();
+        initdata2( null );
+
+        /*
+         *---------------------搜索功能实现方法----------------------------
+         */
+        search_et=(EditText)findViewById( R.id.search_et );
+        //搜索框的文本变化实时监听
+        search_et.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            //输入后调用该方法
+            @Override
+            public void afterTextChanged(Editable s) {
+                String temp = search_et.getText().toString();
+                if(TextUtils.isEmpty( temp )){
+                    initdata2( null );
+                }else {
+                    initdata2(temp);
+                }
+                searchLv.setAdapter( new CommonAdapter<Note>(MainActivity.this, searchData, R.layout.item_note_search){
+                    @Override
+                    public void convert(final ViewHolder holder, final Note note, final int delete) {
+                        int iddd=note.id;
+                        Notedata nd=DataSupport.find( Notedata.class,iddd );
+                        boolean lock=nd.isLock();
+                        if(lock){
+                            holder.setText(R.id.content1,"已上锁" );
+                        }else {
+                            holder.setText(R.id.content1, note.note.trim());
+                        }
+
+                        holder.setText(R.id.content2,note.date);
+                        if (note.isalarm==true){
+                            holder.setVisible(R.id.content3,true);
+                        }
+                        else {
+                            holder.setVisible(R.id.content3,false);
+                        }
+                        holder.setOnClickListener(R.id.content, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((SwipeMenuLayout) holder.getConvertView()).quickClose();
+                                int id=note.id;
+                                Notedata notedata = DataSupport.find(Notedata.class, id);
+                                boolean islock=notedata.isLock();
+                                if (isDeadLock()){
+                                    Toast.makeText( MainActivity.this,"无法进入密码锁",Toast.LENGTH_SHORT ).show();
+                                }else {
+                                    if (islock){
+                                        Intent lock=new Intent( MainActivity.this, LockToNoteActivity.class );
+                                        lock.putExtra( "in_data",id );
+                                        startActivity( lock);
+                                    }else {
+                                        Intent intent = new Intent(MainActivity.this, note_activity.class);
+                                        intent.putExtra("in_data",id);
+                                        startActivity(intent);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -640,6 +829,16 @@ public class MainActivity extends AppCompatActivity {
                 mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord()));
             }
         }
+    }
+
+    protected void initdata2(String temp){
+        searchData = new ArrayList<>();
+        List<Notedata> notedatas = DataSupport
+                .where("note like ?","%"+temp+"%").find( Notedata.class );
+        for (Notedata notedata:notedatas){
+            searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord()));
+        }
+
     }
 
     boolean isDeadLock(){

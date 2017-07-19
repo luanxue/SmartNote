@@ -8,29 +8,38 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +54,8 @@ import com.nightonke.boommenu.Util;
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
@@ -74,7 +85,12 @@ public class note_activity extends AppCompatActivity {
     TextView time;
     boolean Issave;
     boolean Isedit;
+    boolean Isphoto;
     Button back;
+    public static final int TAKE_PHOTO = 1;
+    private ImageView picture;
+    private Uri imageUri;
+    public static final int CHOOSE_PHOTO = 2;
 
 
 
@@ -82,8 +98,11 @@ public class note_activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
+
         Issave = false;
         Isedit = false;
+        Isphoto = false;
+        picture = (ImageView)findViewById(R.id.picture);
         delete = (ImageButton) findViewById(R.id.delete);
         change = (ImageButton) findViewById(R.id.change);
         Button sendText = (Button) findViewById(R.id.share_button);
@@ -107,7 +126,14 @@ public class note_activity extends AppCompatActivity {
             Notedata notedata = DataSupport.find(Notedata.class,myid);
             Issave = notedata.isRecord();
             Isedit = notedata.isEdit();
-        }
+            Isphoto = notedata.isPhoto();
+        }/*
+        if (Isphoto==true){
+            Bitmap bitmap = getLocalBitmap(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg");
+            picture.setVisibility(View.VISIBLE);
+            picture.setImageBitmap(bitmap);
+            picture.setImageBitmap(bitmap);
+        }*/
         record_ok=(ImageButton)findViewById( R.id.ok_record );
         time = (TextView)findViewById(R.id.time);
         mWaveView = (WaveView) findViewById(R.id.wave);
@@ -139,6 +165,22 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
+
+        ImageButton record_ok=(ImageButton)findViewById( R.id.ok_record );
+        record_ok.setOnClickListener( new View.OnClickListener( ) {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutfi = (RelativeLayout)findViewById(R.id.record_layout);
+                // 从原位置下滑到底部的动画
+                //从当前的位置向下移动700px
+                TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                animation.setDuration(400);
+                recordlayoutfi.startAnimation(animation);
+                recordlayoutfi.setVisibility(View.GONE);
+            }
+        } );
+
+  
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -218,7 +260,43 @@ public class note_activity extends AppCompatActivity {
             }
         });
 
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
+                if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS!=RECORDING&&STATUS!=PLAY){
+                    TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
+                    animation.setDuration(400);
+                    recordlayoutback.startAnimation(animation);
+                    recordlayoutback.setVisibility(View.GONE);
+                }
+                else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
+                    stopPlay();
+                }
+                else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
+                    Notedata notedata = DataSupport.find(Notedata.class,myid);
+                    notedata.setRecord(false);
+                    notedata.save();
+                    Issave = false;
+                    stopRecording();
+                }
+            }
+        });
+
     }
+
+    private Bitmap getLocalBitmap(String url) {
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            return BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
     //设置menu的监听功能
     private void addBuilder(int i) {
         bmb_note.addBuilder(new SimpleCircleButton.Builder()
@@ -231,7 +309,30 @@ public class note_activity extends AppCompatActivity {
                         imm.hideSoftInputFromWindow(bmb_note.getWindowToken(),0);
                         switch (index){
                             case 0:
-                                Toast.makeText( note_activity.this,"拍照(待完成)",Toast.LENGTH_SHORT ).show();
+                                if (myid==-1){
+                                    Notedata notedata = new Notedata();
+                                    notedata.save();
+                                    myid = notedata.getId();
+                                }
+                                File outputImage = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                                        myid+"output_image.jpg");
+                                try{
+                                    if (outputImage.exists()){
+                                        outputImage.delete();
+                                    }
+                                    outputImage.createNewFile();
+                                }catch (IOException e){
+                                    e.printStackTrace();
+                                }
+                                if (Build.VERSION.SDK_INT >= 24){
+                                    imageUri = FileProvider.getUriForFile(note_activity.this,
+                                            "com.example.cameraalbumtest.fileprovider",outputImage);
+                                }else{
+                                    imageUri = Uri.fromFile(outputImage);
+                                }
+                                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
+                                startActivityForResult(intent,TAKE_PHOTO);
                                 break;
                             case 1:
                                 Toast.makeText( note_activity.this,"选择照片(待完成)",Toast.LENGTH_SHORT ).show();
@@ -247,12 +348,13 @@ public class note_activity extends AppCompatActivity {
                                     );
                                     animation.setDuration(600);
                                     recordlayout.setVisibility(View.VISIBLE);
-                                    recordlayout.startAnimation(animation); if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+    recordlayout.startAnimation(animation); if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                                             ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                                         init();
                                     } else {
                                         ActivityCompat.requestPermissions(note_activity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                                     }
+
                                 }
                                 break;
                             default:
@@ -278,6 +380,7 @@ public class note_activity extends AppCompatActivity {
             animation.setDuration(400);
             recordlayoutback.startAnimation(animation);
             recordlayoutback.setVisibility(View.GONE);
+
         }
         else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
             stopPlay();
@@ -289,6 +392,7 @@ public class note_activity extends AppCompatActivity {
             Issave = false;
             stopRecording();
         } else {
+
             //空笔记或者没有改变笔记都不会弹dialog
             if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
                 finish( );
@@ -300,17 +404,20 @@ public class note_activity extends AppCompatActivity {
                     Notedata notedata = new Notedata( );
                     notedata.setDate( GetDate( ) );
                     notedata.setNote( word1 );
-                    notedata.save( ); Isedit = true;
+                    notedata.setEdit(true);
+                    notedata.save( );
+
+                        Isedit = true;
                         myid = notedata.getId();
                     finish( );
-
                     }else{
                         Notedata notedata = DataSupport.find(Notedata.class,myid);
                         notedata.setDate( GetDate( ) );
                         notedata.setNote( word1 );
-                        notedata.save( );Isedit = true;
+                        notedata.setEdit(true);
+                        notedata.save( );
+                        Isedit = true;
                         finish( );
-
                     }
                 }else {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
@@ -356,9 +463,43 @@ public class note_activity extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode,int resultCode,Intent data){
+        switch(requestCode){
+            case TAKE_PHOTO:
+                if (resultCode == RESULT_OK){
+                    try{
+                        Notedata notedata = DataSupport.find(Notedata.class,myid);
+                        notedata.setPhoto(true);
+                        notedata.setDate(GetDate());
+                        notedata.save();
+                        Isphoto = true;
+                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                        picture.setVisibility(View.VISIBLE);
+                        picture.setImageBitmap(bitmap);
+                    }catch (FileNotFoundException e){
+                        e.printStackTrace();
+                    }
+                }
+                break;
+           /* case CHOOSE_PHOTO:
+                if (resultCode == RESULT_OK){
+                    if (Build.VERSION.SDK_INT >= 19){
+                        handleImageOnKitKat(data);
+                    }else{
+                        handleImageBeforeKitKat(data);
+                    }
+                }
+                break;*/
+            default:
+                break;
+        }
+    }
+
     protected String GetDate(){
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 hh时mm分");
         String date = sDateFormat.format(new java.util.Date());
+
         return date;
     }
 
@@ -508,6 +649,7 @@ public class note_activity extends AppCompatActivity {
                  file.delete();
              }
          }
+
     }
 
     @Override

@@ -26,8 +26,8 @@
         </activity>
         <activity
             android:name=".note_activity"
-            android:windowSoftInputMode="adjustPan|stateHidden"
-            android:theme="@style/BarTheme"/>
+            android:theme="@style/BarTheme"
+            android:windowSoftInputMode="adjustPan|stateHidden"/>
         <activity android:name="com.gongyunhaoyyy.password.LockActivity"/>
         <activity android:name="com.gongyunhaoyyy.password.DeblockingActivity"/>
         <activity android:name="com.gongyunhaoyyy.password.SetPasswordActivity"/>
@@ -43,10 +43,8 @@
             </intent-filter>
         </receiver>
 
-
         <activity android:name="com.gongyunhaoyyy.password.AboutUsActivity">
         </activity>
-
     </application>
 
 </manifest>

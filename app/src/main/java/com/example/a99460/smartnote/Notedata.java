@@ -115,4 +115,14 @@ public class Notedata extends DataSupport{
     public boolean isEdit() {
         return edit;
     }
+
+    public boolean isPhoto() {
+        return isPhoto;
+    }
+
+    public void setPhoto(boolean photo) {
+        isPhoto = photo;
+    }
+
+    private boolean isPhoto;
 }

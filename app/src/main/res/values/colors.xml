@@ -9,9 +9,9 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="black">#070708</color>
     <color name="wrongpassword">#ef5775</color>
-    <color name="maincolor">#fcf6f5</color>
     <color name="titlecolor">#fb7a6a</color>
     <color name="line">#525252</color>
     <color name="text">#272a2c</color>
 
+    <color name="activity_background">#fff2f0</color>
 </resources>
