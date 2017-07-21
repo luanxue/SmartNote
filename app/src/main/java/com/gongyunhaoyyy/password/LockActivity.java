@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LockActivity extends AppCompatActivity {
+    private int COLOR;
+    private LinearLayout lln;
     private PatternLockView mPatternLockView;
     private PatternLockViewListener mPatternLockViewListener = new PatternLockViewListener() {
         @Override
@@ -42,6 +46,18 @@ public class LockActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_lock );
+        lln=(LinearLayout)findViewById( R.id.lockln );
+        SharedPreferences themeColor=getSharedPreferences( "themecolor",MODE_PRIVATE );
+        COLOR=themeColor.getInt( "themecolorhaha",0 );
+
+        /**
+         * ---------------更换主题颜色----------------
+         */
+        if (COLOR==0){
+            lln.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
+        } else if (COLOR==1){
+            lln.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
+        }
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );

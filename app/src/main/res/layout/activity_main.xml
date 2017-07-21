@@ -12,16 +12,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_framelo"
     tools:context="com.example.a99460.smartnote.MainActivity"
     android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-    android:background="@color/activity_background">
+    android:background="@color/activity_background_orange">
 
     <include layout="@layout/main_title"/>
 
 <ListView
     android:layout_marginTop="72dp"
     android:visibility="visible"
+
     android:divider="@drawable/listview_shade"
+
     android:dividerHeight="10dp"
     android:id="@+id/list"
     android:layout_width="match_parent"
@@ -35,8 +38,8 @@
     app:elevation="10dp"
     android:visibility="visible"
     android:src="@drawable/add2"
-    app:rippleColor="@color/yellow"
-    app:backgroundTint="@color/titlecolor"
+    app:rippleColor="@color/titlecolor_blue"
+    app:backgroundTint="@color/titlecolor_orange"
     android:layout_gravity="bottom|center"
     android:layout_width="64dp"
     android:layout_height="64dp"
@@ -55,12 +58,12 @@
         <EditText
             android:id="@+id/search_et"
             android:layout_width="match_parent"
-            android:textColorHint="#fac198"
+            android:textColorHint="#a5ede4e4"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:textColor="@color/white"
-            android:background="@drawable/search_et_bg"
+            android:background="@drawable/search_et_orange_bg"
             android:drawableLeft="@drawable/find_note"
             android:hint="请输入搜索内容"/>
 

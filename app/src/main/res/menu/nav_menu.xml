@@ -4,18 +4,19 @@
         <item
             android:id="@+id/menu_lock"
             android:icon="@drawable/lock_icon"
-            android:title="@string/password"
-            android:textColor="@color/text"/>
+            android:title="@string/password"/>
+        <item
+            android:id="@+id/menu_themecolor"
+            android:icon="@drawable/ic_themecolor"
+            android:title="炫酷皮肤"/>
         <item
             android:id="@+id/menu_typeface"
             android:icon="@drawable/typeface"
-            android:title="@string/typeface"
-            android:textColor="@color/text"/>
+            android:title="@string/typeface"/>
         <item
             android:id="@+id/menu_aboutus"
             android:icon="@drawable/squirrel"
-            android:title="@string/abutus"
-            android:textColor="@color/text"/>
+            android:title="@string/abutus"/>
     </group>
 
 </menu>

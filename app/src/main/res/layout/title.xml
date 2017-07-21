@@ -3,10 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
+    android:id="@+id/edit_title"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:background="@drawable/nav_shape"
+    android:background="@drawable/nav_orange"
     android:clipToPadding="true">
 
     <Button
