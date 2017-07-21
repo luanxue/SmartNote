@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
-
     <color name="colorAccent">#fb7a6a</color>
    <color name="white">#fffefe</color>
     <color name="yellow">#43a17f</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="black">#070708</color>
-    <color name="wrongpassword">#ef5775</color>
-    <color name="titlecolor">#fb7a6a</color>
     <color name="line">#525252</color>
     <color name="text">#272a2c</color>
-    <color name="activity_background">#fef4f3</color>
+
+    <!--orange主题色在此-->
+    <color name="titlecolor_orange">#fb7a6a</color>
+    <color name="search_et_orange">#f57c5c</color>
+    <color name="activity_background_orange">#fef4f3</color>
+    <!--blue主题色在此-->
+    <color name="titlecolor_blue">#46bfe4</color>
+    <color name="search_et_blue">#50aad4</color>
+    <color name="activity_background_blue">#96f2f5f5</color>
 </resources>
