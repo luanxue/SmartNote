@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="160dp"
+    android:layout_height="190dp"
     android:padding="10dp"
     android:fitsSystemWindows="true"
     android:background="@drawable/nav_shape">
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:paddingBottom="3dp"
-        android:text="点滴记事非正式版本"
+        android:text="   点滴记事非正式版本"
         android:textColor="#FFF"
         android:textSize="14sp"/>
 
@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/username"
-        android:text="@string/version"
+        android:text="   v3.41"
         android:textColor="#FFF"
         android:textSize="14sp"/>
 

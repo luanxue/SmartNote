@@ -12,4 +12,6 @@
     <color name="line">#525252</color>
     <color name="text">#272a2c</color>
     <color name="activity_background">#fef4f3</color>
+    <color name="delete_red">#fa2222</color>
+    <color name="alarm_yellow">#ffde07</color>
 </resources>

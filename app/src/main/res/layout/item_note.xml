@@ -95,7 +95,7 @@
         android:layout_width="92dp"
         android:textSize="17dp"
         android:layout_height="match_parent"
-        android:background="#e8d310"
+        android:background="@color/alarm_yellow"
         android:clickable="true"
         android:text="设置闹钟"
         android:textColor="@android:color/white"/>
@@ -105,7 +105,7 @@
         android:layout_width="78dp"
         android:textSize="17dp"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_red_dark"
+        android:background="@color/delete_red"
         android:text="删除"
         android:textColor="@android:color/white"/>
 

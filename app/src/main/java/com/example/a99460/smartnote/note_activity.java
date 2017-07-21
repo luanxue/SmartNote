@@ -98,13 +98,12 @@ public class note_activity extends AppCompatActivity {
     private ImageView picture;
     private Uri imageUri;
     public static final int CHOOSE_PHOTO = 2;
+    View dark_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
-    //    AndroidBug5497Workaround.assistActivity(this);
         Issave = false;
         Isedit = false;
         Isphoto = false;
@@ -138,7 +137,7 @@ public class note_activity extends AppCompatActivity {
             imagePath = notedata.getImagepath();
         }
         if (Isphoto==true||IsAlbum==true){
-            Bitmap bitmap = getImageThumbnail(imagePath,400,400);
+            Bitmap bitmap = getImageThumbnail(imagePath,630,500);
             picture.setVisibility(View.VISIBLE);
             picture.setImageBitmap(bitmap);
         }
@@ -149,7 +148,7 @@ public class note_activity extends AppCompatActivity {
         change = (ImageButton) findViewById(R.id.change);
         delete = (ImageButton) findViewById(R.id.delete);
         back = (Button)findViewById(R.id.cancle);
-
+        dark_view = (View)findViewById(R.id.dark_view);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
@@ -174,22 +173,41 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
-
-        ImageButton record_ok=(ImageButton)findViewById( R.id.ok_record );
-        record_ok.setOnClickListener( new View.OnClickListener( ) {
+        picture.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                RelativeLayout recordlayoutfi = (RelativeLayout)findViewById(R.id.record_layout);
-                // 从原位置下滑到底部的动画
-                //从当前的位置向下移动700px
-                TranslateAnimation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 700.0f);
-                animation.setDuration(400);
-                recordlayoutfi.startAnimation(animation);
-                recordlayoutfi.setVisibility(View.GONE);
-            }
-        } );
+            public boolean onLongClick(View v) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
+                dialog.setTitle("是否删除照片");
+                dialog.setCancelable(false);
+                dialog.setPositiveButton("是",new DialogInterface.
+                        OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog,int which){
+                        Notedata notedata = DataSupport.find(Notedata.class,myid);
+                        notedata.setAlbum(false);
+                        notedata.setPhoto(false);
+                        IsAlbum = false;
+                        Isphoto = false;
+                        notedata.save();
+                        picture.setVisibility(View.GONE);
+                        if(!Isedit&&!Isrecording){
+                            notedata.delete();
+                        }
+                    }
+                });
+                dialog.setNegativeButton("否",new DialogInterface.
+                        OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog,int which){
 
-  
+                    }
+                });
+                dialog.show();
+
+                return false;
+            }
+        });
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -258,6 +276,7 @@ public class note_activity extends AppCompatActivity {
             }
             }
         });
+
         sendText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -278,7 +297,7 @@ public class note_activity extends AppCompatActivity {
             }
         });
 
-        editText.setOnClickListener(new View.OnClickListener() {
+        dark_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
@@ -287,11 +306,15 @@ public class note_activity extends AppCompatActivity {
                     animation.setDuration(400);
                     recordlayoutback.startAnimation(animation);
                     recordlayoutback.setVisibility(View.GONE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                    dark_view.setVisibility(View.GONE);
                 }
                 else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
                     stopPlay();
                    //closeSoftKeybord(editText,note_activity.this);
-
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
                 }
                 else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==RECORDING){
@@ -301,18 +324,13 @@ public class note_activity extends AppCompatActivity {
                     Issave = false;
                     stopRecording();
                     // closeSoftKeybord(editText,note_activity.this);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
                 }
             }
         });
 
     }
-
-
-    public static void closeSoftKeybord(EditText mEditText, Context mContext) {
-        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
-    }
-
 
     //设置menu的监听功能
     private void addBuilder(int i) {
@@ -370,6 +388,24 @@ public class note_activity extends AppCompatActivity {
                                     animation.setDuration(600);
                                     recordlayout.setVisibility(View.VISIBLE);
                                     recordlayout.startAnimation(animation);
+                                    animation.setAnimationListener(new Animation.AnimationListener() {
+                                        @Override
+                                        public void onAnimationStart(Animation animation) {
+
+                                        }
+
+                                        @Override
+                                        public void onAnimationEnd(Animation animation) {
+                                            dark_view.setVisibility(View.VISIBLE);
+                                        }
+
+                                        @Override
+                                        public void onAnimationRepeat(Animation animation) {
+
+                                        }
+                                    });
+
+
                                     if (ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                                             ContextCompat.checkSelfPermission(note_activity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                                         init();
@@ -378,6 +414,7 @@ public class note_activity extends AppCompatActivity {
                                     }
 
                                 }
+
                                 break;
                             default:
                         }
@@ -394,7 +431,6 @@ public class note_activity extends AppCompatActivity {
     }
 
     @Override
-
     public void onBackPressed(){
         final String wordsecond = editText.getText().toString();
         RelativeLayout recordlayoutback = (RelativeLayout)findViewById(R.id.record_layout);
@@ -403,6 +439,7 @@ public class note_activity extends AppCompatActivity {
             animation.setDuration(400);
             recordlayoutback.startAnimation(animation);
             recordlayoutback.setVisibility(View.GONE);
+            dark_view.setVisibility(View.GONE);
 
         }
         else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
@@ -415,7 +452,6 @@ public class note_activity extends AppCompatActivity {
             Issave = false;
             stopRecording();
         } else {
-
             //空笔记或者没有改变笔记都不会弹dialog
             if (wordsecond.equals( wordfirst ) || wordsecond == null || !Issave( wordsecond )) {
                 finish( );
@@ -501,7 +537,7 @@ public class note_activity extends AppCompatActivity {
                         Isphoto = true;
                         IsAlbum = false;
                         imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg";
-                        Bitmap bitmap = getImageThumbnail(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg",400,400);
+                        Bitmap bitmap = getImageThumbnail(getExternalFilesDir(Environment.DIRECTORY_PICTURES)+"/"+myid+"output_image.jpg",630,500);
                 picture.setVisibility(View.VISIBLE);
                 picture.setImageBitmap(bitmap);
         }
@@ -830,6 +866,7 @@ public class note_activity extends AppCompatActivity {
                 animation.setDuration(400);
                 recordlayoutfi.startAnimation(animation);
                 recordlayoutfi.setVisibility(View.GONE);
+                dark_view.setVisibility(View.GONE);
                     Notedata notedata = DataSupport.find(Notedata.class,myid);
                     notedata.setRecordTime(timeCount);
                     notedata.setRecord(true);
@@ -908,7 +945,7 @@ public class note_activity extends AppCompatActivity {
                 IsAlbum = true;
                 Isphoto = false;
             }
-            Bitmap bitmap = getImageThumbnail(imagePath,400,400);
+            Bitmap bitmap = getImageThumbnail(imagePath,630,500);
             picture.setVisibility(View.VISIBLE);
             picture.setImageBitmap(bitmap);
         }else{

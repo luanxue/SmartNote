@@ -1,5 +1,6 @@
 package com.example.a99460.smartnote;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
@@ -27,6 +28,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -100,10 +102,21 @@ public class MainActivity extends AppCompatActivity {
         nav=(NavigationView)findViewById( R.id.nav_view );
         searchbt=(Button)findViewById( R.id.search_btn);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }*/
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+                //将侧边栏顶部延伸至status bar
+                mdrawlayout.setFitsSystemWindows(true);
+                //将主页面顶部延伸至status bar;虽默认为false,但经测试,DrawerLayout需显示设置
+                mdrawlayout.setClipToPadding(false);
+            }
         }
+
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
@@ -164,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         nav.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener( ) {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
+
                 switch (item.getItemId()){
                     case R.id.menu_lock:
                         //设置新密码or修改密码
@@ -516,6 +530,7 @@ public class MainActivity extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
+
         searchLv = (ListView) findViewById( R.id.search_lv );
         searchLv.setTextFilterEnabled(true);
         mLv = (ListView) findViewById(R.id.list);
@@ -880,6 +895,22 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }else {
             return false;
+        }
+    }
+
+    public static void setTranslucentForDrawerLayout(Activity activity, DrawerLayout drawerLayout) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // 设置状态栏透明
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            // 设置内容布局属性
+            ViewGroup contentLayout = (ViewGroup) drawerLayout.getChildAt(0);
+            contentLayout.setFitsSystemWindows(true);
+            contentLayout.setClipToPadding(true);
+            // 设置抽屉布局属性
+            ViewGroup vg = (ViewGroup) drawerLayout.getChildAt(1);
+            vg.setFitsSystemWindows(false);
+            // 设置 DrawerLayout 属性
+            drawerLayout.setFitsSystemWindows(false);
         }
     }
 }

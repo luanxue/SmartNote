@@ -21,8 +21,8 @@
 <ListView
     android:layout_marginTop="72dp"
     android:visibility="visible"
-    android:divider="@color/activity_background"
-    android:dividerHeight="6dp"
+    android:divider="@drawable/listview_shade"
+    android:dividerHeight="10dp"
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
