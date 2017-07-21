@@ -23,6 +23,7 @@
     tools:context="com.example.a99460.smartnote.note_activity"
     >
 
+
     <include layout="@layout/title"
         android:id="@+id/include"/>
 
@@ -76,8 +77,14 @@
 
     </LinearLayout>
 </ScrollView>
-
+<View
+    android:visibility="gone"
+    android:id="@+id/dark_view"
+    android:background="@color/default_bmb_dimColor"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
 </RelativeLayout>
+
 
 
     <RelativeLayout
@@ -86,11 +93,11 @@
         android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="@color/white"
+        android:background="#fbf4f4"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
         <ImageView
-            android:background="@color/black"
+            android:background="#f1cfcf"
             android:layout_width="match_parent"
             android:layout_height="1dp" />
         <ImageButton
