@@ -131,12 +131,6 @@ public class MainActivity extends AppCompatActivity {
         initdata();
 
         if (COLOR==0){
-            mLv.setDivider( line_orange );
-            mainfl.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
-            mtitle.setBackground( orange_title );
-            search_et.setBackground( search_et_orange );
-            fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#fb7a6a") ) );
-            nav.getHeaderView( 0 ).setBackground( orange_title );
         } else if (COLOR==1){
             mLv.setDivider( line_blue );
             mainfl.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
@@ -323,25 +317,22 @@ public class MainActivity extends AppCompatActivity {
         /**
          * -----------------更换主题颜色------------------
          */
-        if(COLOR==COLOR2){
 
-        }else {
             if (COLOR2==0){
                 mLv.setDivider( line_orange );
                 mainfl.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
                 mtitle.setBackground( orange_title );
                 search_et.setBackground( search_et_orange );
                 fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#fb7a6a") ) );
-                nav.getHeaderView( 0 ).setBackground( orange_title );
+                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#fb7a6a" ) );
             } else if (COLOR2==1){
                 mLv.setDivider( line_blue );
                 mainfl.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
                 mtitle.setBackground( blue_title );
                 search_et.setBackground( search_et_blue );
                 fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#46bfe4") ) );
-                nav.getHeaderView( 0 ).setBackground( blue_title );
+                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#46bfe4" ) );
             }
-        }
 
         /**
          *---------------------搜索功能实现方法----------------------------
