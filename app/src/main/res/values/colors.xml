@@ -8,6 +8,8 @@
     <color name="black">#070708</color>
     <color name="line">#525252</color>
     <color name="text">#272a2c</color>
+    <color name="alarm_yellow">#e9c81d</color>
+    <color name="delete_red">#c81e25</color>
 
 
     <!--orange主题色在此-->

@@ -22,9 +22,7 @@
 <ListView
     android:layout_marginTop="72dp"
     android:visibility="visible"
-
-    android:divider="@drawable/listview_shade"
-
+    android:divider="@drawable/line_orange"
     android:dividerHeight="10dp"
     android:id="@+id/list"
     android:layout_width="match_parent"
