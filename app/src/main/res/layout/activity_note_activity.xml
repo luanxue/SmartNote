@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_weight="1"
-    android:background="@color/activity_background"
+    android:background="@color/activity_background_orange"
     tools:context="com.example.a99460.smartnote.note_activity"
     >
 
@@ -36,7 +36,7 @@
         android:layout_marginRight="5dp"
         app:bmb_buttonEnum="simpleCircle"
         app:bmb_piecePlaceEnum="piecePlace_dot_3_2"
-        app:bmb_highlightedColor="@color/titlecolor"
+        app:bmb_highlightedColor="@color/titlecolor_orange"
         app:bmb_normalColor="@android:color/transparent"
         android:layout_alignParentEnd="true"/>
     <ScrollView

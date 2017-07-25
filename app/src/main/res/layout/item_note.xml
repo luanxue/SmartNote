@@ -85,7 +85,7 @@
         android:id="@+id/btnLock"
         android:layout_width="78dp"
         android:layout_height="match_parent"
-        android:background="#bbc2ca"
+        android:background="#b6bdc5"
         android:textSize="17dp"
         android:text="上锁"
         android:textColor="@android:color/white" />

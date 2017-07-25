@@ -10,12 +10,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -78,6 +80,9 @@ public class note_activity extends AppCompatActivity {
     static final int RECORDING = 3;
     static final int STOPRECORDING = 4;
     static int STATUS=START;
+    private Drawable orange_tit;
+    private Drawable blue_tit;
+    private RelativeLayout et_title;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
     String PATH_NAME;
@@ -90,6 +95,7 @@ public class note_activity extends AppCompatActivity {
     TextView time;
     boolean Issave;
     boolean Isedit;
+    int COLOR;
     boolean Isphoto;
     boolean IsAlbum;
     String imagePath;
@@ -104,6 +110,13 @@ public class note_activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_activity);
+
+    
+        SharedPreferences themeColor=getSharedPreferences( "themecolor",MODE_PRIVATE );
+        COLOR=themeColor.getInt( "themecolorhaha",0 );
+        blue_tit=getResources().getDrawable( R.drawable.nav_skyblue );
+        orange_tit=getResources().getDrawable( R.drawable.nav_orange );
+
         Issave = false;
         Isedit = false;
         Isphoto = false;
@@ -141,6 +154,17 @@ public class note_activity extends AppCompatActivity {
             picture.setVisibility(View.VISIBLE);
             picture.setImageBitmap(bitmap);
         }
+        et_title=(RelativeLayout)findViewById( R.id.include );
+        /**
+         * ---------------更换主题颜色----------------
+         */
+        if (COLOR==0){
+            et_title.setBackground( orange_tit );
+            editText.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
+        } else if (COLOR==1){
+           et_title.setBackground( blue_tit );
+            editText.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
+        }
 
         record_ok=(ImageButton)findViewById( R.id.ok_record );
         time = (TextView)findViewById(R.id.time);
@@ -156,6 +180,7 @@ public class note_activity extends AppCompatActivity {
         }
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
+
 
         if(tftf.length()<=0){
             editText.setTypeface( Typeface.SANS_SERIF );
@@ -173,7 +198,9 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
+
         picture.setOnLongClickListener(new View.OnLongClickListener() {
+
             @Override
             public boolean onLongClick(View v) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(note_activity.this);
@@ -312,6 +339,7 @@ public class note_activity extends AppCompatActivity {
                 }
                 else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
                     stopPlay();
+
                    //closeSoftKeybord(editText,note_activity.this);
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
@@ -323,9 +351,11 @@ public class note_activity extends AppCompatActivity {
                     notedata.save();
                     Issave = false;
                     stopRecording();
+
                     // closeSoftKeybord(editText,note_activity.this);
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+
                 }
             }
         });
@@ -421,6 +451,7 @@ public class note_activity extends AppCompatActivity {
                     }
                 }));
     }
+
 
     @Override
     protected void onResume() {
