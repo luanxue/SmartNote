@@ -82,6 +82,7 @@ public class note_activity extends AppCompatActivity {
     static int STATUS=START;
     private Drawable orange_tit;
     private Drawable blue_tit;
+    private Drawable purple_tit;
     private RelativeLayout et_title;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
@@ -116,6 +117,7 @@ public class note_activity extends AppCompatActivity {
         COLOR=themeColor.getInt( "themecolorhaha",0 );
         blue_tit=getResources().getDrawable( R.drawable.nav_skyblue );
         orange_tit=getResources().getDrawable( R.drawable.nav_orange );
+        purple_tit=getResources().getDrawable( R.drawable.nav_purple );
 
         Issave = false;
         Isedit = false;
@@ -162,8 +164,11 @@ public class note_activity extends AppCompatActivity {
             et_title.setBackground( orange_tit );
             editText.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
         } else if (COLOR==1){
-           et_title.setBackground( blue_tit );
+            et_title.setBackground( blue_tit );
             editText.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
+        }else if (COLOR==2){
+            et_title.setBackground( purple_tit );
+            editText.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
         }
 
         record_ok=(ImageButton)findViewById( R.id.ok_record );
@@ -181,9 +186,8 @@ public class note_activity extends AppCompatActivity {
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
 
-
         if(tftf.length()<=0){
-            editText.setTypeface( Typeface.SANS_SERIF );
+            editText.setTypeface( Typeface.MONOSPACE );
         }else {
             Typeface typeface =Typeface.createFromAsset(getAssets(),tftf);
             editText.setTypeface( typeface );
@@ -197,7 +201,6 @@ public class note_activity extends AppCompatActivity {
                 editText.setSelection(wordfirst.length());
             }
         }
-
 
         picture.setOnLongClickListener(new View.OnLongClickListener() {
 
@@ -230,7 +233,6 @@ public class note_activity extends AppCompatActivity {
                     }
                 });
                 dialog.show();
-
                 return false;
             }
         });

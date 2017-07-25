@@ -39,6 +39,8 @@ public class ThemeSelectActivity extends AppCompatActivity {
             aaaaa.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
         } else if (COLOR==1){
             aaaaa.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
+        }else if (COLOR==2){
+            aaaaa.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
         }
 
         Button huawenxingkai=(Button)findViewById( R.id.huawenxingkai );

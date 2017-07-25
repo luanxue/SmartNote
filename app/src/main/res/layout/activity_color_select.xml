@@ -5,38 +5,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/color_lo"
     tools:context="com.gongyunhaoyyy.password.ColorSelectActivity">
 
+    <include layout="@layout/color_title"/>
 
     <Button
         android:id="@+id/orange_btn"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="85dp"
         android:text="炫酷橙(默认)"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="12dp"
         app:layout_constraintRight_toRightOf="parent"
         android:background="@drawable/btn_orange"
         android:textSize="20sp"
         android:textColor="@color/white"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="12dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="85dp"
         app:layout_constraintHorizontal_bias="0.0"/>
 
     <Button
         android:id="@+id/blue_btn"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="85dp"
         android:text="清新蓝"
         android:textColor="@color/white"
         android:textSize="20sp"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="12dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="12dp"
         android:background="@drawable/btn_skyblue"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@+id/orange_btn"
+        app:layout_constraintHorizontal_bias="0.0"/>
+
+    <Button
+        android:id="@+id/purple_btn"
+        android:layout_width="0dp"
+        android:layout_height="85dp"
+        android:text="妖艳紫"
+        android:layout_marginRight="12dp"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:background="@drawable/btn_purple"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="12dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/blue_btn"
         app:layout_constraintHorizontal_bias="0.0"/>
 </android.support.constraint.ConstraintLayout>

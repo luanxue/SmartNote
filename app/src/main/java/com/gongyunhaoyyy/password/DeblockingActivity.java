@@ -23,6 +23,7 @@ import com.example.a99460.smartnote.note_activity;
 
 import org.litepal.crud.DataSupport;
 
+import java.lang.annotation.ElementType;
 import java.util.List;
 
 import io.reactivex.functions.Consumer;
@@ -58,6 +59,8 @@ public class DeblockingActivity extends AppCompatActivity {
             dbln.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
         } else if (COLOR==1){
             dbln.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
+        }else if (COLOR==2){
+            dbln.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
         }
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );

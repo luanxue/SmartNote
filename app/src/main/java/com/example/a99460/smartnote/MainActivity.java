@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -92,13 +93,15 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout mtitle;
     public Drawable orange_title;
     public Drawable blue_title;
+    public Drawable purple_title;
     public Drawable search_et_orange;
     public Drawable search_et_blue;
+    public Drawable search_et_purple;
     public Drawable line_orange;
     public Drawable line_blue;
+    public Drawable line_purple;
     String result = "";
     long triggerAtTime;
-    int COLOR;
     int COLOR2;
     ImageButton open_navi;
     NavigationView nav;
@@ -114,12 +117,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         blue_title=getResources().getDrawable( R.drawable.nav_skyblue );
         orange_title=getResources().getDrawable( R.drawable.nav_orange );
+        purple_title=getResources().getDrawable( R.drawable.nav_purple );
         search_et_orange=getResources().getDrawable( R.drawable.search_et_orange_bg );
         search_et_blue=getResources().getDrawable( R.drawable.search_et_blue_bg );
+        search_et_purple=getResources().getDrawable( R.drawable.search_et_purple_bg );
         line_orange=getResources().getDrawable( R.drawable.line_orange );
         line_blue=getResources().getDrawable( R.drawable.line_blue );
-        SharedPreferences themeColor=getSharedPreferences( "themecolor",MODE_PRIVATE );
-        COLOR=themeColor.getInt( "themecolorhaha",0 );
+        line_purple=getResources().getDrawable( R.drawable.line_purple );
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         mtitle=(RelativeLayout)findViewById( R.id.m_title );
         mainfl=(FrameLayout)findViewById( R.id.main_framelo );
@@ -129,16 +134,6 @@ public class MainActivity extends AppCompatActivity {
         searchbt=(Button)findViewById( R.id.search_btn);
         mLv = (ListView)findViewById(R.id.list);
         initdata();
-
-        if (COLOR==0){
-        } else if (COLOR==1){
-            mLv.setDivider( line_blue );
-            mainfl.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
-            mtitle.setBackground( blue_title );
-            search_et.setBackground( search_et_blue );
-            fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#46bfe4") ) );
-            nav.getHeaderView( 0 ).setBackground( blue_title );
-        }
 
        /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
@@ -300,8 +295,7 @@ public class MainActivity extends AppCompatActivity {
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath(tftf)
                 .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+                .build());
 
         SharedPreferences themeColor=getSharedPreferences( "themecolor",MODE_PRIVATE );
         COLOR2=themeColor.getInt( "themecolorhaha",0 );
@@ -332,6 +326,13 @@ public class MainActivity extends AppCompatActivity {
                 search_et.setBackground( search_et_blue );
                 fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#46bfe4") ) );
                 nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#46bfe4" ) );
+            }else if (COLOR2==2){
+                mLv.setDivider( line_purple );
+                mainfl.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
+                mtitle.setBackground( purple_title );
+                search_et.setBackground( search_et_purple );
+                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#b176f0") ) );
+                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#b176f0" ) );
             }
 
         /**
