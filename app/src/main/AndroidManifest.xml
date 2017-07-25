@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.a99460.smartnote">
+    package="com.example.a99460.smartnote">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:name="org.litepal.LitePalApplication"
@@ -17,33 +17,38 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+            >
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
             android:name=".note_activity"
             android:theme="@style/BarTheme"
-            android:windowSoftInputMode="adjustPan|stateHidden"/>
-        <activity android:name="com.gongyunhaoyyy.password.LockActivity"/>
-        <activity android:name="com.gongyunhaoyyy.password.DeblockingActivity"/>
-        <activity android:name="com.gongyunhaoyyy.password.SetPasswordActivity"/>
-        <activity android:name="com.gongyunhaoyyy.password.LockToNoteActivity"/>
-        <activity android:name="com.gongyunhaoyyy.password.ThemeSelectActivity"/>
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity android:name="com.gongyunhaoyyy.password.LockActivity" />
+        <activity android:name="com.gongyunhaoyyy.password.DeblockingActivity" />
+        <activity android:name="com.gongyunhaoyyy.password.SetPasswordActivity" />
+        <activity android:name="com.gongyunhaoyyy.password.LockToNoteActivity" />
+        <activity android:name="com.gongyunhaoyyy.password.ThemeSelectActivity" />
 
         <receiver
             android:name=".AlarmReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.example.alarmtest.ALARM_RECEIVER"/>
+                <action android:name="com.example.alarmtest.ALARM_RECEIVER" />
             </intent-filter>
         </receiver>
 
-        <activity android:name="com.gongyunhaoyyy.password.AboutUsActivity">
+        <activity android:name="com.gongyunhaoyyy.password.AboutUsActivity" />
+        <activity android:name=".WelcomeActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppStartLoadTranslucent"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
