@@ -46,7 +46,6 @@ public class ThemeSelectActivity extends AppCompatActivity {
         Button huawenxingkai=(Button)findViewById( R.id.huawenxingkai );
         Button katongjianti=(Button)findViewById( R.id.katongjianti );
         Button wawaziti=(Button)findViewById( R.id.wawaziti );
-        Button youyuan=(Button)findViewById( R.id.youyuan );
         Button inittypeface=(Button)findViewById( R.id.initTypeface );
         final TextView tftv=(TextView)findViewById( R.id.typefacetextView );
         final SharedPreferences.Editor editor = getSharedPreferences( "typeface", MODE_PRIVATE ).edit( );
@@ -90,20 +89,12 @@ public class ThemeSelectActivity extends AppCompatActivity {
                 tftv.setTypeface( wawazititf );
             }
         } );
-        youyuan.setOnClickListener( new View.OnClickListener( ) {
+        inittypeface.setOnClickListener( new View.OnClickListener( ) {
             @Override
             public void onClick(View v) {
                 editor.putString( "typefacehaha","fonts/youyuan.ttf" );
                 editor.apply();
                 tftv.setTypeface( youyuantf );
-            }
-        } );
-        inittypeface.setOnClickListener( new View.OnClickListener( ) {
-            @Override
-            public void onClick(View v) {
-                editor.putString( "typefacehaha","" );
-                editor.apply();
-                tftv.setTypeface( Typeface.SANS_SERIF );
             }
         } );
 

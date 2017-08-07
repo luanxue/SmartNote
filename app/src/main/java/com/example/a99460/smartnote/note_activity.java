@@ -342,7 +342,6 @@ public class note_activity extends AppCompatActivity {
                 else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
                     stopPlay();
 
-                   //closeSoftKeybord(editText,note_activity.this);
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
@@ -357,11 +356,9 @@ public class note_activity extends AppCompatActivity {
                     // closeSoftKeybord(editText,note_activity.this);
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-
                 }
             }
         });
-
     }
 
     //设置menu的监听功能
@@ -619,7 +616,7 @@ public class note_activity extends AppCompatActivity {
     }
 
     protected String GetDate(){
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 E kk时mm分");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd E kk:mm:ss");
         String date = sDateFormat.format(new java.util.Date());
         return date;
     }

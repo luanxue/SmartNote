@@ -39,6 +39,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -160,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
-        String tftf=typef.getString( "typefacehaha","" );
+        String tftf=typef.getString( "typefacehaha","fonts/youyuan.ttf" );
         //onCreat中注册Calligraphy
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                         .setDefaultFontPath(tftf)
@@ -191,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
                     searchbt.setVisibility( View.GONE );
                     TranslateAnimation animation1 = new TranslateAnimation(0.0f, 0.0f, 0.0f, 400.0f);
                     Animation animation2=new AlphaAnimation( 1.0f,0.0f );
-//                    TranslateAnimation animation2 = new TranslateAnimation(0.0f, -1100.0f, 0.0f, 0.0f);
                     TranslateAnimation animation3 = new TranslateAnimation(0.0f, 0.0f, 0.0f, -300.0f);
                     TranslateAnimation animation4 = new TranslateAnimation(1000.0f, 0.0f, 0.0f, 0.0f);
                     TranslateAnimation animation5 =new TranslateAnimation(0.0f,-300.0f,0.0f,0.0f);
@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
-        String tftf=typef.getString( "typefacehaha","" );
+        String tftf=typef.getString( "typefacehaha","fonts/youyuan.ttf" );
         //onStart中注册Calligraphy
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath(tftf)
@@ -335,28 +335,21 @@ public class MainActivity extends AppCompatActivity {
                 mainfl.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
                 mtitle.setBackground( blue_title );
                 search_et.setBackground( search_et_blue );
-                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#46bfe4") ) );
-                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#46bfe4" ) );
+                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#50a9fc") ) );
+                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#50a9fc" ) );
             }else if (COLOR2==2){
                 mLv.setDivider( line_purple );
                 mainfl.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
                 mtitle.setBackground( purple_title );
                 search_et.setBackground( search_et_purple );
-                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#b176f0") ) );
-                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#b176f0" ) );
+                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#a86bf7") ) );
+                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#a86bf7" ) );
             }
 
         /**
          *---------------------搜索功能实现方法----------------------------
          */
         search_et=(EditText)findViewById( R.id.search_et );
-        search_et.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                //限制回车,当按回车时返回true
-                return (event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
-            }
-        });
         //搜索框的文本变化实时监听
         search_et.addTextChangedListener(new TextWatcher() {
             @Override
@@ -369,7 +362,9 @@ public class MainActivity extends AppCompatActivity {
                 String temp = search_et.getText().toString();
                 if(TextUtils.isEmpty( temp )){
                     initdata2( null );
-                }else {
+                }else if (temp.charAt( temp.length()-1 )=='\n'){
+                    closeKeyboard(MainActivity.this,search_et);
+                } else {
                     initdata2(temp);
                 }
                 searchLv.setAdapter( new CommonAdapter<Note>(MainActivity.this, searchData, R.layout.item_note_search){
@@ -627,7 +622,6 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             my.show();
-
                         }
                     }
                 } );
@@ -678,6 +672,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public static void closeKeyboard(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
     protected void initdata(){
         mDatas = new ArrayList<>();
