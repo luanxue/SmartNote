@@ -28,7 +28,7 @@
         android:layout_height="match_parent"
         android:text="编辑"
         android:textColor="@color/white"
-        android:layout_marginStart="14dp"
+        android:layout_marginStart="12dp"
         android:layout_alignBottom="@+id/cancle"
         android:layout_toEndOf="@+id/cancle"
         android:layout_alignTop="@+id/cancle"/>

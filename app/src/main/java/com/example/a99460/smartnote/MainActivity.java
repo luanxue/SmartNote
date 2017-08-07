@@ -23,6 +23,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText search_et;
     private LinearLayout search_LL;
     private RelativeLayout mtitle;
+    private RelativeLayout navHaed;
     public Drawable orange_title;
     public Drawable blue_title;
     public Drawable purple_title;
@@ -112,7 +114,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
         final boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        if(isFirstRun){LitePal.getDatabase();}
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (isFirstRun) {
+            LitePal.getDatabase();
+            editor.putBoolean("isFirstRun", false);
+            editor.commit();
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         blue_title=getResources().getDrawable( R.drawable.nav_skyblue );
@@ -129,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         mtitle=(RelativeLayout)findViewById( R.id.m_title );
         mainfl=(FrameLayout)findViewById( R.id.main_framelo );
         search_et=(EditText)findViewById( R.id.search_et );
+        navHaed=(RelativeLayout)findViewById( R.id.nav_head );
         mdrawlayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         nav=(NavigationView)findViewById( R.id.nav_view );
         searchbt=(Button)findViewById( R.id.search_btn);
@@ -182,12 +190,13 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     searchbt.setVisibility( View.GONE );
                     TranslateAnimation animation1 = new TranslateAnimation(0.0f, 0.0f, 0.0f, 400.0f);
-                    TranslateAnimation animation2 = new TranslateAnimation(0.0f, -1100.0f, 0.0f, 0.0f);
+                    Animation animation2=new AlphaAnimation( 1.0f,0.0f );
+//                    TranslateAnimation animation2 = new TranslateAnimation(0.0f, -1100.0f, 0.0f, 0.0f);
                     TranslateAnimation animation3 = new TranslateAnimation(0.0f, 0.0f, 0.0f, -300.0f);
                     TranslateAnimation animation4 = new TranslateAnimation(1000.0f, 0.0f, 0.0f, 0.0f);
                     TranslateAnimation animation5 =new TranslateAnimation(0.0f,-300.0f,0.0f,0.0f);
                     animation1.setDuration(330);
-                    animation2.setDuration(330);
+                    animation2.setDuration(300);
                     animation3.setDuration(330);
                     animation4.setDuration(330);
                     animation5.setDuration(330);
@@ -242,13 +251,13 @@ public class MainActivity extends AppCompatActivity {
                     Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
                     Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
             );
-            TranslateAnimation animation2 = new TranslateAnimation(-1100.0f, 0.0f, 0.0f, 0.0f);
+            Animation animation2=new AlphaAnimation( 0.0f,1.0f );
             TranslateAnimation animation3 = new TranslateAnimation(0.0f, 1000.0f, 0.0f, 0.0f);
-            TranslateAnimation animation4 = new TranslateAnimation(-1000.0f, 0.0f, 0.0f, 0.0f);
+            TranslateAnimation animation4 = new TranslateAnimation(-760.0f, 0.0f, 0.0f, 0.0f);
             TranslateAnimation animation5 = new TranslateAnimation(0.0f, 0.0f, -300.0f, 0.0f);
             TranslateAnimation animation6 = new TranslateAnimation(-300.0f,0.0f,0.0f,0.0f);
             animation6.setDuration(330);
-            animation2.setDuration(330);
+            animation2.setDuration(300);
             animation.setDuration(330);
             animation3.setDuration(330);
             animation4.setDuration(330);
@@ -267,7 +276,9 @@ public class MainActivity extends AppCompatActivity {
             searchbt.startAnimation( animation4 );
             searchbt.setVisibility( View.VISIBLE );
             search_et.setText( null );
-        }else {
+        }else if (mdrawlayout.isDrawerOpen( Gravity.START )){
+            mdrawlayout.closeDrawer(Gravity.START);
+        } else {
             finish();
         }
     }
@@ -670,7 +681,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void initdata(){
         mDatas = new ArrayList<>();
-        List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
+        List<Notedata> notedatas = DataSupport.order( "date desc" ).find(Notedata.class);
         for (Notedata notedata:notedatas){
             if (notedata.isEdit()||notedata.isRecord()||notedata.isAlbum()||notedata.isAlarm()) {
                 mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlbum()));
@@ -683,9 +694,9 @@ public class MainActivity extends AppCompatActivity {
         List<Notedata> notedatas = DataSupport
                 .where("note like ?","%"+temp+"%").find( Notedata.class );
         for (Notedata notedata:notedatas){
-
-            searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlarm()));
-
+            if (!notedata.isLock()){
+                searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlarm()));
+            }
         }
     }
 

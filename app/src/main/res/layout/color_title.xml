@@ -15,7 +15,7 @@
         android:textSize="19sp"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text="主 题 效 果 预 览 区"
+        android:text="主 题 效 果 预 览"
         android:textColor="@color/white"
         android:layout_marginTop="2dp"
         android:layout_centerHorizontal="true"/>

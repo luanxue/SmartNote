@@ -498,7 +498,6 @@ public class note_activity extends AppCompatActivity {
                     notedata.setNote( word1 );
                     notedata.setEdit(true);
                     notedata.save( );
-
                         Isedit = true;
                         myid = notedata.getId();
                     finish( );
@@ -622,7 +621,6 @@ public class note_activity extends AppCompatActivity {
     protected String GetDate(){
         SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 E kk时mm分");
         String date = sDateFormat.format(new java.util.Date());
-
         return date;
     }
 

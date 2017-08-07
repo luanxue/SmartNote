@@ -8,14 +8,14 @@
  <color name="black">#070708</color>
  <color name="line">#525252</color>
  <color name="text">#272a2c</color>
- <color name="alarm_yellow">#e9c81d</color>
+ <color name="alarm_yellow">#f1b53d</color>
  <color name="delete_red">#c81e25</color>
  <!--orange主题色在此-->
  <color name="titlecolor_orange">#fb7a6a</color>
  <color name="search_et_orange">#f57c5c</color>
  <color name="activity_background_orange">#fef4f3</color>
  <!--blue主题色在此-->
- <color name="titlecolor_blue">#46bfe4</color>
+ <color name="titlecolor_blue">#46b5e4</color>
  <color name="search_et_blue">#50aad4</color>
  <color name="activity_background_blue">#96f2f5f5</color>
  <!--purple主题色在此-->

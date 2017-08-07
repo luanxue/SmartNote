@@ -58,6 +58,7 @@
             android:id="@+id/search_et"
             android:layout_width="match_parent"
             android:textColorHint="#a5ede4e4"
+            android:singleLine="true"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
