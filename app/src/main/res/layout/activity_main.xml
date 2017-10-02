@@ -23,6 +23,7 @@
     android:layout_marginTop="72dp"
     android:visibility="visible"
     android:divider="@drawable/line_orange"
+    android:layoutAnimation="@anim/anim_listview_item"
     android:dividerHeight="10dp"
     android:id="@+id/list"
     android:layout_width="match_parent"
@@ -57,11 +58,12 @@
             android:id="@+id/search_et"
             android:layout_width="match_parent"
             android:textColorHint="#a5ede4e4"
+            android:singleLine="true"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:textColor="@color/white"
-            android:background="@drawable/search_et_orange_bg"
+            android:background="@drawable/search_et_purple_bg"
             android:drawableLeft="@drawable/find_note"
             android:hint="请输入搜索内容"/>
 

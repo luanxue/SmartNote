@@ -57,6 +57,8 @@ public class LockActivity extends AppCompatActivity {
             lln.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
         } else if (COLOR==1){
             lln.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
+        }else if (COLOR==2){
+            lln.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
         }
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );

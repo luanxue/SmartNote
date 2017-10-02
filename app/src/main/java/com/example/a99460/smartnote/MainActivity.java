@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -37,6 +39,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -90,15 +93,18 @@ public class MainActivity extends AppCompatActivity {
     private EditText search_et;
     private LinearLayout search_LL;
     private RelativeLayout mtitle;
+    private RelativeLayout navHaed;
     public Drawable orange_title;
     public Drawable blue_title;
+    public Drawable purple_title;
     public Drawable search_et_orange;
     public Drawable search_et_blue;
+    public Drawable search_et_purple;
     public Drawable line_orange;
     public Drawable line_blue;
+    public Drawable line_purple;
     String result = "";
     long triggerAtTime;
-    int COLOR;
     int COLOR2;
     ImageButton open_navi;
     NavigationView nav;
@@ -109,36 +115,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = this.getSharedPreferences("share", MODE_PRIVATE);
         final boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
-        if(isFirstRun){LitePal.getDatabase();}
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (isFirstRun) {
+            LitePal.getDatabase();
+            editor.putBoolean("isFirstRun", false);
+            editor.commit();
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         blue_title=getResources().getDrawable( R.drawable.nav_skyblue );
         orange_title=getResources().getDrawable( R.drawable.nav_orange );
+        purple_title=getResources().getDrawable( R.drawable.nav_purple );
         search_et_orange=getResources().getDrawable( R.drawable.search_et_orange_bg );
         search_et_blue=getResources().getDrawable( R.drawable.search_et_blue_bg );
+        search_et_purple=getResources().getDrawable( R.drawable.search_et_purple_bg );
         line_orange=getResources().getDrawable( R.drawable.line_orange );
         line_blue=getResources().getDrawable( R.drawable.line_blue );
-        SharedPreferences themeColor=getSharedPreferences( "themecolor",MODE_PRIVATE );
-        COLOR=themeColor.getInt( "themecolorhaha",0 );
+        line_purple=getResources().getDrawable( R.drawable.line_purple );
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         mtitle=(RelativeLayout)findViewById( R.id.m_title );
         mainfl=(FrameLayout)findViewById( R.id.main_framelo );
         search_et=(EditText)findViewById( R.id.search_et );
+        navHaed=(RelativeLayout)findViewById( R.id.nav_head );
         mdrawlayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         nav=(NavigationView)findViewById( R.id.nav_view );
         searchbt=(Button)findViewById( R.id.search_btn);
         mLv = (ListView)findViewById(R.id.list);
         initdata();
-
-        if (COLOR==0){
-        } else if (COLOR==1){
-            mLv.setDivider( line_blue );
-            mainfl.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
-            mtitle.setBackground( blue_title );
-            search_et.setBackground( search_et_blue );
-            fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#46bfe4") ) );
-            nav.getHeaderView( 0 ).setBackground( blue_title );
-        }
 
        /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明状态栏
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
-        String tftf=typef.getString( "typefacehaha","" );
+        String tftf=typef.getString( "typefacehaha","fonts/youyuan.ttf" );
         //onCreat中注册Calligraphy
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                         .setDefaultFontPath(tftf)
@@ -187,12 +191,12 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     searchbt.setVisibility( View.GONE );
                     TranslateAnimation animation1 = new TranslateAnimation(0.0f, 0.0f, 0.0f, 400.0f);
-                    TranslateAnimation animation2 = new TranslateAnimation(0.0f, -1100.0f, 0.0f, 0.0f);
+                    Animation animation2=new AlphaAnimation( 1.0f,0.0f );
                     TranslateAnimation animation3 = new TranslateAnimation(0.0f, 0.0f, 0.0f, -300.0f);
                     TranslateAnimation animation4 = new TranslateAnimation(1000.0f, 0.0f, 0.0f, 0.0f);
                     TranslateAnimation animation5 =new TranslateAnimation(0.0f,-300.0f,0.0f,0.0f);
                     animation1.setDuration(330);
-                    animation2.setDuration(330);
+                    animation2.setDuration(300);
                     animation3.setDuration(330);
                     animation4.setDuration(330);
                     animation5.setDuration(330);
@@ -247,13 +251,13 @@ public class MainActivity extends AppCompatActivity {
                     Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
                     Animation.RELATIVE_TO_PARENT, 1.0f, Animation.RELATIVE_TO_PARENT, 0.0f
             );
-            TranslateAnimation animation2 = new TranslateAnimation(-1100.0f, 0.0f, 0.0f, 0.0f);
+            Animation animation2=new AlphaAnimation( 0.0f,1.0f );
             TranslateAnimation animation3 = new TranslateAnimation(0.0f, 1000.0f, 0.0f, 0.0f);
-            TranslateAnimation animation4 = new TranslateAnimation(-1000.0f, 0.0f, 0.0f, 0.0f);
+            TranslateAnimation animation4 = new TranslateAnimation(-760.0f, 0.0f, 0.0f, 0.0f);
             TranslateAnimation animation5 = new TranslateAnimation(0.0f, 0.0f, -300.0f, 0.0f);
             TranslateAnimation animation6 = new TranslateAnimation(-300.0f,0.0f,0.0f,0.0f);
             animation6.setDuration(330);
-            animation2.setDuration(330);
+            animation2.setDuration(300);
             animation.setDuration(330);
             animation3.setDuration(330);
             animation4.setDuration(330);
@@ -272,7 +276,9 @@ public class MainActivity extends AppCompatActivity {
             searchbt.startAnimation( animation4 );
             searchbt.setVisibility( View.VISIBLE );
             search_et.setText( null );
-        }else {
+        }else if (mdrawlayout.isDrawerOpen( Gravity.START )){
+            mdrawlayout.closeDrawer(Gravity.START);
+        } else {
             finish();
         }
     }
@@ -295,13 +301,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
-        String tftf=typef.getString( "typefacehaha","" );
+        String tftf=typef.getString( "typefacehaha","fonts/youyuan.ttf" );
         //onStart中注册Calligraphy
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath(tftf)
                 .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+                .build());
 
         SharedPreferences themeColor=getSharedPreferences( "themecolor",MODE_PRIVATE );
         COLOR2=themeColor.getInt( "themecolorhaha",0 );
@@ -330,21 +335,21 @@ public class MainActivity extends AppCompatActivity {
                 mainfl.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
                 mtitle.setBackground( blue_title );
                 search_et.setBackground( search_et_blue );
-                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#46bfe4") ) );
-                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#46bfe4" ) );
+                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#50a9fc") ) );
+                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#50a9fc" ) );
+            }else if (COLOR2==2){
+                mLv.setDivider( line_purple );
+                mainfl.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
+                mtitle.setBackground( purple_title );
+                search_et.setBackground( search_et_purple );
+                fab.setBackgroundTintList( ColorStateList.valueOf( Color.parseColor("#a86bf7") ) );
+                nav.getHeaderView( 0 ).setBackgroundColor( Color.parseColor( "#a86bf7" ) );
             }
 
         /**
          *---------------------搜索功能实现方法----------------------------
          */
         search_et=(EditText)findViewById( R.id.search_et );
-        search_et.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                //限制回车,当按回车时返回true
-                return (event.getKeyCode() == KeyEvent.KEYCODE_ENTER);
-            }
-        });
         //搜索框的文本变化实时监听
         search_et.addTextChangedListener(new TextWatcher() {
             @Override
@@ -357,7 +362,9 @@ public class MainActivity extends AppCompatActivity {
                 String temp = search_et.getText().toString();
                 if(TextUtils.isEmpty( temp )){
                     initdata2( null );
-                }else {
+                }else if (temp.charAt( temp.length()-1 )=='\n'){
+                    closeKeyboard(MainActivity.this,search_et);
+                } else {
                     initdata2(temp);
                 }
                 searchLv.setAdapter( new CommonAdapter<Note>(MainActivity.this, searchData, R.layout.item_note_search){
@@ -615,7 +622,6 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             my.show();
-
                         }
                     }
                 } );
@@ -666,10 +672,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public static void closeKeyboard(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
     protected void initdata(){
         mDatas = new ArrayList<>();
-        List<Notedata> notedatas = DataSupport.findAll(Notedata.class);
+        List<Notedata> notedatas = DataSupport.order( "date desc" ).find(Notedata.class);
         for (Notedata notedata:notedatas){
             if (notedata.isEdit()||notedata.isRecord()||notedata.isAlbum()||notedata.isAlarm()) {
                 mDatas.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlbum()));
@@ -682,9 +692,9 @@ public class MainActivity extends AppCompatActivity {
         List<Notedata> notedatas = DataSupport
                 .where("note like ?","%"+temp+"%").find( Notedata.class );
         for (Notedata notedata:notedatas){
-
-            searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlarm()));
-
+            if (!notedata.isLock()){
+                searchData.add(new Note(notedata.getDate(), notedata.getNote(), notedata.getId(), notedata.isAlarm(),notedata.isRecord(),notedata.isPhoto(),notedata.isAlarm()));
+            }
         }
     }
 

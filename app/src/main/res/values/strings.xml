@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">点滴记事</string>
-    <string name="app_introduction">示例：\n生活中有快乐也有悲伤，有美满也有辛酸，一点一滴都是满满的回忆，点滴记事承载你我——《点滴记事》</string>
+    <string name="app_introduction">示例：\n生活的一点一滴都是满满的回忆，点滴记事承载你我——《点滴记事》</string>
 
     <string name="password">加密小锁</string>
     <string name="password_sub">设置/修改密码,满满的安全感</string>
@@ -10,6 +10,10 @@
     <string name="aboutus_sub">这里有帅气小哥哥和漂亮小姐姐哦</string>
     <string name="newnote">点滴新事件</string>
     <string name="newnote_sub">新建一条记事，点滴生活在这里</string>
+
+    <string name="version">   v3.5.1</string>
+
     <string name="version">v3.4.1</string>
+
 
 </resources>

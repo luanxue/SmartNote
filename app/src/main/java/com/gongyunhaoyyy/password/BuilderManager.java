@@ -15,7 +15,7 @@ public class BuilderManager {
     private static int[] imageResources = new int[]{
             R.drawable.lock_icon,      //0
             R.drawable.typeface,       //1
-            R.drawable.squirrel,       //2
+            R.drawable.us,             //2
             R.drawable.take_photo,     //3
             R.drawable.insert_photo,   //4
             R.drawable.record          //5

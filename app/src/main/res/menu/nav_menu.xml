@@ -15,7 +15,7 @@
             android:title="@string/typeface"/>
         <item
             android:id="@+id/menu_aboutus"
-            android:icon="@drawable/squirrel"
+            android:icon="@drawable/us"
             android:title="@string/abutus"/>
     </group>
 

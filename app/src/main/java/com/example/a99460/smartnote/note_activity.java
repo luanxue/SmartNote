@@ -90,6 +90,7 @@ public class note_activity extends AppCompatActivity {
     static int STATUS=START;
     private Drawable orange_tit;
     private Drawable blue_tit;
+    private Drawable purple_tit;
     private RelativeLayout et_title;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
@@ -126,6 +127,7 @@ public class note_activity extends AppCompatActivity {
         COLOR=themeColor.getInt( "themecolorhaha",0 );
         blue_tit=getResources().getDrawable( R.drawable.nav_skyblue );
         orange_tit=getResources().getDrawable( R.drawable.nav_orange );
+        purple_tit=getResources().getDrawable( R.drawable.nav_purple );
 
         Issave = false;
         Isedit = false;
@@ -172,8 +174,11 @@ public class note_activity extends AppCompatActivity {
             et_title.setBackground( orange_tit );
             editText.setBackgroundColor( Color.parseColor( "#fef4f3" ) );
         } else if (COLOR==1){
-           et_title.setBackground( blue_tit );
+            et_title.setBackground( blue_tit );
             editText.setBackgroundColor( Color.parseColor( "#96f2f5f5" ) );
+        }else if (COLOR==2){
+            et_title.setBackground( purple_tit );
+            editText.setBackgroundColor( Color.parseColor( "#96ece2fb" ) );
         }
 
         record_ok=(ImageButton)findViewById( R.id.ok_record );
@@ -192,9 +197,8 @@ public class note_activity extends AppCompatActivity {
         SharedPreferences typef=getSharedPreferences( "typeface",MODE_PRIVATE );
         String tftf=typef.getString( "typefacehaha","" );
 
-
         if(tftf.length()<=0){
-            editText.setTypeface( Typeface.SANS_SERIF );
+            editText.setTypeface( Typeface.MONOSPACE );
         }else {
             Typeface typeface =Typeface.createFromAsset(getAssets(),tftf);
             editText.setTypeface( typeface );
@@ -209,8 +213,7 @@ public class note_activity extends AppCompatActivity {
             }
         }
 
-
-
+ 
         picture.setOnLongClickListener(new View.OnLongClickListener() {
 
             @Override
@@ -242,7 +245,6 @@ public class note_activity extends AppCompatActivity {
                     }
                 });
                 dialog.show();
-
                 return false;
             }
         });
@@ -348,7 +350,6 @@ public class note_activity extends AppCompatActivity {
                 else if(recordlayoutback.getVisibility()==View.VISIBLE&&STATUS==PLAY){
                     stopPlay();
 
-                   //closeSoftKeybord(editText,note_activity.this);
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
@@ -363,11 +364,9 @@ public class note_activity extends AppCompatActivity {
                     // closeSoftKeybord(editText,note_activity.this);
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-
                 }
             }
         });
-
     }
 
     //设置menu的监听功能
@@ -504,7 +503,6 @@ public class note_activity extends AppCompatActivity {
                     notedata.setNote( word1 );
                     notedata.setEdit(true);
                     notedata.save( );
-
                         Isedit = true;
                         myid = notedata.getId();
                     finish( );
@@ -626,9 +624,8 @@ public class note_activity extends AppCompatActivity {
     }
 
     protected String GetDate(){
-        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy年MM月dd日 E kk时mm分");
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd E kk:mm:ss");
         String date = sDateFormat.format(new java.util.Date());
-
         return date;
     }
 
