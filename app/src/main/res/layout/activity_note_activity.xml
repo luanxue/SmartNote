@@ -6,8 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_weight="1"
+    android:orientation="vertical"
     android:background="@color/activity_background_orange"
     tools:context="com.example.a99460.smartnote.note_activity"
     >
@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:src="@drawable/app_icon"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/edit_note"
